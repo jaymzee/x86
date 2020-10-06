@@ -1,5 +1,7 @@
-; Hello World Win64
 ; Display Hello World in a MessageBox
+
+; assemble with
+;   ml64 hello-world.asm /link /ENTRY:main /SUBSYSTEM:console
 
 includelib kernel32.lib
 includelib user32.lib
