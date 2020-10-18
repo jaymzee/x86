@@ -7,5 +7,5 @@ msg:
 	msglen = . - msg
 	.text
 _start:
-	write	$1, $msg, $msglen
+	write	$1, msg, $msglen
 	exit	$0
