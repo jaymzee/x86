@@ -27,7 +27,7 @@ main PROC FRAME
 	lea	r8,[caption]	; LPCSTR lpCaption
 	mov	r9d,0		; uType = MB_OK
 	call	MessageBoxA
-	mov	ecx,eax	; uExitCode = MessageBox(...)
+	mov	ecx,eax		; uExitCode = MessageBox(...)
 	call	ExitProcess
 	leave
 main ENDP
