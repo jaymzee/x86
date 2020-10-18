@@ -8,4 +8,4 @@ hello.o: hello.s
 	as $(ASFLAGS) -o $@ $<
 
 clean:
-	rm hello hello.o
+	rm hello hello.o hello.s

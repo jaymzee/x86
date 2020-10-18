@@ -6,7 +6,7 @@
 .macro	write	fd, msg, msglen
 	mov	$__NR_write, %rax	# use the write syscall
 	mov	\fd, %rdi		# file descriptor
-	mov	\msg, %rsi		# string to write
+	lea	\msg(%rip), %rsi		# string to write
 	mov	\msglen, %rdx		# number of characters
 	syscall				# make syscall
 .endm
