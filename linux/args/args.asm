@@ -10,27 +10,33 @@
 	global	_start
 
 	section	.text
-_start	pop	rax
-	mov	[argc], eax
-	add	[mesg], al
-
-	pop	rsi		; argv[0]
+_start:
+	pop	rax		; argc
+	mov	rbx, rax	; save it in a nonvolatile register
+.loop	pop	rdi		; argv[0]
+	call	strlen
+	mov	rdx, rax	; number of bytes
+	mov	rsi, rdi	; argv[0]
 	mov	rax, 1		; system call for write
 	mov	rdi, 1		; file handle 1 is stdout
-	mov	rdx, 4		; number of bytes
 	syscall			; invoke operating system to do the write
-
 	mov	rax, 1		; system call for write
 	mov	rdi, 1		; file handle 1 is stdout
-	lea	rsi, [mesg]	; address of string to output
-	mov	rdx, mesglen	; number of bytes
+	lea	rsi, [newline]	; argv[0]
+	mov	rdx, 1		; number of bytes
 	syscall			; invoke operating system to do the write
-
+	dec	rbx
+	jnz	.loop
 	mov	rax, 60		; system call for exit
 	xor	rdi, rdi	; exit code 0
 	syscall			; invoke operating system to exit
 
-	section	.data
-argc	dd	0
-mesg	db	"0",10
-mesglen	equ $ - mesg
+strlen:
+	mov	rax, -1
+.loop	inc	rax
+	cmp	byte [rdi + rax], 0
+	jne	.loop
+	ret
+
+newline:
+	db	10
