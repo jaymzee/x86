@@ -23,11 +23,11 @@ main PROC FRAME
 .allocstack 20h
 .endprolog
 	mov	rcx,0		; hWnd = HWND_DESKTOP
-	lea	rdx,msg		; LPCSTR lpText
-	lea	r8,caption	; LPCSTR lpCaption
+	lea	rdx,[msg]	; LPCSTR lpText
+	lea	r8,[caption]	; LPCSTR lpCaption
 	mov	r9d,0		; uType = MB_OK
 	call	MessageBoxA
-	mov	ecx,eax		; uExitCode = MessageBox(...)
+	mov	ecx,eax	; uExitCode = MessageBox(...)
 	call	ExitProcess
 	leave
 main ENDP
