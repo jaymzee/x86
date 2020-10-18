@@ -4,6 +4,8 @@
 ; To assemble and run:
 ;
 ;     nasm -felf64 hello.asm && ld hello.o && ./a.out
+; to add debug info assemble with:
+;     nasm -felf64 -Fdwarf hello.asm
 ; ------------------------------------------------------------------------------
 
 	default rel
