@@ -13,7 +13,7 @@
 _start:
 	pop	rax		; argc
 	mov	rbx, rax	; save it in a nonvolatile register
-.loop	pop	rdi		; argv[0]
+.L1	pop	rdi		; argv[0]
 	call	strlen
 	mov	rdx, rax	; number of bytes
 	mov	rsi, rdi	; argv[0]
@@ -26,16 +26,16 @@ _start:
 	mov	rdx, 1		; number of bytes
 	syscall			; invoke operating system to do the write
 	dec	rbx
-	jnz	.loop
+	jnz	.L1
 	mov	rax, 60		; system call for exit
 	xor	rdi, rdi	; exit code 0
 	syscall			; invoke operating system to exit
 
 strlen:
 	mov	rax, -1
-.loop	inc	rax
+.L1	inc	rax
 	cmp	byte [rdi + rax], 0
-	jne	.loop
+	jne	.L1
 	ret
 
 newline:
