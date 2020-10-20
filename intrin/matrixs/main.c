@@ -2,13 +2,6 @@
 #include <immintrin.h>
 #include "matrix.h"
 
-double mul_sd(double x, double y)
-{
-    __m128d xx = _mm_set_sd(x);
-    __m128d yy = _mm_set_sd(y);
-    return _mm_mul_sd(xx, yy)[0];
-}
-
 void print_vector(__m128 x)
 {
     printf("[ ");
@@ -21,23 +14,23 @@ void print_vector(__m128 x)
 int main()
 {
     __m128 a[4] = {
-        {16,  2,  3, 13},
-        { 5, 11, 10,  8},
-        { 9,  7,  6, 12},
-        { 4, 14, 15,  1}
+        {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 3, 2, 1},
+        {5, 4, 7, 6}
     };
     __m128 y, x = {1, 2, 3, 4};
 
     for (int i = 0; i < 10000000; i++) {
-        y = m4x4v_colSSE(a, x);
+        y = m4x4v_cs_SSE(a, x);
         //y = m4x4v_rowSSE3(a, x);
         //y = m4x4v_rowSSE4(a, x);
     }
-    y = m4x4v_colSSE(a, x);
+    y = m4x4v_cs_SSE(a, x);
     print_vector(y);
-    y = m4x4v_rowSSE3(a, x);
+    y = m4x4v_rs_SSE3(a, x);
     print_vector(y);
-    y = m4x4v_rowSSE4(a, x);
+    y = m4x4v_rs_SSE4(a, x);
     print_vector(y);
 }
 

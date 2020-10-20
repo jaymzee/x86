@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O2 -mavx
+CFLAGS = -O2 -mavx2
 LFLAGS =
 
 matrixd: main.o matrixd.o
