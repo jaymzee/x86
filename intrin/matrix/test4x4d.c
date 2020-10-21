@@ -1,5 +1,5 @@
 #include "matrix4x4d.h"
-#include "print_sse.h"
+#include "print_avx.h"
 
 int main()
 {

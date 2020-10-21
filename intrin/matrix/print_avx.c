@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <emmintrin.h>
+#include <immintrin.h>
 
-void print_m128(__m128 x)
+void print_m256d(__m256d x)
 {
     printf("[");
     for (int j = 0; j < 4; j++) {

@@ -1,13 +1,13 @@
-CC = gcc
+CC = clang
 CFLAGS = -std=c99 -pedantic -Wall -O2
 LFLAGS =
 
-all: test4x4d test4x4s
+all: test4x4d.exe test4x4s.exe
 
-test4x4d: test4x4d.o matrix4x4d.o print_avx.o
+test4x4d.exe: test4x4d.o matrix4x4d.o print_avx.o
 	$(CC) -o $@ $^ $(LFLAGS)
 
-test4x4s: test4x4s.o matrix4x4s.o print_sse.o
+test4x4s.exe: test4x4s.o matrix4x4s.o print_sse.o
 	$(CC) -o $@ $^ $(LFLAGS)
 
 test4x4d.o: test4x4d.c
