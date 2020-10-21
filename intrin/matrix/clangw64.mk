@@ -29,4 +29,4 @@ print_avx.o: print_avx.c print_avx.h
 	$(CC) -c $(CFLAGS) -mavx $<
 
 clean:
-	rm -f *.o test4x4d test4x4s
+	rm -f *.o *.obj test4x4d test4x4s
