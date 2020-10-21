@@ -4,10 +4,10 @@ LFLAGS =
 
 all: test4x4d test4x4s
 
-test4x4d: test4x4d.o matrix4x4d.o
+test4x4d: test4x4d.o matrix4x4d.o print_sse.o
 	$(CC) -o $@ $^ $(LFLAGS)
 
-test4x4s: test4x4s.o matrix4x4s.o
+test4x4s: test4x4s.o matrix4x4s.o print_sse.o
 	$(CC) -o $@ $^ $(LFLAGS)
 
 test4x4d.o: test4x4d.c
@@ -21,6 +21,9 @@ matrix4x4d.o: matrix4x4d.c matrix4x4d.h
 
 matrix4x4s.o: matrix4x4s.c matrix4x4s.h
 	$(CC) -c $(CFLAGS) -msse4 $<
+
+print_sse.o: print_sse.c print_sse.h
+	$(CC) -c $(CFLAGS) -mavx $<
 
 clean:
 	rm -f *.o test4x4d test4x4s
