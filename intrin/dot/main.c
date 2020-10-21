@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <immintrin.h>
 
+// requires SSE4
+
 int main(int argc, char *argv[])
 {
     __m128 u = {1.0, 2.0, 3.0, 4.0};

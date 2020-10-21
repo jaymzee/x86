@@ -1,5 +1,5 @@
 #include <immintrin.h>
-#include "matrixd.h"
+#include "matrix4x4d.h"
 
 __m256d m4x4v_cd(const __m256d cols[4], const __m256d x) {
     // AVX2

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <immintrin.h>
-#include "matrixd.h"
+#include "matrix4x4d.h"
 
 void print_vector(__m256d x)
 {

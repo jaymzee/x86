@@ -1,5 +1,5 @@
 #include <immintrin.h>
-#include "matrix.h"
+#include "matrix4x4s.h"
 
 __m128 m4x4v_cs_SSE(const __m128 cols[4], const __m128 x) {
     // x[0] * col[0] + x[1] * col[1] + x[2] * col[2] + x[3] * col[3]
