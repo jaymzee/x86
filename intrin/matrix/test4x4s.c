@@ -23,5 +23,7 @@ int main()
     print_m128(y);
     y = m4x4v_rs_SSE4(a, x);
     print_m128(y);
+
+    return 0;
 }
 

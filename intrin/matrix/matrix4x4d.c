@@ -1,6 +1,6 @@
 #include "matrix4x4d.h"
 
-__m256d m4x4v_cd(const __m256d cols[4], const __m256d x) {
+__m256d m4x4v_cd(const __m256d cols[static 4], const __m256d x) {
     // AVX2
     // matrix vector product (column major)
     // x[0] * col[0] + x[1] * col[1] + x[2] * col[2] + x[3] * col[3]
@@ -17,7 +17,7 @@ __m256d m4x4v_cd(const __m256d cols[4], const __m256d x) {
   return _mm256_add_pd(_mm256_add_pd(v0, v1), _mm256_add_pd(v2, v3));
 }
 
-__m256d m4x4v_rd(const __m256d rows[4], const __m256d x) {
+__m256d m4x4v_rd(const __m256d rows[static 4], const __m256d x) {
     // AVX
     // matrix vector product (row major)
   __m256d v0 = _mm256_mul_pd(rows[0], x);

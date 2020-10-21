@@ -19,5 +19,7 @@ int main()
     print_m256d(y);
     y = m4x4v_rd(a, x);
     print_m256d(y);
+
+    return 0;
 }
 

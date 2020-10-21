@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O2
+CFLAGS = -std=c99 -pedantic -Wall -O2
 LFLAGS =
 
 all: test4x4d test4x4s
