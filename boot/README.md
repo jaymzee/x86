@@ -1,6 +1,6 @@
 to disassemble the mbr:
 
-    objdump -D -b binary -mi386
+    objdump -D -b binary -m i386 -M addr16,data16
 
 or with netwide assembler
 
@@ -17,3 +17,7 @@ examining the target addresses of the relative jumps and calls it disassembles.
 output any machine instruction which encompasses bytes on both sides of the
 address. Hence the instruction which starts at that address will be correctly
 disassembled.
+
+to compile c code with gcc for 16 bit
+
+    gcc -m16 -fnopie -nostdlib -ffreestanding
