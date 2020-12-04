@@ -1,12 +1,12 @@
 SRC = hello.asm
 BASE = $(basename $(SRC))
-BIN = $(addsuffix .bin,$(BASE))
+OBJ = $(addsuffix .bin,$(BASE))
 IMG = $(addsuffix .img,$(BASE))
 
-$(IMG): $(BIN)
+$(IMG): $(OBJ)
 	python3 wrimg $<
-$(BIN): $(SRC)
+$(OBJ): $(SRC)
 	nasm -o $@ $<
 
 clean:
-	rm -f $(BIN) $(IMG)
+	rm -f $(OBJ) $(IMG)
