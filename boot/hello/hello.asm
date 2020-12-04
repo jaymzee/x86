@@ -17,10 +17,8 @@ clrscr	mov al, 0		; clrscr character
 	mov si, greeting
 	mov di, 0		; index into screen memory
 	mov cx, greetingL
-.L2	mov al, [si]		; get next char from greeting
-	mov [es:di], al		; write to screen memory
-	inc si			; increment index for next char
-	add di, 2		; increment index for screen memory
+.L2	movsb			; copy greeting to screen memory
+	inc di			; increment screen memory index again
 	loop .L2
 forever	jmp forever
 

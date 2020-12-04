@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+# write mbr to an empty 1.44MB floppy disk image
+import os
+import sys
+
+if len(sys.argv) != 2:
+    print("Usage: wrimg binfile")
+    exit(1)
+
+imgsize = 2880 # number of blocks in img
+basename = os.path.splitext(sys.argv[1])[0]
+emptyblock = bytes(512)
+
+with open(basename + ".bin", mode='rb') as file:
+    mbr = file.read()
+
+with open(basename + ".img", mode='wb') as file:
+    file.write(mbr)
+    # fill remaining blocks with zero
+    for i in range(imgsize - 1):
+        file.write(emptyblock)
