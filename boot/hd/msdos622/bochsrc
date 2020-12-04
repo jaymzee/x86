@@ -1,0 +1,5 @@
+megs: 32
+ata0-master: type=disk, path=msdos622.img, cylinders=1015, heads=16, spt=63
+boot: c
+log: bochs.log
+mouse: enabled=0
