@@ -12,10 +12,10 @@ basename = os.path.splitext(sys.argv[1])[0]
 emptyblock = bytes(512)
 
 with open(basename + ".bin", mode='rb') as file:
-    mbr = file.read()
+    boot = file.read()
 
 with open(basename + ".img", mode='wb') as file:
-    file.write(mbr)
+    file.write(boot)
     # fill remaining blocks with zero
     for i in range(imgsize - 1):
         file.write(emptyblock)

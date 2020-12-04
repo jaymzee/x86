@@ -1,8 +1,5 @@
-;; assemble with:
-;; nasm -o hello.bin hello.asm
-	org 0x7c00
+	org 0x100
 _start:
-	cli			; disable interrupts
 	mov ax, 0xB800		; initialize es data segment for vga text
 	mov es, ax
 clrscr	mov al, 0		; clrscr character
@@ -25,8 +22,3 @@ forever	jmp forever
 greeting:
 	db "hello, world!!"
 greetingL equ $ - greeting
-padding:
-times 510-($-$$) db 0
-magic:
-	db 0x55, 0xaa
-
