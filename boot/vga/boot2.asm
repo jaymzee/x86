@@ -4,49 +4,32 @@
 
 	org 0x500
 _start:
-	mov	bp, sp
+	mov	bp, 0
 	call	main
 .L1	jmp .L1			; forever
 
 main:
 	push	bp
 	mov	bp, sp
-	sub	sp, 16		; local alloc
+	sub	sp, 4		; local alloc
 	push	bx
-
-	mov	ax, greetingL
-	push	ax
-	push	greeting
-	call	printString
 
 	mov	ax, 0013h
 	int	10h		; set video mode 13h
 
-	push	word greeting2L
-	push	greeting2
-	call	printString
-
-	push	sp
-	call	printInt
-	call	printLine
-
-	mov	word [bp+2], 10	; x = 10
-	mov	word [bp+4], 10	; y = 10
-.L1	push	10		; color
-	push	word [bp+4]	; y
-	push	word [bp+2]	; x
+	mov	word [bp-2], 10	; x = 10
+	mov	word [bp-4], 10	; y = 10
+.L1	mov	ax, 10
+	push	ax		; color
+	push	word [bp-4]	; y
+	push	word [bp-2]	; x
 	call	writePixel
-	inc	word [bp+2]
-	cmp	word [bp+2], 310
+	inc	word [bp-2]
+	cmp	word [bp-2], 310
 	jle	.L1
-
-	push	sp
-	call	printInt
-	call	printLine
 
 	pop	bx
 	leave
-	ret
 
 ; void writePixel(int16 x, int16 y, int8 color)
 writePixel:
@@ -65,7 +48,7 @@ writePixel:
 	leave
 	retn	6
 
-; void writeString(char *str, int16 len)
+; void writeString(char *str)
 printString:
 	push	bp
 	mov	bp, sp
@@ -73,18 +56,19 @@ printString:
 	push	si
 
 	mov	si, [bp + 4]	; str
-	mov	cx, [bp + 6]	; len
 	mov	bx, 0x000f	; page number (and color in gfx mode)
 	mov	ah, 0Eh		; teletype output
 .L1	mov	al, [si]
+	cmp	al, 0
+	je	.done
 	int	10h
 	inc	si
 	loop	.L1
 
-	pop	si
+.done	pop	si
 	pop	bx
 	leave
-	retn	4
+	retn	2
 
 printLine:
 	push	bx
@@ -95,7 +79,7 @@ printLine:
 	mov	al, 10
 	int	10h
 	pop	bx
-	retn	4
+	ret
 
 
 ; void printInt(int16 x)
@@ -122,9 +106,3 @@ printInt:
 	leave
 	retn	2
 
-greeting:
-	db `Entering VGA mode 13h\r\n`
-greetingL equ $ - greeting
-greeting2:
-	db `VGA mode 13h\r\n`
-greeting2L equ $ - greeting2
