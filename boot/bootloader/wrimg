@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# write mbr to an empty 1.44MB floppy disk image
+# write boot sector and 2nd level boot loader to a 1.44MB floppy disk image
 import sys
 
 if len(sys.argv) != 4:
