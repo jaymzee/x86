@@ -8,7 +8,7 @@ LOADAD	equ 0x7e00
 	global _start
 _start:
 	mov	ah, 2h		; read sectors from drive
-	mov	al, 59		; sector count
+	mov	al, 32		; sector count
 	mov	ch, 0		; cylinder
 	mov	dh, 0		; head
 	mov	cl, 2		; sector

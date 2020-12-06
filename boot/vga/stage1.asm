@@ -1,3 +1,4 @@
+; ---------------------------------------------------------------------
 ; set video mode to vga and draw some lines
 
 	bits 16
@@ -9,27 +10,52 @@ _start:
 
 	global main
 main:
-	push	bp
-	mov	bp, sp
-	sub	sp, 4		; local alloc
-	push	bx
-
 	mov	ax, 0013h
 	int	10h		; set video mode 13h
 
-	mov	word [bp-2], 10	; x = 10
-	mov	word [bp-4], 10	; y = 10
-.L1	mov	ax, 10
-	push	ax		; color
-	push	word [bp-4]	; y
-	push	word [bp-2]	; x
+	mov	ax, 10
+	push	ax
+	mov	ax, 10
+	push	ax
+	call	hLine
+	mov	ax, 10
+	push	ax
+	mov	ax, 100
+	push	ax
+	call	hLine
+	mov	ax, 10
+	push	ax
+	mov	ax, 190
+	push	ax
+	call	hLine
+	push	greeting
+	call	printString
+	ret
+
+; void hLine(int16 y, int8 color)
+hLine:
+	push	bp
+	mov	bp, sp
+	push	bx
+	push	si
+	push	di
+
+	mov	si, 10		; x = 10
+	mov	di, [bp + 4]	; y
+	mov	bx, [bp + 6]	; color
+.L1	push	bx		; color
+	push	di		; y
+	push	si		; x
 	call	writePixel
-	inc	word [bp-2]
-	cmp	word [bp-2], 310
+	inc	si
+	cmp	si, 310
 	jle	.L1
 
+	pop	di
+	pop	si
 	pop	bx
 	leave
+	retn	4
 
 ; void writePixel(int16 x, int16 y, int8 color)
 writePixel:
@@ -106,3 +132,5 @@ printInt:
 	leave
 	retn	2
 
+greeting:
+	db `Hello, world!\r\n`, 0
