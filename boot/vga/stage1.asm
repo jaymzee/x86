@@ -1,13 +1,13 @@
 ; set video mode to vga and draw some lines
-;
-	bits 16
 
-	org 0x500
+	bits 16
+	global _start
 _start:
 	mov	bp, 0
 	call	main
 .L1	jmp .L1			; forever
 
+	global main
 main:
 	push	bp
 	mov	bp, sp

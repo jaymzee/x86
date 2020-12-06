@@ -1,6 +1,6 @@
 ; floppy disk boot block
-
-	org 0x7c00
+	bits 16
+	global _start
 _start:
 	mov ah, 2h	; read sectors from drive
 	mov al, 59	; sector count
@@ -10,7 +10,7 @@ _start:
 	mov dl, 0	; drive a (use 80h for 1st HD)
 	mov bx, 500h	; start address of next boot loader
 	int 13h
-	jmp 500h	; jump to 2nd level boot loader
+	jmp 0:500h	; jump to 2nd level boot loader
 
 padding:
 times 510-($-$$) db 0

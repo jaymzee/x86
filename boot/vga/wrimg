@@ -3,22 +3,15 @@
 import sys
 
 if len(sys.argv) != 4:
-    print("Usage: wrimg image bootfile mainfile")
+    print("Usage: wrimg image stage0 stage1")
     exit(1)
 
-img_size = 2880 # number of blocks in img
-img_name = sys.argv[1]
-boot_name = sys.argv[2]
-main_name = sys.argv[3]
-
-with open(boot_name, mode='rb') as file:
-    boot = file.read()
-
-with open(main_name, mode='rb') as file:
-    main = file.read()
-
-with open(img_name, mode='wb') as file:
-    file.write(boot)
-    file.write(main)
+with open(sys.argv[2], mode='rb') as file:
+    stage0 = file.read()
+with open(sys.argv[3], mode='rb') as file:
+    stage1 = file.read()
+with open(sys.argv[1], mode='wb') as file:
+    file.write(stage0)
+    file.write(stage1)
     # fill remaining blocks with zero
-    file.write(bytes(2880*512-len(main)-512))
+    file.write(bytes(2879*512 - len(stage0)))

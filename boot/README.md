@@ -21,3 +21,12 @@ disassembled.
 to compile c code with gcc for 16 bit
 
     gcc -m16 -fnopie -nostdlib -ffreestanding
+
+nasm assembler dwarf debugging symbols:
+
+    nasm -g -F dwarf -f elf -o stage0.elf stage0.asm
+
+link elf to binary
+
+    ld -m elf_i386 -s -Ttext=0x7c00 --oformat=binary -o stage0.bin stage0.elf
+
