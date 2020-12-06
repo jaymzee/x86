@@ -1,8 +1,13 @@
-demo.img: boot.bin boot2.bin
-	python3 wrimg $@ $^
-boot.bin: boot.asm
-	nasm -o $@ $<
-boot2.bin: boot2.asm
-	nasm -o $@ $<
+ASFLAGS = -g -F dwarf -f elf
+LDFLAGS = -m elf_i386 --oformat=binary
+
+demo.img: stage0.bin stage1.bin
+	python wrimg $@ $^
+%.elf: %.asm
+	nasm $(ASFLAGS) -o $@ $<
+stage0.bin: stage0.elf
+	ld $(LDFLAGS) -Ttext=0x7c00 -o $@ $^
+stage1.bin: stage1.elf
+	ld $(LDFLAGS) -Ttext=0x0500 -o $@ $^
 clean:
-	rm -f demo.img boot.bin boot2.bin
+	rm -f demo.img *.elf *.bin

@@ -1,2 +1,2 @@
 #!/bin/sh
-qemu-system-i386 -drive format=raw,if=floppy,file=demo.img,readonly -curses
+qemu-system-i386 -boot a -drive format=raw,if=floppy,file=demo.img,readonly

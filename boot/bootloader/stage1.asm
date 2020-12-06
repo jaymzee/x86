@@ -1,4 +1,5 @@
-	org 0x500
+	bits 16
+	global _start
 _start:
 	mov si, greeting
 	mov cx, greetingL

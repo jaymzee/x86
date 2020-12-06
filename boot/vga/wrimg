@@ -14,4 +14,5 @@ with open(sys.argv[1], mode='wb') as file:
     file.write(stage0)
     file.write(stage1)
     # fill remaining blocks with zero
-    file.write(bytes(2879*512 - len(stage0)))
+    count = len(stage0) + len(stage1)
+    file.write(bytearray(2880*512 - count))

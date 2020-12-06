@@ -1,0 +1,4 @@
+add-symbol-file stage0.elf 0x7c00
+add-symbol-file stage1.elf 0x500
+target remote | qemu-system-i386 -S -gdb stdio -m 16 -fda demo.img
+set tdesc filename target.xml
