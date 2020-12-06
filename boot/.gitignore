@@ -1,2 +1,3 @@
 *.img
-bochs.log
+*.log
+.venv
