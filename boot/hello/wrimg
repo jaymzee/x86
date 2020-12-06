@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# write mbr to an empty 1.44MB floppy disk image
+# write boot block to an empty 1.44MB floppy disk image
 import os
 import sys
 
