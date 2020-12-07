@@ -2,7 +2,7 @@ ASFLAGS = -g -F dwarf -f elf
 LDFLAGS = -m elf_i386 --oformat=binary
 
 demo.img: stage0.bin stage1.bin
-	python wrimg $@ $^
+	python3 wrimg $@ $^
 %.elf: %.asm
 	nasm $(ASFLAGS) -o $@ $<
 stage0.bin: stage0.elf

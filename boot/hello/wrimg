@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # write boot block to an empty 1.44MB floppy disk image
 import os
 import sys
