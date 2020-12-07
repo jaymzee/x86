@@ -10,69 +10,9 @@ _start:
 
 	global main
 main:
-	mov	ax, 0013h
-	int	10h		; set video mode 13h
-
-	mov	ax, 10
-	push	ax
-	mov	ax, 10
-	push	ax
-	call	hLine
-	mov	ax, 10
-	push	ax
-	mov	ax, 100
-	push	ax
-	call	hLine
-	mov	ax, 10
-	push	ax
-	mov	ax, 190
-	push	ax
-	call	hLine
 	push	greeting
 	call	printString
 	ret
-
-; void hLine(int16 y, int8 color)
-hLine:
-	push	bp
-	mov	bp, sp
-	push	bx
-	push	si
-	push	di
-
-	mov	si, 10		; x = 10
-	mov	di, [bp + 4]	; y
-	mov	bx, [bp + 6]	; color
-.L1	push	bx		; color
-	push	di		; y
-	push	si		; x
-	call	writePixel
-	inc	si
-	cmp	si, 310
-	jle	.L1
-
-	pop	di
-	pop	si
-	pop	bx
-	leave
-	retn	4
-
-; void writePixel(int16 x, int16 y, int8 color)
-writePixel:
-	push	bp
-	mov	bp, sp
-	push	bx
-
-	mov	cx, [bp + 4]	; x
-	mov	dx, [bp + 6]	; y
-	mov	ax, [bp + 8]	; color
-	mov	bh, 0		; page number
-	mov	ah, 0ch		; write pixel
-	int	10h
-
-	pop	bx
-	leave
-	retn	6
 
 ; void writeString(char *str)
 printString:
