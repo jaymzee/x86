@@ -1,6 +1,6 @@
-CFLAGS = -Os -m16 -ffreestanding
+CFLAGS = -g -std=c99 -pedantic -Wall -Os -m16 -ffreestanding -fno-exceptions -fno-asynchronous-unwind-tables
 ASFLAGS = -g -F dwarf -f elf
-LDFLAGS = -m elf_i386 --nmagic
+LDFLAGS = -m elf_i386 --nmagic  # --nmagic eliminates gaps between sections
 GCCVERSION := $(shell gcc -dumpversion)
 ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
     # disable CET endbr32 instructions in function entry point

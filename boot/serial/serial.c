@@ -1,5 +1,5 @@
 #include "system.h"
-#define PORT 0x3f8   /* COM1 */
+#define PORT 0x3f8      // COM1
 
 void InitSerial() {
    outb(PORT + 1, 0x00);    // Disable all interrupts
@@ -11,7 +11,45 @@ void InitSerial() {
    outb(PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
 }
 
-int Main(int x)
+int IsTransmitEmpty()
+{
+    return inb(PORT + 5) & 0x20;
+}
+ 
+void WriteSerial(char a)
+{
+    while (!IsTransmitEmpty())
+       ;
+
+    outb(PORT, a);
+}
+
+int IsReceived()
+{
+    return inb(PORT + 5) & 1;
+}
+ 
+char ReadSerial()
+{
+    while (!IsReceived())
+        ;
+
+    return inb(PORT);
+}
+
+void Main()
 {
     InitSerial();
+    WriteSerial('H');
+    WriteSerial('e');
+    WriteSerial('l');
+    WriteSerial('l');
+    WriteSerial('o');
+    WriteSerial('\r');
+    WriteSerial('\n');
+    WriteSerial('W');
+    WriteSerial('o');
+    WriteSerial('r');
+    WriteSerial('l');
+    WriteSerial('d');
 }
