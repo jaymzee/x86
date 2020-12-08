@@ -8,15 +8,9 @@
 	global _start
 _start:
 	mov	bp, 0		; terminate chain of fp with null
-	push	sp
-	call	printInt
-	call	printLine
 	push	greeting
 	call	printString
 	call	0:Main
-	push	sp
-	call	printInt
-	call	printLine
 .L1	jmp .L1			; forever
 
 ; void printString(char *str)
@@ -78,4 +72,4 @@ printInt:
 	retn	2
 
 greeting:
-	db `calling Main()\r\n`, 0
+	db `switch to serial 0 console\r\n`, 0

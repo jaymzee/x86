@@ -1,4 +1,4 @@
-CFLAGS = -g -std=c99 -pedantic -Wall -Os -m16 -ffreestanding -fno-exceptions -fno-asynchronous-unwind-tables
+CFLAGS = -g -std=c99 -pedantic -Wall -Os -m16 -ffreestanding -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 ASFLAGS = -g -F dwarf -f elf
 LDFLAGS = -m elf_i386 --nmagic  # --nmagic eliminates gaps between sections
 GCCVERSION := $(shell gcc -dumpversion)
