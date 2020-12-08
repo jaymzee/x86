@@ -1,45 +1,25 @@
 ; ----------------------------------------------------------------------
 ; set video mode to vga and draw some lines
 
-	extern square
+	extern Main
 
 	bits 16
 
 	global _start
 _start:
-	mov	bp, 0
-	call	main
-.L1	jmp .L1			; forever
-
-
-	global main
-main:
-	push	regsp
-	call	printString
+	mov	bp, 0		; terminate chain of fp with null
 	push	sp
 	call	printInt
 	call	printLine
-
 	push	greeting
 	call	printString
-
-	mov	eax, 3
-	push	eax
-	call	0:square
-	pop	ecx
-	push	ax
-	call	printInt
-	call	printLine
-
-	push	regsp
-	call	printString
+	call	0:Main
 	push	sp
 	call	printInt
 	call	printLine
+.L1	jmp .L1			; forever
 
-	ret
-
-; void writeString(char *str)
+; void printString(char *str)
 printString:
 	push	bp
 	mov	bp, sp
@@ -60,6 +40,7 @@ printString:
 	leave
 	retn	2
 
+; void printLine()
 printLine:
 	push	bx
 	mov	bx, 0x0000	; page number (and color in gfx mode)
@@ -97,6 +78,4 @@ printInt:
 	retn	2
 
 greeting:
-	db `square(3) = `, 0
-regsp:
-	db `SP = 0x`, 0
+	db `calling Main()\r\n`, 0

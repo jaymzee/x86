@@ -11,7 +11,7 @@ void InitSerial() {
    outb(PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
 }
 
-int square(int x)
+int Main(int x)
 {
-    return x * x;
+    InitSerial();
 }
