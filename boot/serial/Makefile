@@ -1,6 +1,11 @@
-CFLAGS = -Os -m16 -mmanual-endbr -ffreestanding
+CFLAGS = -Os -m16 -ffreestanding
 ASFLAGS = -g -F dwarf -f elf
 LDFLAGS = -m elf_i386 --nmagic
+GCCVERSION := $(shell gcc -dumpversion)
+ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
+    # disable CET endbr32 instructions in function entry point
+    CFLAGS += -fcf-protection=return
+endif
 
 demo.img: stage0.bin stage1.bin
 	python3 wrimg $@ $^
