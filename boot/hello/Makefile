@@ -1,12 +1,8 @@
-SRC = hello.asm
-BASE = $(basename $(SRC))
-OBJ = $(addsuffix .bin,$(BASE))
-IMG = $(addsuffix .img,$(BASE))
+hello.img: stage0.bin
+	python3 wrimg $@ $<
 
-$(IMG): $(OBJ)
-	python3 wrimg $<
-$(OBJ): $(SRC)
-	nasm -o $@ $<
+%.bin: %.asm
+	nasm -l $(addsuffix .lst,$(basename $@)) -o $@ $<
 
 clean:
-	rm -f $(OBJ) $(IMG)
+	rm -f *.bin *.lst hello.img

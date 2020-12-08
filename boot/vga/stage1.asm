@@ -84,11 +84,10 @@ printString:
 	mov	si, [bp + 4]	; str
 	mov	bx, 0x000f	; page number (and color in gfx mode)
 	mov	ah, 0Eh		; teletype output
-.L1	mov	al, [si]
+.L1	lodsb
 	cmp	al, 0
 	je	.done
 	int	10h
-	inc	si
 	jmp	.L1
 
 .done	pop	si

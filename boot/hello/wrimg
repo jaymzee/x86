@@ -3,18 +3,17 @@
 import os
 import sys
 
-if len(sys.argv) != 2:
-    print("Usage: wrimg binfile")
+if len(sys.argv) != 3:
+    print("Usage: wrimg image stage0")
     exit(1)
 
 imgsize = 2880 # number of blocks in img
-basename = os.path.splitext(sys.argv[1])[0]
 emptyblock = bytes(512)
 
-with open(basename + ".bin", mode='rb') as file:
+with open(sys.argv[2], mode='rb') as file:
     boot = file.read()
 
-with open(basename + ".img", mode='wb') as file:
+with open(sys.argv[1], mode='wb') as file:
     file.write(boot)
     # fill remaining blocks with zero
     for i in range(imgsize - 1):
