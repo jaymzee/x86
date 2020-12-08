@@ -5,7 +5,9 @@
  * 16750 has a 64 byte FIFO
  */
 
+#include "serial.h"
 #include "system.h"
+
 #define COM1_PORT 0x3f8      // COM1
 
 void COM_Init() {
@@ -55,18 +57,5 @@ void COM_WriteString(const char *str)
             COM_WriteChar(13);
         }
         COM_WriteChar(ch);
-    }
-}
-
-void Main()
-{
-    COM_Init();
-    COM_WriteString("Welcome to my first bootloader\n");
-    COM_WriteString("Stay tuned for enabling protected mode\n");
-    while (1) {
-        COM_WriteString("\npress a key ");
-        char c = COM_ReadChar();
-        COM_WriteString("\nyou pressed: ");
-        COM_WriteChar(c);
     }
 }
