@@ -5,35 +5,29 @@
 	global _start
 _start:
 	mov	bp, 0
-	call	main
+	call	_main
 .L1	jmp .L1			; forever
 
 	global main
-main:
+_main:
 	mov	ax, 0013h
 	int	10h		; set video mode 13h
 
-	mov	ax, 10
-	push	ax
-	mov	ax, 10
-	push	ax
-	call	hLine
-	mov	ax, 10
-	push	ax
-	mov	ax, 100
-	push	ax
-	call	hLine
-	mov	ax, 10
-	push	ax
-	mov	ax, 190
-	push	ax
-	call	hLine
+	push	10
+	push	10
+	call	_hLine
+	push	10
+	push	100
+	call	_hLine
+	push	10
+	push	190
+	call	_hLine
 	push	greeting
-	call	printString
+	call	_printStr
 	ret
 
 ; void hLine(int16 y, int8 color)
-hLine:
+_hLine:
 	push	bp
 	mov	bp, sp
 	push	bx
@@ -46,7 +40,7 @@ hLine:
 .L1	push	bx		; color
 	push	di		; y
 	push	si		; x
-	call	writePixel
+	call	_writePixel
 	inc	si
 	cmp	si, 310
 	jle	.L1
@@ -58,7 +52,7 @@ hLine:
 	retn	4
 
 ; void writePixel(int16 x, int16 y, int8 color)
-writePixel:
+_writePixel:
 	push	bp
 	mov	bp, sp
 	push	bx
@@ -75,7 +69,7 @@ writePixel:
 	retn	6
 
 ; void writeString(char *str)
-printString:
+_printStr:
 	push	bp
 	mov	bp, sp
 	push	bx
@@ -95,7 +89,7 @@ printString:
 	leave
 	retn	2
 
-printLine:
+_printLine:
 	push	bx
 	mov	bx, 0x0000	; page number (and color in gfx mode)
 	mov	ah, 0Eh		; teletype output
@@ -108,7 +102,7 @@ printLine:
 
 
 ; void printInt(int16 x)
-printInt:
+_printInt:
 	push	bp
 	mov	bp, sp
 	push	bx

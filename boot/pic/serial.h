@@ -5,19 +5,19 @@
  * 16750 has a 64 byte FIFO
  */
 
-void COM_Init();
+void COM_Init(void);
 
 // is serial transmitter empty
-int COM_IsTxEmpty();
+int COM_IsTxEmpty(void);
 
 // blocking
 void COM_WriteChar(char a);
 
 // does serial receive have data
-int COM_IsRxReady();
+int COM_IsRxReady(void);
 
 // blocking
-char COM_ReadChar();
+char COM_ReadChar(void);
 
 void COM_WriteString(const char *str);
 

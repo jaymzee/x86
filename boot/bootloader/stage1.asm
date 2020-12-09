@@ -8,7 +8,7 @@ _start:
 .L1	lodsb
 	int	10h
 	loop	.L1
-forever	jmp	forever
+.halt	jmp	.halt
 
 greeting:
 	db "hello, world!!", 13, 10, "Hi!"

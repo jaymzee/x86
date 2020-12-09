@@ -10,7 +10,7 @@
 
 #define COM1_PORT 0x3f8      // COM1
 
-void COM_Init() {
+void COM_Init(void) {
    outb(COM1_PORT + 1, 0x00);   // Disable all interrupts
    outb(COM1_PORT + 3, 0x80);   // Enable DLAB (set baud rate divisor)
    outb(COM1_PORT + 0, 12);     // Set divisor to 12 (lo byte) 9600 baud
@@ -21,7 +21,7 @@ void COM_Init() {
 }
 
 // is serial transmitter empty
-int COM_IsTxEmpty()
+int COM_IsTxEmpty(void)
 {
     return inb(COM1_PORT + 5) & 0x20;
 }
@@ -36,13 +36,13 @@ void COM_WriteChar(char a)
 }
 
 // does serial receive have data
-int COM_IsRxReady()
+int COM_IsRxReady(void)
 {
     return inb(COM1_PORT + 5) & 1;
 }
 
 // blocking
-char COM_ReadChar()
+char COM_ReadChar(void)
 {
     while (!COM_IsRxReady())
         ;

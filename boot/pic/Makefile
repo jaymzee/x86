@@ -13,7 +13,7 @@ demo.img: stage0.bin stage1.bin
 	objcopy -O binary $< $@
 stage0.elf: stage0.o
 	ld $(LDFLAGS) -Ttext=0x7c00 -o $@ $^
-stage1.elf: stage1.o serial.o main.o
+stage1.elf: stage1.o serial.o util.o main.o
 	ld $(LDFLAGS) -Ttext=0x7e00 -o $@ $^
 %.o: %.asm
 	nasm $(ASFLAGS) -l $(addsuffix .lst,$(basename $@)) $<
