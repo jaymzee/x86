@@ -1,7 +1,10 @@
 ; ---------------------------------------------------------------------
 ; set video mode to vga and draw some lines
 
+	extern Main
+
 	bits 16
+
 	global _start
 _start:
 	mov	bp, 0
@@ -10,6 +13,8 @@ _start:
 
 	global main
 _main:
+	push	di
+
 	mov	ax, 0013h
 	int	10h		; set video mode 13h
 
@@ -24,6 +29,16 @@ _main:
 	call	_hLine
 	push	greeting
 	call	_printStr
+	mov	ax, 0xA000
+	mov	es, ax
+	mov	di, 0
+	mov	cx, 8
+.L1	mov	byte [es: di + 20*320], 10
+	inc	di
+	loop	.L1
+	call	0:Main
+
+	pop	di
 	ret
 
 ; void hLine(int16 y, int8 color)
