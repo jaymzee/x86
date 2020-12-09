@@ -1,3 +1,4 @@
+#include "pic.h"
 #include "serial.h"
 #include "util.h"
 
@@ -31,5 +32,13 @@ void Main()
         int c = getchar();
         print("\nyou pressed: ");
         putchar(c);
+        if (c == 'e') {
+            PIC_UnmaskIRQ(0);
+            print("\nIRQ 0 enabled");
+        }
+        if (c == 'd') {
+            PIC_MaskIRQ(0);
+            print("\nIRQ 0 disabled");
+        }
     }
 }
