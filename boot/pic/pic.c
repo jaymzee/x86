@@ -28,6 +28,8 @@
 #define ICW4_BUF_MASTER 0x0C    // Buffered mode/master
 #define ICW4_SFNM       0x10    // Special fully nested (not)
 
+#define RTC             0x70    // CMOS/Real Time Clock/disable NMI
+
 // on older machines its necessary to give the PIC some time to react
 // to commands as they might not be processed quickly
 #define wait() __asm__("nop")
@@ -126,4 +128,16 @@ unsigned short PIC_GetIRR(void)
 unsigned short PIC_GetISR(void)
 {
     return PIC_IssueOCW3(OCW3_READ_ISR);
+}
+
+// unmask NMI via CMOS/RTC
+void NMI_Enable()
+{
+    outb(RTC, inb(RTC) & 0x7F);
+}
+
+// mask NMI via CMOS/RTC
+void NMI_Disable()
+{
+     outb(RTC, inb(RTC) | 0x80);
 }
