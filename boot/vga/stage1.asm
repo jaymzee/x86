@@ -11,13 +11,10 @@ _start:
 	call	_main
 .L1	jmp .L1			; forever
 
-	global main
+	global _main
 _main:
-	push	di
-
 	mov	ax, 0013h
 	int	10h		; set video mode 13h
-
 	push	10
 	push	10
 	call	_hLine
@@ -29,16 +26,6 @@ _main:
 	call	_hLine
 	push	greeting
 	call	_printStr
-	mov	ax, 0xA000
-	mov	es, ax
-	mov	di, 0
-	mov	cx, 8
-.L1	mov	byte [es: di + 20*320], 10
-	inc	di
-	loop	.L1
-	call	0:Main
-
-	pop	di
 	ret
 
 ; void hLine(int16 y, int8 color)
@@ -68,6 +55,28 @@ _hLine:
 
 ; void writePixel(int16 x, int16 y, int8 color)
 _writePixel:
+	push	bp
+	mov	bp, sp
+	push	bx
+	push	es
+
+	mov	ax, 0xA000
+	mov	es, ax
+	mov	cx, 320
+	mov	ax, [bp + 6]	; y
+	mul	cx
+	add	ax, [bp + 4]	; x
+	mov	bx, ax
+	mov	ax, [bp + 8]	; color
+	mov	[es:bx], al
+
+	pop	es
+	pop	bx
+	leave
+	retn	6
+
+; void writePixel(int16 x, int16 y, int8 color)
+_writePixelBIOS:
 	push	bp
 	mov	bp, sp
 	push	bx

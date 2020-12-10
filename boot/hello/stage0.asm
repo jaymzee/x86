@@ -10,8 +10,7 @@ _start:
 	mov	ah, 7		; clrscr attribute
 	mov	di, 0		; index into screen memory
 	mov	cx, 2000	; 80 x 25
-.L1	mov	[es:di], al	; set character
-	inc	di
+.L1	stosb			; set character
 	mov	[es:di], ah	; set attribute
 	inc	di
 	loop	.L1
