@@ -2,7 +2,7 @@
  * intel 8259 interrupt controller
  */
 
-#include "pic.h"
+#include "interrupt.h"
 #include "system.h"
 
 #define PIC1            0x20        // PIC controller 1 base address

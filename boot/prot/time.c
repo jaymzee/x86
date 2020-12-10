@@ -1,15 +1,8 @@
-#include "rtc.h"
+#include "time.h"
 #include "system.h"
 
 #define CMOS_ADDR       0x70
 #define CMOS_DATA       0x71
-
-unsigned char second;
-unsigned char minute;
-unsigned char hour;
-unsigned char day;
-unsigned char month;
-unsigned int year;
 
 static int RTC_updateInProgress()
 {
@@ -23,7 +16,7 @@ static unsigned char RTC_read(int reg)
     return inb(CMOS_DATA);
 }
 
-static void RTC_readDate(struct RTC *now)
+static void RTC_readTime(struct time *now)
 {
     while (RTC_updateInProgress())
         ; // Make sure an update isn't in progress
@@ -36,19 +29,19 @@ static void RTC_readDate(struct RTC *now)
     now->year = RTC_read(0x09);
 }
 
-void RTC_GetDate(struct RTC *now)
+void RTC_GetTime(struct time *now)
 {
-    struct RTC last;
+    struct time last;
     unsigned char status_reg_B;
 
     // Note: This uses the `read registers until you get the same values twice
     //       in a row` technique to avoid getting dodgy/inconsistent values due
     //       to RTC updates
 
-    RTC_readDate(now);
+    RTC_readTime(now);
     do {
         last = *now;
-        RTC_readDate(now);
+        RTC_readTime(now);
     } while (now->second != last.second || now->minute != last.minute ||
              now->hour != last.hour || now->day != last.day ||
              now->month != last.month || now->year != last.year);

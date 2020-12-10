@@ -1,4 +1,4 @@
-struct RTC {
+struct time {
     unsigned char second;
     unsigned char minute;
     unsigned char hour;
@@ -7,4 +7,4 @@ struct RTC {
     unsigned int year;
 };
 
-void RTC_GetDate(struct RTC *now);
+void RTC_GetTime(struct time *now);
