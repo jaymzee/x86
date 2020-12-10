@@ -1,0 +1,1 @@
+# demonstrate protected mode

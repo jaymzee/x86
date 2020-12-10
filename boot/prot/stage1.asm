@@ -10,19 +10,8 @@ _start:
 	mov	bp, 0			; terminate chain of fp with null
 	push	greeting
 	call	_print
-	cli				; disable interrupts
-	mov	dword [0x20], timerISR	; install ISR
-	sti				; enable interrupts
 	call	0:Main
 .L1	jmp .L1				; forever
-
-timerISR:
-	inc	dword [tick_counter]
-	push	ax
-	mov	al, 0x20
-	out	0x20, al		; issue EOI
-	pop	ax
-	iret
 
 ; void print(char *str)			; print to screen using BIOS INT 10h
 _print:
@@ -47,7 +36,3 @@ _print:
 
 greeting:
 	db `switch to serial 0 console\r\n`, 0
-
-	global tick_counter
-tick_counter:
-	dd 0
