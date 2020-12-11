@@ -5,6 +5,7 @@
 LOADADDR equ 0x7e00
 
 	bits 16
+
 	global _start
 _start:
 	mov	ah, 2h		; read sectors from drive

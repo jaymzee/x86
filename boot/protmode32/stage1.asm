@@ -2,7 +2,7 @@
 ; second stage bootloader enter protected mode
 ; assemble with nasm
 
-STACK32_TOP EQU 0x200000		; top of 32MB memory
+STACK32_TOP EQU 0x200000		; top of 2MB memory
 CODE32_REL  EQU 0x110000
 VIDEOMEM    EQU 0x0b8000
 
@@ -41,7 +41,7 @@ _print:
 
 enter_prot_mode:
 	call	a20_on		; Enable A20 gate (uses Fast method as proof of concept)
-	cli
+	cli			; disable interrupts
 
 	; Compute linear address of label gdt_start
 	; Using (segment << 4) + offset
@@ -79,7 +79,7 @@ check_pmode:
 
 ; Enable a20 (fast method). This may not work on all hardware
 a20_on:
-	cli
+	cli			; disable interrupts
 	in	al, 0x92	; Read System Control Port A
 	test	al, 0x02	; Test current a20 value (bit 1)
 	jnz	.skipfa20	; If already 1 skip a20 enable
@@ -88,7 +88,7 @@ a20_on:
 				;     a fast reset into real mode
 	out	0x92, al        ; Enable a20
 .skipfa20:
-	sti
+	sti			; reenable interrupts
 	ret
 
 greeting:
@@ -125,18 +125,18 @@ gdt_data:
 gdt_end:
 
 
+	dq 0, 0		; some padding
+
+
 ; Code that will run in 32-bit protected mode
 ; Align code to 4 byte boundary. code_32bit label is
 ; relative to the origin point 100h
 
 	align 4
+	bits 32
 code_32bit:
-	use32
 
 ; Set virtual memory address of pm code/data to CODE32_REL
-; We will be relocating this section from low memory where DOS
-; originally loaded it.
-	section protectedmode vstart=CODE32_REL, valign=4
 start_32:
 	cld			; Direction flag forward
 	mov	eax,0x10	; 0x10 is flat selector for data
@@ -148,10 +148,6 @@ start_32:
 	mov	esp,STACK32_TOP	; Should set ESP to a usable memory location
 				; Stack will be grow down from this location
 
-	mov	edi,start_32	; EDI = linear address where PM code will be copied
-	mov	esi,ebx		; ESI = linear address of code_32bit
-	mov	ecx,PMSIZE_LONG	; ECX = number of DWORDs to copy
-	rep	movsd		; Copy all code/data from code_32bit to CODE32_REL
 	jmp	0x08:.relentry	; Absolute jump to relocated code
 
 .relentry:
@@ -161,29 +157,29 @@ start_32:
 	mov	esi,str		; ESI = address of string to print
 	mov	edi,VIDEOMEM	; EDI = base address of video memory
 	call	print_string_attr
+	call	Main
 
-	cli
-.endloop:
+	cli			; disable interrupts
+.forever:
 	hlt			; Halt CPU with infinite loop
-	jmp	.endloop
+	jmp	.forever
 
 print_string_attr:
 	push	ecx
 	xor	ecx, ecx	; ECX = 0 current video offset
 	jmp	.loopentry
-.printloop:
+.L1:
 	mov	[edi+ecx*2], ax	; Copy attr and character to display
 	inc	ecx			; Next word position
 .loopentry:
 	mov	al, [esi+ecx]	; Get next character to print
 	test	al, al
-	jnz	.printloop	; If it's not NUL continue
-.endprint:
+	jnz	.L1		; If it's not NUL continue
 	pop	ecx
 	ret
 
 str:
-	db "Protected Mode entered successfully", 0
+	db "Protected Mode entered successfully - console on serial 0", 0
 
 ; Number of DWORDS that the protected mode section takes up (rounded up)
 PMSIZE_LONG equ ($-$$+3)>>2

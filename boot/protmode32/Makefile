@@ -1,4 +1,6 @@
-CFLAGS = -g -std=c99 -pedantic -Wall -Os -m16 -ffreestanding -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
+CFLAGS = -g -std=c99 -pedantic -Wall -Os -m32 -ffreestanding
+# these options keep the binary very small
+CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 ASFLAGS = -g -F dwarf -f elf
 LDFLAGS = -m elf_i386 --nmagic  # --nmagic eliminates gaps between sections
 GCCVERSION := $(shell gcc -dumpversion)
@@ -13,7 +15,7 @@ demo.img: stage0.bin stage1.bin
 	objcopy -O binary $< $@
 stage0.elf: stage0.o
 	ld $(LDFLAGS) -Ttext=0x7c00 -o $@ $^
-stage1.elf: stage1.o serial.o main.o
+stage1.elf: stage1.o serial.o string.o time.o main.o
 	ld $(LDFLAGS) -Ttext=0x7e00 -o $@ $^
 %.o: %.asm
 	nasm $(ASFLAGS) -l $(addsuffix .lst,$(basename $@)) $<
