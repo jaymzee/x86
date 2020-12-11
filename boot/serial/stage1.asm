@@ -1,6 +1,3 @@
-; ----------------------------------------------------------------------
-; set video mode to vga and draw some lines
-
 	extern Main
 
 	bits 16
