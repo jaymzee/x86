@@ -4,7 +4,6 @@
 
 	global _start
 _start:
-	mov	bp, 0		; terminate chain of fp with null
 	push	greeting
 	call	_print
 	call	0:Main

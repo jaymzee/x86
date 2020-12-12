@@ -4,7 +4,6 @@
 
 	global _start
 _start:
-	mov	bp, 0			; terminate chain of fp with null
 	push	greeting
 	call	_print
 	cli				; disable interrupts

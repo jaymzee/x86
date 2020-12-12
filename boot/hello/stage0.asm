@@ -4,6 +4,11 @@
 	bits 16
 	org 0x7c00
 _start:
+	mov	bp, 0		; initialize ss:bp and ss:sp
+	mov	ax, 0
+	mov	ss, ax
+	mov	sp, 0x7c00
+
 	mov	ax, 0xB800	; initialize es data segment for vga text
 	mov	es, ax
 	mov	al, 0		; clrscr character

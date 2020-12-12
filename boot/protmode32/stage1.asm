@@ -12,13 +12,12 @@ VIDEOMEM    EQU 0x0b8000
 
 	global _start
 _start:
-	mov	bp, 0			; terminate chain of fp with null
 	push	greeting
-	call	_print
+	call	_bios_print
 	jmp	enter_prot_mode
 
-; void print(char *str)			; print to screen using BIOS INT 10h
-_print:
+; void bios_print(char *str)		; print to screen using BIOS INT 10h
+_bios_print:
 	push	bp
 	mov	bp, sp
 	push	bx
@@ -28,7 +27,7 @@ _print:
 	mov	bx, 0x000f		; page number (and color in gfx mode)
 	mov	ah, 0Eh			; teletype output
 .L1	lodsb
-	cmp	al, 0
+	test	al, al
 	je	.done
 	int	10h
 	jmp	.L1
@@ -82,12 +81,12 @@ a20_on:
 	cli			; disable interrupts
 	in	al, 0x92	; Read System Control Port A
 	test	al, 0x02	; Test current a20 value (bit 1)
-	jnz	.skipfa20	; If already 1 skip a20 enable
+	jnz	.skip		; If already 1 skip a20 enable
 	or	al, 0x02	; Set a20 bit (bit 1) to 1
 	and	al, 0xfe	; Always write a zero to bit 0 to avoid
 				;     a fast reset into real mode
 	out	0x92, al        ; Enable a20
-.skipfa20:
+.skip:
 	sti			; reenable interrupts
 	ret
 
@@ -96,14 +95,14 @@ greeting:
 
 
 	align 4
+	section .data
 gdtr:
 	dw gdt_end-gdt_start-1
 	dd gdt_start
 
 gdt_start:
 	; First entry is always the Null Descriptor
-	dd 0
-	dd 0
+	dq 0
 
 gdt_code:
 	; 4gb flat r/w/executable code descriptor
@@ -154,23 +153,24 @@ start_32:
 	mov	ah, 0x57	; Attribute white on magenta
 
 	; Print a string to display
-	mov	esi,str		; ESI = address of string to print
+	mov	esi,pmode_str	; ESI = address of string to print
 	mov	edi,VIDEOMEM	; EDI = base address of video memory
-	call	print_string_attr
-	call	Main
+	call	write_screen
+	mov	ebp, 0		; terminate chain of frame pointers
+	call	Main		; not expected for Main to return
 
 	cli			; disable interrupts
 .forever:
 	hlt			; Halt CPU with infinite loop
 	jmp	.forever
 
-print_string_attr:
+write_screen:
 	push	ecx
 	xor	ecx, ecx	; ECX = 0 current video offset
 	jmp	.loopentry
 .L1:
 	mov	[edi+ecx*2], ax	; Copy attr and character to display
-	inc	ecx			; Next word position
+	inc	ecx		; Next word position
 .loopentry:
 	mov	al, [esi+ecx]	; Get next character to print
 	test	al, al
@@ -178,7 +178,7 @@ print_string_attr:
 	pop	ecx
 	ret
 
-str:
+pmode_str:
 	db "Protected Mode entered successfully - console on serial 0", 0
 
 ; Number of DWORDS that the protected mode section takes up (rounded up)

@@ -7,7 +7,6 @@
 
 	global _start
 _start:
-	mov	bp, 0
 	call	_main
 .L1	jmp .L1			; forever
 
