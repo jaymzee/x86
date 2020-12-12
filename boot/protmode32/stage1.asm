@@ -2,7 +2,7 @@
 ; second stage bootloader enter protected mode
 ; assemble with nasm
 
-STACK32_TOP EQU 0x200000		; top of 2MB memory
+STACK32_TOP EQU 0x1000000		; top of 16MB memory
 CODE32_REL  EQU 0x110000
 VIDEOMEM    EQU 0x0b8000
 
