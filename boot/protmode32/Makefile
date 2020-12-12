@@ -8,6 +8,10 @@ ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
     # disable CET endbr32 instructions in function entry point
     CFLAGS += -fcf-protection=return
 endif
+vpath %.c src
+vpath %.h src
+vpath %.asm src
+vpath %.o obj
 
 demo.img: stage0.bin stage1.bin
 	python3 wrimg $@ $^
@@ -18,8 +22,8 @@ stage0.elf: stage0.o
 stage1.elf: stage1.o serial.o string.o time.o main.o
 	ld $(LDFLAGS) -Ttext=0x7e00 -o $@ $^
 %.o: %.asm
-	nasm $(ASFLAGS) -l $(addsuffix .lst,$(basename $@)) $<
+	nasm $(ASFLAGS) -o $@ -l $(addsuffix .lst,$(basename $@)) $<
 %.o: %.c
-	gcc $(CFLAGS) -c $<
+	gcc $(CFLAGS) -o $@ -c $<
 clean:
 	rm -f demo.img *.elf *.o *.lst *.bin
