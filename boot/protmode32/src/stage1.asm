@@ -35,18 +35,18 @@ bios_print:
 
 
 enter_prot_mode:
-	call	a20_on		; Enable A20 gate
+	call	enable_a20		; Enable A20 gate
 	cli			; disable interrupts
 	lgdt	[gdtr]		; Load gdt
 	mov	eax, cr0
 	or	eax, 1
 	mov	cr0, eax	; Set protected mode flag
-	jmp	0x08:start_32
+	jmp	0x08:start32
 
 ; Enable A20
 ;   uses fast method as proof of concept and may not work on all hardware
 ;   ax  clobbered
-a20_on:
+enable_a20:
 	cli			; disable interrupts
 	in	al, 0x92	; Read System Control Port A
 	test	al, 0x02	; Test current a20 value (bit 1)
@@ -65,7 +65,7 @@ a20_on:
 
 	section .text
 	align 4
-start_32:
+start32:
 	cld			; Direction flag forward
 	mov	eax, 0x10	; 0x10 is flat selector for data
 	mov	ds, eax
@@ -115,7 +115,7 @@ greeting2:
 
 	align 8
 gdtr:
-	dw gdt_end-gdt_start - 1
+	dw gdt_end - gdt_start - 1
 	dd gdt_start
 
 	align 8
@@ -124,18 +124,18 @@ gdt_start:
 	dq 0
 gdt_code:
 	; 4gb flat r/w/executable code descriptor
-	dw 0xFFFF	; limit low
-	dw 0		; base low
-	db 0		; base middle
-	db 0b10011010	; access
-	db 0b11001111	; granularity
-	db 0		; base high
+	dw 0xFFFF	; limit 0:15
+	dw 0		; base 0:15
+	db 0		; base 16:23
+	db 0b10011010	; access P GPL S Type
+	db 0b11001111	; flags Gr Sz L, Limit 16:19
+	db 0		; base 24:31
 gdt_data:
 	; 4gb flat r/w data descriptor
-	dw 0xFFFF	; limit low
-	dw 0		; base low
-	db 0		; base middle
-	db 0b10010010	; access
-	db 0b11001111	; granularity
-	db 0		; base high
+	dw 0xFFFF	; limit 0:15
+	dw 0		; base 0:15
+	db 0		; base 16:23
+	db 0b10010010	; access P GPL S Type
+	db 0b11001111	; flags Gr Sz L, Limit 16:19
+	db 0		; base 24:31
 gdt_end:
