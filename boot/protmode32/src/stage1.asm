@@ -63,7 +63,7 @@ a20_on:
 
 	bits 32
 
-	section .code
+	section .text
 	align 4
 start_32:
 	cld			; Direction flag forward

@@ -20,9 +20,9 @@ $(TARGET): stage0.bin stage1.bin
 %.bin: %.elf
 	objcopy -O binary $< $@
 stage0.elf: stage0.o
-	$(LD) $(LDFLAGS) -Ttext=0x7c00 -o $@ $^
+	$(LD) $(LDFLAGS) -T stage0.ld -o $@ $^
 stage1.elf: $(OBJS)
-	$(LD) $(LDFLAGS) -Ttext=0x7e00 -o $@ $^
+	$(LD) $(LDFLAGS) -T stage1.ld -o $@ $^
 %.o: %.asm
 	nasm $(ASFLAGS) -o $@ -l $(addsuffix .lst,$(basename $@)) $<
 %.o: %.c

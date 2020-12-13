@@ -22,6 +22,3 @@ _start:
 	mov	bx, LOADADDR	; start address of next boot loader
 	int	13h
 	jmp	0:LOADADDR	; jump to 2nd level boot loader
-
-	times 510-($-$$) db 0
-	db 0x55, 0xaa		; boot block signature
