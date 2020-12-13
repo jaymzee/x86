@@ -1,4 +1,7 @@
-CFLAGS = -g -std=c99 -pedantic -Wall -Os -m32 -ffreestanding
+TARGET= boot.img
+OBJS = stage1.o serial.o string.o time.o main.o
+CC = gcc
+CFLAGS = -g -std=c99 -pedantic -Wall -Os -m32 -ffreestanding -I include
 # these options keep the binary very small
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 ASFLAGS = -g -F dwarf -f elf
@@ -9,21 +12,24 @@ ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
     CFLAGS += -fcf-protection=return
 endif
 vpath %.c src
-vpath %.h src
 vpath %.asm src
-vpath %.o obj
 
-demo.img: stage0.bin stage1.bin
-	python3 wrimg $@ $^
+.PHONY: clean run debug
+$(TARGET): stage0.bin stage1.bin
+	./mkboot $@ $^
 %.bin: %.elf
 	objcopy -O binary $< $@
 stage0.elf: stage0.o
-	ld $(LDFLAGS) -Ttext=0x7c00 -o $@ $^
-stage1.elf: stage1.o serial.o string.o time.o main.o
-	ld $(LDFLAGS) -Ttext=0x7e00 -o $@ $^
+	$(LD) $(LDFLAGS) -Ttext=0x7c00 -o $@ $^
+stage1.elf: $(OBJS)
+	$(LD) $(LDFLAGS) -Ttext=0x7e00 -o $@ $^
 %.o: %.asm
 	nasm $(ASFLAGS) -o $@ -l $(addsuffix .lst,$(basename $@)) $<
 %.o: %.c
-	gcc $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 clean:
-	rm -f demo.img *.elf *.o *.lst *.bin
+	$(RM) $(TARGET) *.elf *.o *.lst *.bin
+run: $(TARGET)
+	@./qemu
+debug: $(TARGET)
+	gdb -x start.gdb

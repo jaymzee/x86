@@ -1,2 +1,6 @@
 #!/bin/sh
-qemu-system-i386 -m 16 -boot a -drive format=raw,if=floppy,file=demo.img,readonly -curses
+
+megs=16
+file=boot.img
+
+qemu-system-i386 $@ -m $megs -boot a -drive format=raw,if=floppy,file=$file,readonly
