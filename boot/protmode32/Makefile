@@ -28,8 +28,8 @@ stage1.elf: $(OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 clean:
-	$(RM) $(TARGET) *.elf *.o *.lst *.bin
+	@$(RM) $(TARGET) *.elf *.o *.lst *.bin
 run: $(TARGET)
-	@./qemu
+	@./qemu -display curses
 debug: $(TARGET)
 	gdb -x start.gdb
