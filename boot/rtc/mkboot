@@ -3,7 +3,7 @@
 import sys
 
 if len(sys.argv) != 4:
-    print("Usage: wrimg image stage0 stage1")
+    print("Usage: mkboot image stage0 stage1")
     exit(1)
 
 with open(sys.argv[2], mode='rb') as file:

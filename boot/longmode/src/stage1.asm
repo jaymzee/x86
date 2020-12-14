@@ -15,7 +15,7 @@ VIDEOMEM    EQU 0x0b8000
 _start:
 	mov	si, greeting1
 	call	bios_print
-	jmp	enter_prot_mode
+	jmp	enter_long_mode
 
 ; print to screen using calls to BIOS INT 10h
 ;   si  pointer to null terminated string
@@ -38,9 +38,9 @@ enter_long_mode:
 	call	enable_a20	; Enable A20 gate
 	cli			; disable interrupts
 	; TODO: setup page tables (paging is required in long mode)
-	mov	eax, cr0
-	or	eax, 0x80000000 ; enable paging, bit 31
-	mov	cr0, eax	;
+	;mov	eax, cr0
+	;or	eax, 0x80000000 ; enable paging, bit 31
+	;mov	cr0, eax	;
 	lgdt	[gdtr]		; Load gdt
 	mov	eax, cr0
 	or	eax, 1

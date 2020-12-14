@@ -1,6 +1,6 @@
-#include "interrupt.h"
-#include "serial.h"
-#include "string.h"
+#include <interrupt.h>
+#include <serial.h>
+#include <string.h>
 
 static void print(const char *str)
 {
