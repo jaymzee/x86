@@ -34,10 +34,11 @@ char *itoa(int num, int base, char *str)
         isNegative = 1;
         num = -num;
     }
-    while (num != 0) {
-        int r = num % base;
+    unsigned int unum = num;
+    while (unum != 0) {
+        unsigned int r = unum % base;
         str[i++] = (r > 9) ? (r - 10) + 'a' : r + '0';
-        num /= base;
+        unum /= base;
     }
     if (isNegative) {
         str[i++] = '-';

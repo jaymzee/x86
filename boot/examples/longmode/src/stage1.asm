@@ -1,8 +1,10 @@
 ; ------------------------------------------------------------------------------
-; second stage bootloader enters 32-bit protected mode
+; second stage bootloader enters long mode
+; paging is required in long mode
+; only the first 2MB is identity mapped to show proof of concept
 ; assemble with nasm
 
-STACK32_TOP EQU 0x1000000		; top of 16MB memory
+STACK32_TOP EQU 0x200000		; top of 2MB memory
 VIDEOMEM    EQU 0x0b8000
 
 	extern Main
@@ -37,14 +39,41 @@ bios_print:
 enter_long_mode:
 	call	enable_a20	; Enable A20 gate
 	cli			; disable interrupts
-	; TODO: setup page tables (paging is required in long mode)
-	;mov	eax, cr0
-	;or	eax, 0x80000000 ; enable paging, bit 31
-	;mov	cr0, eax	;
+.clr_pd	mov	edi, 0x1000
+	mov	cr3, edi
+	xor	eax, eax
+	mov	ecx, 4096
+	rep	stosd		; clear page directory tables
+.set_pd	mov	edi, cr3
+	mov	eax, 0x1000
+	mov	ecx, 0x2003
+	mov	[edi], ecx	; PML4T[0] -> PDPT
+	add	edi, eax
+	add	ecx, eax
+	mov	[edi], ecx	; PDPT[0] -> PDT
+	add	edi, eax
+	add	ecx, eax
+	mov	[edi], ecx	; PDT[0] -> PT
+	add	edi, eax
+	add	ecx, eax
+.id_map cld
+	mov	ebx, 3
+	mov	ecx, 512	; identity map first 2MB
+.fillpt	mov	[edi], ebx	; PT[n] = n*4096 + 3
+	add	ebx, 0x1000
+	add	edi, 8
+	loop	.fillpt
+.en_pae	mov	eax, cr4
+	or	eax, 1 << 5	; enable PAE-paging
+	mov	cr4, eax
+.set_lm	mov	ecx, 0xC0000080 ; EFER MSR
+	rdmsr
+	or	eax, 1 << 8	; set LM-bit in the EFER MSR
+	wrmsr
+.en_pr	mov	eax, cr0
+	or	eax, 1 << 31 | 1; enable paging and protected mode
+	mov	cr0, eax
 	lgdt	[gdtr]		; Load gdt
-	mov	eax, cr0
-	or	eax, 1
-	mov	cr0, eax	; Set protected mode flag
 	jmp	0x08:start64
 
 ; Enable A20
@@ -80,11 +109,10 @@ start64:
 	mov	esp,STACK32_TOP ; Should set ESP to a usable memory location
 				; Stack will be grow down from this location
 
-	; print success message to display
 	mov	ah, 0x57	; Attribute white on magenta
 	mov	esi, greeting2	; ESI = address of string to print
 	mov	edi, VIDEOMEM	; EDI = base address of video memory
-	call	write_screen
+	call	write_screen	; print success message to display
 
 	mov	ebp, 0		; terminate chain of frame pointers
 	call	Main		; it's not expected for Main to ever return
@@ -114,9 +142,9 @@ write_screen:
 	section .data
 
 greeting1:
-	db `Entering Protected Mode\r\n`, 0
+	db `Entering long mode...\r\n`, 0
 greeting2:
-	db "Protected Mode entered successfully - console on serial 0", 0
+	db "long mode (x64) entered successfully - console on serial 0", 0
 
 	align 8
 gdtr:
@@ -128,11 +156,11 @@ gdt_start:
 	; First entry is always the Null Descriptor
 	dq 0
 gdt_code:
-	; 4gb flat r/w/executable code descriptor
+	; 4gb flat r/executable code descriptor
 	dw 0xFFFF	; limit 0:15
 	dw 0		; base 0:15
 	db 0		; base 16:23
-	db 0b10011010	; access P DPL S Type
+	db 0b10011010	; access P DPL S, flags Ex DC R Ac
 	db 0b10101111	; flags Gr Sz L, Limit 16:19
 	db 0		; base 24:31
 gdt_data:
@@ -140,7 +168,7 @@ gdt_data:
 	dw 0xFFFF	; limit 0:15
 	dw 0		; base 0:15
 	db 0		; base 16:23
-	db 0b10010010	; access P DPL S Type
+	db 0b10010010	; access P DPL S, flags Ex DC W Ac
 	db 0b10101111	; flags Gr Sz L, Limit 16:19
 	db 0		; base 24:31
 gdt_end:

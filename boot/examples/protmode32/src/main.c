@@ -7,6 +7,12 @@ static void print(const char *str)
     COM_WriteString(str);
 }
 
+static void print(const char *str)
+{
+    COM_WriteString(str);
+    COM_WriteString("\n");
+}
+
 static int getchar(void)
 {
     return COM_ReadChar();

@@ -7,6 +7,12 @@ static void print(const char *str)
     COM_WriteString(str);
 }
 
+static void println(const char *str)
+{
+    COM_WriteString(str);
+    COM_WriteString("\n");
+}
+
 static int getchar(void)
 {
     return COM_ReadChar();
@@ -20,12 +26,36 @@ static int putchar(int ch)
 
 void Main()
 {
+    long *p = (long *)0x1000;
+    char buf[80];
+    int n = 0;
+
     COM_Init();
-    print("protected mode demo\n");
+    println("long mode demo");
+    print("PML4T[0] = 0x");
+    println(itoa(p[0], 16, buf));
+    print("PDPT[0] = 0x");
+    println(itoa(p[0x200], 16, buf));
+    print("PDT[0] = 0x");
+    println(itoa(p[0x400], 16, buf));
+    for (int i = 0; i < 16; i++, n++) {
+        print("PT[");
+        print(itoa(n, 10, buf));
+        print("] = ");
+        println(itoa(p[0x600 + n], 16, buf));
+    }
+
     while (1) {
-        print("\npress a key ");
+        print("press a key ");
         int c = getchar();
-        print("\nyou pressed: ");
-        putchar(c);
+        print("\n");
+        for (int i = 0; i < 16; i++, n++) {
+            if (n < 512) {
+                print("PT[");
+                print(itoa(n, 10, buf));
+                print("] = ");
+                println(itoa(p[0x600 + n], 16, buf));
+            }
+        }
     }
 }
