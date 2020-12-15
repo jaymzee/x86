@@ -1,11 +1,12 @@
 TARGET = demo.img
 OBJECTS = stage1.o serial.o main.o
 SOURCE = ../../pc/src
-INCLUDE = $(SOURCE)
+INCLUDE = ../../pc/include
+CC = gcc
 CFLAGS = -g -std=c99 -pedantic -Wall -Os -m16 -ffreestanding
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(INCLUDE)
-ASFLAGS = -g -F dwarf -f elf
+ASFLAGS = -g -F dwarf -f elf -I $(addsuffix /,$(INCLUDE))
 LDFLAGS = -m elf_i386 --nmagic
 GCCVERSION := $(shell gcc -dumpversion)
 ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
@@ -16,7 +17,7 @@ vpath %.asm src
 vpath %.c src
 vpath %.c $(SOURCE)
 
-.PHONY: clean
+.PHONY: clean run debug
 $(TARGET): stage0.bin stage1.bin
 	./mkboot $@ $^
 %.bin: %.elf
@@ -28,6 +29,10 @@ stage1.elf: $(OBJECTS)
 %.o: %.asm
 	nasm $(ASFLAGS) -o $@ -l $(addsuffix .lst,$(basename $@)) $<
 %.o: %.c
-	gcc $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 clean:
 	rm -f $(TARGET) *.elf *.o *.lst *.bin
+run: $(TARGET)
+	@./qemu -display curses
+debug: $(TARGET)
+	gdb -x start16.gdb

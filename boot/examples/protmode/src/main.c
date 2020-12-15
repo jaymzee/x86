@@ -7,7 +7,7 @@ static void print(const char *str)
     COM_WriteString(str);
 }
 
-static void print(const char *str)
+static void println(const char *str)
 {
     COM_WriteString(str);
     COM_WriteString("\n");
@@ -27,7 +27,7 @@ static int putchar(int ch)
 void Main()
 {
     COM_Init();
-    print("protected mode demo\n");
+    println("protected mode demo");
     while (1) {
         print("\npress a key ");
         int c = getchar();

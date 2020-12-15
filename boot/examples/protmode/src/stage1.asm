@@ -14,52 +14,19 @@ VIDEOMEM    EQU 0x0b8000
 	global _start
 _start:
 	mov	si, greeting1
-	call	bios_print
-	jmp	enter_prot_mode
-
-; print to screen using calls to BIOS INT 10h
-;   si  pointer to null terminated string
-;   ax  clobbered
-bios_print:
-	push	bx
-	cld
-	mov	bx, 0x000f		; page number (and color in gfx mode)
-	mov	ah, 0Eh			; teletype output
-.L1	lodsb
-	test	al, al
-	je	.break
-	int	10h
-	jmp	.L1
-.break	pop	bx
-	ret
-
-
-enter_prot_mode:
-	call	enable_a20		; Enable A20 gate
+	call	_print
+	call	_enable_a20_line
 	cli			; disable interrupts
-	lgdt	[gdtr]		; Load gdt
-	mov	eax, cr0
-	or	eax, 1
-	mov	cr0, eax	; Set protected mode flag
+	call	_enter_prot_mode
+	lgdt	[gdtr]
 	jmp	0x08:start32
 
-; Enable A20
-;   uses fast method as proof of concept and may not work on all hardware
-;   ax  clobbered
-enable_a20:
-	cli			; disable interrupts
-	in	al, 0x92	; Read System Control Port A
-	test	al, 0x02	; Test current a20 value (bit 1)
-	jnz	.skip		; If already 1 skip a20 enable
-	or	al, 0x02	; Set a20 bit (bit 1) to 1
-	and	al, 0xfe	; Always write a zero to bit 0 to avoid
-				;     a fast reset into real mode
-	out	0x92, al        ; Enable a20
-.skip	sti			; reenable interrupts
-	ret
+%include "bios.asm"
+%include "cpumode.asm"
 
 
-; Code that will run in 32-bit protected mode
+
+; 32 bit code that will run in 32-bit protected mode
 
 	bits 32
 

@@ -1,13 +1,13 @@
 TARGET = boot.img
 OBJECTS = stage1.o serial.o string.o time.o main.o
 SOURCE = ../../pc/src
-INCLUDE = $(SOURCE)
+INCLUDE = ../../pc/include
 CC = gcc
 CFLAGS = -g -std=c99 -pedantic -Wall -Os -m32 -ffreestanding
 # these options keep the binary very small
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(INCLUDE)
-ASFLAGS = -g -F dwarf -f elf
+ASFLAGS = -g -F dwarf -f elf -I $(addsuffix /,$(INCLUDE))
 LDFLAGS = -m elf_i386 --nmagic  # --nmagic eliminates gaps between sections
 GCCVERSION := $(shell gcc -dumpversion)
 ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)

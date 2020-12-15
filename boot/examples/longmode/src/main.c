@@ -2,26 +2,20 @@
 #include "serial.h"
 #include "string.h"
 
-static void print(const char *str)
+void print(const char *str)
 {
     COM_WriteString(str);
 }
 
-static void println(const char *str)
+void println(const char *str)
 {
     COM_WriteString(str);
     COM_WriteString("\n");
 }
 
-static int getchar(void)
+int getchar(void)
 {
     return COM_ReadChar();
-}
-
-static int putchar(int ch)
-{
-    COM_WriteChar(ch);
-    return ch;
 }
 
 void Main()
@@ -47,7 +41,7 @@ void Main()
 
     while (1) {
         print("press a key ");
-        int c = getchar();
+        getchar();
         print("\n");
         for (int i = 0; i < 16; i++, n++) {
             if (n < 512) {
