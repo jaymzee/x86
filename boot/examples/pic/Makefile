@@ -1,6 +1,6 @@
 TARGET = demo.img
 OBJECTS = stage1.o serial.o string.o interrupt.o main.o
-SOURCE = ../../pc/src
+SOURCE = ../../isa/src
 INCLUDE = $(SOURCE)
 CC = gcc
 CFLAGS = -g -std=c99 -pedantic -Wall -Os -m16 -ffreestanding

@@ -1,7 +1,7 @@
 TARGET = demo.img
 OBJECTS = stage1.o serial.o main.o
-SOURCE = ../../pc/src
-INCLUDE = ../../pc/include
+SOURCE = ../../isa/src
+INCLUDE = ../../isa/include
 CC = gcc
 CFLAGS = -g -std=c99 -pedantic -Wall -Os -m16 -ffreestanding
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables

@@ -1,12 +1,14 @@
-TARGET = demo.img
-OBJECTS = stage1.o graphics.o
+TARGET = boot.img
+OBJECTS = stage1.o serial.o string.o graphics.o main.o
 SOURCE = ../../isa/src
-INCLUDE = $(SOURCE)
-CFLAGS = -g -std=c99 -pedantic -Wall -Os -m16 -ffreestanding
+INCLUDE = ../../isa/include
+CC = gcc
+CFLAGS = -g -std=c99 -pedantic -Wall -Os -m32 -ffreestanding
+# these options keep the binary very small
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(INCLUDE)
-ASFLAGS = -g -F dwarf -f elf
-LDFLAGS = -m elf_i386 --nmagic
+ASFLAGS = -g -F dwarf -f elf -I $(addsuffix /,$(INCLUDE))
+LDFLAGS = -m elf_i386 --nmagic  # --nmagic eliminates gaps between sections
 GCCVERSION := $(shell gcc -dumpversion)
 ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
     # disable CET endbr32 instructions in function entry point
@@ -16,7 +18,7 @@ vpath %.asm src
 vpath %.c src
 vpath %.c $(SOURCE)
 
-.PHONY: clean debug run
+.PHONY: clean run debug
 $(TARGET): stage0.bin stage1.bin
 	./mkboot $@ $^
 %.bin: %.elf
@@ -28,10 +30,10 @@ stage1.elf: $(OBJECTS)
 %.o: %.asm
 	nasm $(ASFLAGS) -o $@ -l $(addsuffix .lst,$(basename $@)) $<
 %.o: %.c
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 clean:
 	@$(RM) $(TARGET) *.elf *.o *.lst *.bin
 run: $(TARGET)
-	@./qemu -display curses
+	@./qemu
 debug: $(TARGET)
-	gdb -x start16.gdb
+	gdb -x start.gdb
