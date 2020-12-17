@@ -1,3 +1,4 @@
+#include "conio.h"
 #include "interrupt.h"
 #include "serial.h"
 #include "string.h"
@@ -18,12 +19,14 @@ int getchar(void)
     return COM_ReadChar();
 }
 
-void Main()
+void main()
 {
     long *p = (long *)0x2000;
     char buf[80];
     int n = 0;
 
+    WriteText(0, 0, "long mode (x64) entered sucessfully!", 0x57);
+    WriteText(0, 1, "switch to serial 0 for console", 0x57);
     COM_Init();
     println("long mode demo");
     print("PML4T[0] = 0x");
@@ -53,3 +56,6 @@ void Main()
         }
     }
 }
+
+void main() __attribute__((section(".text.main")));
+

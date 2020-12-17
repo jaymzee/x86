@@ -4,10 +4,9 @@
 ; only the first 2MB is identity mapped to show proof of concept
 ; assemble with nasm
 
-STACK64_TOP EQU 0x400000	; top of 4MB memory
-VIDEOMEM    EQU 0x0b8000
+STACK64_TOP equ 0x400000	; top of 4MB memory
+LOADADDR    equ 0x8000		; address to load program into
 
-	extern Main
 
 ; 16 bit functions that run in real mode
 
@@ -15,8 +14,9 @@ VIDEOMEM    EQU 0x0b8000
 
 	global _start
 _start:
-	mov	si, greeting1
+	mov	si, greeting
 	call	_print
+	call	_load_program
 	call	_enable_a20_line
 	call	_init_page_tables
 	cli			; disable interrupts
@@ -24,6 +24,20 @@ _start:
 	call	_enter_long_mode
 	lgdt	[gdt.record]
 	jmp	0x08:start64
+
+; ax, cx, dx  clobbered
+_load_program:
+	push	bx
+	mov	ah, 2h		; read sectors from drive
+	mov	al, 32		; sector count (16K)
+	mov	ch, 0		; cylinder
+	mov	dh, 0		; head
+	mov	cl, 3		; sector
+	mov	dl, 0		; drive a (use 80h for 1st HD)
+	mov	bx, LOADADDR	; start address of main program
+	int	13h
+	pop	bx
+	ret
 
 %include "bios.asm"
 %include "cpumode.asm"
@@ -67,6 +81,8 @@ _init_page_tables:
 
 	bits 64
 
+	default abs
+
 	section .text
 	align 8
 start64:
@@ -80,43 +96,15 @@ start64:
 	mov	esp,STACK64_TOP ; Should set ESP to a usable memory location
 				; Stack will be grow down from this location
 
-	mov	ah, 0x57	; Attribute white on magenta
-	mov	esi, greeting2	; ESI = address of string to print
-	mov	edi, VIDEOMEM	; EDI = base address of video memory
-	call	write_screen	; print success message to display
-
 	mov	ebp, 0		; terminate chain of frame pointers
-	call	Main		; it's not expected for Main to ever return
-				; but just in case:
+	mov	rax, LOADADDR
+	call	rax		; call main()
+				; not expect for it to return but if it does:
 	cli			;   disable interrupts
 .halt	hlt			;   Halt CPU with infinite loop
 	jmp	.halt
 
-; display text and attribute at a location on the screen
-;   edi - null terminated string to display
-;   esi - screen memory address to write the string to
-;    ah - screen attribute to use for each character
-;   all other registers are preserved
-write_screen:
-	push	rcx
-	xor	ecx, ecx	; ECX = 0 current video offset
-	jmp	.L1_ent
-.L1	mov	[edi+ecx*2], ax	; Copy attr and character to display
-	inc	ecx		; Next word position
-.L1_ent mov	al, [esi+ecx]	; Get next character to print
-	test	al, al
-	jnz	.L1		; If it's not NUL continue
-	pop	rcx
-	ret
-
-
 	section .data
-
-greeting1:
-	db `Entering long mode...\r\n`, 0
-greeting2:
-	db "long mode (x64) entered successfully - console on serial 0", 0
-
 	align 8
 gdt:
 	dq 0			; First entry is always the Null Descriptor
@@ -136,4 +124,7 @@ gdt:
 	db 0			; base 24:31
 .record	dw $ - gdt - 1		; size
 	dd gdt			; offset
+
+greeting:
+	db `Entering long mode...\r\n`, 0
 

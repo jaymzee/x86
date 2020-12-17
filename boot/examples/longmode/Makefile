@@ -1,5 +1,5 @@
 TARGET= boot.img
-OBJS = stage1.o serial.o string.o main.o
+OBJS = main.o conio.o serial.o string.o
 SOURCE = ../../isa/src
 INCLUDE = ../../isa/include
 CC = gcc
@@ -19,14 +19,14 @@ vpath %.c $(SOURCE)
 vpath %.asm src
 
 .PHONY: clean run debug
-$(TARGET): stage0.bin stage1.bin
+$(TARGET): stage0.bin stage1.bin main.bin
 	./mkboot $@ $^
 %.bin: %.elf
 	objcopy -O binary $< $@
-stage0.elf: stage0.o
-	$(LD) $(LDFLAGS) -T stage0.ld -o $@ $^
-stage1.elf: $(OBJS)
-	$(LD) $(LDFLAGS) -T stage1.ld -o $@ $^
+stage%.elf: stage%.o
+	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
+main.elf: $(OBJS)
+	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
 %.o: %.asm
 	nasm $(ASFLAGS) -o $@ -l $(addsuffix .lst,$(basename $@)) $<
 %.o: %.c
@@ -36,4 +36,4 @@ clean:
 run: $(TARGET)
 	@./qemu -display curses
 debug: $(TARGET)
-	gdb -x start.gdb
+	gdb -x init.gdb
