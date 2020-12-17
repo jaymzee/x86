@@ -41,3 +41,18 @@ _enable_a20_line:
 .skip	sti			; reenable interrupts
 	ret
 
+; disable NMI
+;   al  clobbered
+_disable_nmi:
+	in	al, 0x70
+	or	al, 0x80
+	out	0x70, al
+	ret
+
+; enable NMI
+;   al  clobbered
+_enable_nmi:
+	in	al, 0x70
+	and	al, 0x7f
+	out	0x70, al
+	ret

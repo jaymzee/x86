@@ -131,13 +131,13 @@ unsigned short PIC_GetISR(void)
 }
 
 // unmask NMI via CMOS/RTC
-void NMI_Enable()
+void NMI_Enable(void)
 {
     outb(RTC, inb(RTC) & 0x7F);
 }
 
 // mask NMI via CMOS/RTC
-void NMI_Disable()
+void NMI_Disable(void)
 {
      outb(RTC, inb(RTC) | 0x80);
 }

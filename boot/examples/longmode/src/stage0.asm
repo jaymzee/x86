@@ -8,9 +8,8 @@ LOADADDR equ 0x7e00
 
 	global _start
 _start:
-	mov	bp, 0		; initialize ss:sp and ss:bp
-	mov	ax, 0
-	mov	ss, ax
+	xor	bp, bp		; initialize ss:sp and ss:bp
+	mov	ss, bp
 	mov	sp, 0x7c00
 
 	mov	ah, 2h		; read sectors from drive

@@ -22,3 +22,6 @@ void PIC_SendEOI(unsigned char irq);
 unsigned short PIC_GetIRR(void);
 // Returns the combined value of the cascaded PICs in service register
 unsigned short PIC_GetISR(void);
+
+void NMI_Enable(void);
+void NMI_Disable(void);

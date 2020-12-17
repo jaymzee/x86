@@ -20,7 +20,7 @@ int getchar(void)
 
 void Main()
 {
-    long *p = (long *)0x1000;
+    long *p = (long *)0x2000;
     char buf[80];
     int n = 0;
 
@@ -44,7 +44,7 @@ void Main()
         getchar();
         print("\n");
         for (int i = 0; i < 16; i++, n++) {
-            if (n < 512) {
+            if (n < 1024) {
                 print("PT[");
                 print(itoa(n, 10, buf));
                 print("] = ");

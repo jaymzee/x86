@@ -52,27 +52,23 @@ start32:
 
 	align 8
 gdtr:
-	dw gdt_end - gdt_start - 1
-	dd gdt_start
+.size	dw gdt.end - gdt	; size of descriptor table - 1
+.offset	dd gdt
 
 	align 8
-gdt_start:
-	; First entry is always the Null Descriptor
-	dq 0
-gdt_code:
+gdt:
+	dq 0			; First entry is always the Null Descriptor
 	; 4gb flat read/executable code descriptor
-	dw 0xFFFF	; limit 0:15
-	dw 0		; base 0:15
-	db 0		; base 16:23
-	db 0b10011010	; access P GPL S, Type Ex DC R Ac
-	db 0b11001111	; flags Gr Sz L, Limit 16:19
-	db 0		; base 24:31
-gdt_data:
+.code	dw 0xFFFF		; limit 0:15
+	dw 0			; base 0:15
+	db 0			; base 16:23
+	db 0b10011010		; access P GPL S, Type Ex DC R Ac
+	db 0b11001111		; flags Gr Sz L, Limit 16:19
+	db 0			; base 24:31
 	; 4gb flat read/write data descriptor
-	dw 0xFFFF	; limit 0:15
-	dw 0		; base 0:15
-	db 0		; base 16:23
-	db 0b10010010	; access P GPL S Type Ex DC W Ac
-	db 0b11001111	; flags Gr Sz L, Limit 16:19
-	db 0		; base 24:31
-gdt_end:
+.data	dw 0xFFFF		; limit 0:15
+	dw 0			; base 0:15
+	db 0			; base 16:23
+	db 0b10010010		; access P GPL S Type Ex DC W Ac
+	db 0b11001111		; flags Gr Sz L, Limit 16:19
+.end	db 0			; base 24:31

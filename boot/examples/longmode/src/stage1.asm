@@ -4,7 +4,7 @@
 ; only the first 2MB is identity mapped to show proof of concept
 ; assemble with nasm
 
-STACK64_TOP EQU 0x200000	; top of 2MB memory
+STACK64_TOP EQU 0x400000	; top of 4MB memory
 VIDEOMEM    EQU 0x0b8000
 
 	extern Main
@@ -20,8 +20,9 @@ _start:
 	call	_enable_a20_line
 	call	_init_page_tables
 	cli			; disable interrupts
+	call	_disable_nmi	; disable NMI
 	call	_enter_long_mode
-	lgdt	[gdtr]
+	lgdt	[gdt.record]
 	jmp	0x08:start64
 
 %include "bios.asm"
@@ -31,26 +32,29 @@ _start:
 ; eax, ecx, edx  clobbered
 _init_page_tables:
 	push	edi
-.clr_pd	mov	edi, 0x1000
+.clr_pd	mov	edi, 0x2000	; start of page tables
 	mov	cr3, edi
 	xor	eax, eax
-	mov	ecx, 4096
-	rep	stosd		; clear page directory tables
+	mov	ecx, 512 * 2 * 5
+	rep	stosd		; clear page tables
 .set_pd	mov	edi, cr3
-	mov	eax, 0x1000
-	mov	ecx, 0x2003
+	mov	eax, 0x1000	; eax = page size
+	mov	ecx, edi
+	add	ecx, 0x1003	; ecx -> next page table
 	mov	[edi], ecx	; PML4T[0] -> PDPT
 	add	edi, eax
 	add	ecx, eax
 	mov	[edi], ecx	; PDPT[0] -> PDT
 	add	edi, eax
 	add	ecx, eax
-	mov	[edi], ecx	; PDT[0] -> PT
+	mov	[edi], ecx	; PDT[0] -> 1st PT
+	add	ecx, eax
+	mov	[edi + 8], ecx	; PDT[1] -> 2nd PT
 	add	edi, eax
 	add	ecx, eax
 .id_map cld
 	mov	edx, 3		; R/W and Present
-	mov	ecx, 512	; identity map first 2MB
+	mov	ecx, 1024	; identity map first 4MB
 .fillpt	mov	[edi], edx	; PT[n] = n*4096 + 3
 	add	edx, 0x1000
 	add	edi, 8
@@ -114,28 +118,22 @@ greeting2:
 	db "long mode (x64) entered successfully - console on serial 0", 0
 
 	align 8
-gdtr:
-	dw gdt_end - gdt_start - 1
-	dd gdt_start
-
-	align 8
-gdt_start:
-	; First entry is always the Null Descriptor
-	dq 0
-gdt_code:
+gdt:
+	dq 0			; First entry is always the Null Descriptor
 	; 4gb flat r/executable code descriptor
-	dw 0xFFFF	; limit 0:15
-	dw 0		; base 0:15
-	db 0		; base 16:23
-	db 0b10011010	; access P DPL S, flags Ex DC R Ac
-	db 0b10101111	; flags Gr Sz L, Limit 16:19
-	db 0		; base 24:31
-gdt_data:
+.code	dw 0xFFFF		; limit 0:15
+	dw 0			; base 0:15
+	db 0			; base 16:23
+	db 0b10011010		; access P DPL S, flags Ex DC R Ac
+	db 0b10101111		; flags Gr Sz L, Limit 16:19
+	db 0			; base 24:31
 	; 4gb flat r/w data descriptor
-	dw 0xFFFF	; limit 0:15
-	dw 0		; base 0:15
-	db 0		; base 16:23
-	db 0b10010010	; access P DPL S, flags Ex DC W Ac
-	db 0b10101111	; flags Gr Sz L, Limit 16:19
-	db 0		; base 24:31
-gdt_end:
+.data	dw 0xFFFF		; limit 0:15
+	dw 0			; base 0:15
+	db 0			; base 16:23
+	db 0b10010010		; access P DPL S, flags Ex DC W Ac
+	db 0b10101111		; flags Gr Sz L, Limit 16:19
+	db 0			; base 24:31
+.record	dw $ - gdt - 1		; size
+	dd gdt			; offset
+

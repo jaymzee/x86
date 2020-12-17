@@ -17,8 +17,9 @@ _start:
 	call	_print
 	call	_enable_a20_line
 	cli			; disable interrupts
+	call	_disable_nmi	; disable NMI
 	call	_enter_prot_mode
-	lgdt	[gdtr]
+	lgdt	[gdt.record]
 	jmp	0x08:start32
 
 %include "bios.asm"
@@ -81,15 +82,9 @@ greeting2:
 	db "Protected Mode entered successfully - console on serial 0", 0
 
 	align 8
-gdtr:
-	dw gdt_end - gdt_start - 1
-	dd gdt_start
-
-	align 8
-gdt_start:
-	; First entry is always the Null Descriptor
-	dq 0
-gdt_code:
+gdt:
+	dq 0		; First entry is always the Null Descriptor
+.code	equ $ - gdt
 	; 4gb flat read/executable code descriptor
 	dw 0xFFFF	; limit 0:15
 	dw 0		; base 0:15
@@ -97,7 +92,7 @@ gdt_code:
 	db 0b10011010	; access P GPL S, Type Ex DC R Ac
 	db 0b11001111	; flags Gr Sz L, Limit 16:19
 	db 0		; base 24:31
-gdt_data:
+.data	equ $ - gdt
 	; 4gb flat read/write data descriptor
 	dw 0xFFFF	; limit 0:15
 	dw 0		; base 0:15
@@ -105,4 +100,6 @@ gdt_data:
 	db 0b10010010	; access P GPL S Type Ex DC W Ac
 	db 0b11001111	; flags Gr Sz L, Limit 16:19
 	db 0		; base 24:31
-gdt_end:
+.record	dw $ - gdt - 1	; size
+	dd gdt		; offset
+
