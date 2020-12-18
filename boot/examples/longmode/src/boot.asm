@@ -4,8 +4,8 @@
 ; only the first 2MB is identity mapped to show proof of concept
 ; assemble with nasm
 
-STACK64_TOP equ 0x400000	; top of 4MB memory
-LOADADDR    equ 0x8000		; address to load program into
+STACK64_TOP equ 0x1000000	; top of 16MB memory
+LOADADDR    equ 0x10000		; address to load program into
 
 
 ; 16 bit functions that run in real mode
@@ -14,10 +14,17 @@ LOADADDR    equ 0x8000		; address to load program into
 
 	global _start
 _start:
-	xor	bp, bp		; initialize ss:sp and ss:bp
-	mov	ss, bp
+	xor	ax, ax
+	mov	bx, ax
+	mov	cx, ax
+	mov	dx, ax
+	mov	si, ax
+	mov	di, ax
+	mov	ds, ax
+	mov	es, ax
+	mov	ss, ax
+	mov	bp, ax		; initialize ss:sp and ss:bp
 	mov	sp, 0x7c00
-
 	mov	si, greeting
 	call	_print
 	call	_load_program
@@ -31,6 +38,7 @@ _start:
 
 ; ax, cx, dx  clobbered
 _load_program:
+	push	es
 	push	bx
 	mov	ah, 2h		; read sectors from drive
 	mov	al, 32		; sector count (16K)
@@ -38,9 +46,12 @@ _load_program:
 	mov	dh, 0		; head
 	mov	cl, 2		; sector
 	mov	dl, 0		; drive a (use 80h for 1st HD)
-	mov	bx, LOADADDR	; start address of main program
+	mov	bx, LOADADDR >> 4
+	mov	es, bx
+	mov	bx, LOADADDR & 0xFFFF ; es:bx start address of main program
 	int	13h
 	pop	bx
+	pop	es
 	ret
 
 %include "bios.asm"
@@ -50,29 +61,30 @@ _load_program:
 ; eax, ecx, edx  clobbered
 _init_page_tables:
 	push	edi
-.clr_pd	mov	edi, 0x2000	; start of page tables
+	mov	edi, 0x2000	; start of page tables
 	mov	cr3, edi
 	xor	eax, eax
-	mov	ecx, 512 * 2 * 5
+	cld
+	mov	ecx, 512 * 2 * 3
 	rep	stosd		; clear page tables
-.set_pd	mov	edi, cr3
+	mov	edi, cr3
 	mov	eax, 0x1000	; eax = page size
-	mov	ecx, edi
-	add	ecx, 0x1003	; ecx -> next page table
-	mov	[edi], ecx	; PML4T[0] -> PDPT
+	mov	edx, edi
+	add	edx, 0x1003	; edx -> next page table
+	mov	[edi], edx	; PML4T[0] -> PDPT
 	add	edi, eax
-	add	ecx, eax
-	mov	[edi], ecx	; PDPT[0] -> PDT
+	add	edx, eax
+	mov	[edi], edx	; PDPT[0] -> PDT
 	add	edi, eax
-	add	ecx, eax
-	mov	[edi], ecx	; PDT[0] -> 1st PT
-	add	ecx, eax
-	mov	[edi + 8], ecx	; PDT[1] -> 2nd PT
-	add	edi, eax
-	add	ecx, eax
-.id_map cld
+	add	edx, 0x4000
+	mov	ecx, 8
+.pdt	mov	[edi], edx	; PDT[n] -> nth PT
+	add	edx, eax
+	add	edi, 8
+	loop	.pdt
+	mov	edi, 0x8000
 	mov	edx, 3		; R/W and Present
-	mov	ecx, 1024	; identity map first 4MB
+	mov	ecx, 4096	; identity map first 16MB
 .fillpt	mov	[edi], edx	; PT[n] = n*4096 + 3
 	add	edx, 0x1000
 	add	edi, 8
@@ -99,7 +111,6 @@ start64:
 	mov	ss, eax
 	mov	esp,STACK64_TOP ; Should set ESP to a usable memory location
 				; Stack will be grow down from this location
-
 	mov	ebp, 0		; terminate chain of frame pointers
 	mov	rax, LOADADDR
 	call	rax		; call main()

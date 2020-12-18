@@ -11,10 +11,17 @@ LOADADDR    EQU 0x8000
 
 	global _start
 _start:
-	xor	bp, bp		; initialize ss:sp and ss:bp
-	mov	ss, bp
+	xor	ax, ax
+	mov	bx, ax
+	mov	cx, ax
+	mov	dx, ax
+	mov	si, ax
+	mov	di, ax
+	mov	ds, ax
+	mov	es, ax
+	mov	ss, ax
+	mov	bp, ax		; initialize ss:sp and ss:bp
 	mov	sp, 0x7c00
-
 	mov	si, greeting
 	call	_print
 	call	_load_program
@@ -27,6 +34,7 @@ _start:
 
 ; ax, cx, dx  clobbered
 _load_program:
+	push	es
 	push	bx
 	mov	ah, 2h		; read sectors from drive
 	mov	al, 32		; sector count (16K)
@@ -34,9 +42,12 @@ _load_program:
 	mov	dh, 0		; head
 	mov	cl, 2		; sector
 	mov	dl, 0		; drive a (use 80h for 1st HD)
-	mov	bx, LOADADDR	; start address of main program
+	mov	bx, LOADADDR << 4
+	mov	es, bx
+	mov	bx, LOADADDR & 0xFFFF ; start address of main program
 	int	13h
 	pop	bx
+	pop	es
 	ret
 
 %include "bios.asm"
@@ -59,9 +70,8 @@ start32:
 	mov	ss, eax
 	mov	esp,STACK32_TOP ; Should set ESP to a usable memory location
 				; Stack will be grow down from this location
-
 	mov	ebp, 0		; terminate chain of frame pointers
-	call	0x8000		; it's not expected for main to ever return
+	call	LOADADDR	; it's not expected for main to ever return
 				; but just in case:
 	cli			;   disable interrupts
 .halt	hlt			;   Halt CPU with infinite loop
