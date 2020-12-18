@@ -3,9 +3,7 @@
 ; assemble with nasm
 
 STACK32_TOP EQU 0x1000000		; top of 16MB memory
-VIDEOMEM    EQU 0x0b8000
-
-	extern Main
+LOADADDR    EQU 0x8000
 
 ; 16 bit functions that run in real mode
 
@@ -13,7 +11,7 @@ VIDEOMEM    EQU 0x0b8000
 
 	global _start
 _start:
-	mov	si, greeting1
+	mov	si, greeting
 	call	_print
 	call	_enable_a20_line
 	cli			; disable interrupts
@@ -24,7 +22,6 @@ _start:
 
 %include "bios.asm"
 %include "cpumode.asm"
-
 
 
 ; 32 bit code that will run in 32-bit protected mode
@@ -44,42 +41,15 @@ start32:
 	mov	esp,STACK32_TOP ; Should set ESP to a usable memory location
 				; Stack will be grow down from this location
 
-	; print success message to display
-	mov	ah, 0x57	; Attribute white on magenta
-	mov	esi, greeting2	; ESI = address of string to print
-	mov	edi, VIDEOMEM	; EDI = base address of video memory
-	call	write_screen
-
 	mov	ebp, 0		; terminate chain of frame pointers
-	call	Main		; it's not expected for Main to ever return
+	call	0x8000		; it's not expected for main to ever return
 				; but just in case:
 	cli			;   disable interrupts
 .halt	hlt			;   Halt CPU with infinite loop
 	jmp	.halt
 
-; display text and attribute at a location on the screen
-;   edi - null terminated string to display
-;   esi - screen memory address to write the string to
-;    ah - screen attribute to use for each character
-;   all other registers are preserved
-write_screen:
-	push	ecx
-	xor	ecx, ecx	; ECX = 0 current video offset
-	jmp	.L1_ent
-.L1	mov	[edi+ecx*2], ax	; Copy attr and character to display
-	inc	ecx		; Next word position
-.L1_ent mov	al, [esi+ecx]	; Get next character to print
-	test	al, al
-	jnz	.L1		; If it's not NUL continue
-	pop	ecx
-	ret
-
 
 	section .data
-greeting1:
-	db `Entering Protected Mode\r\n`, 0
-greeting2:
-	db "Protected Mode entered successfully - console on serial 0", 0
 
 	align 8
 gdt:
@@ -102,4 +72,7 @@ gdt:
 	db 0		; base 24:31
 .record	dw $ - gdt - 1	; size
 	dd gdt		; offset
+
+greeting:
+	db `Entering Protected Mode...\r\n`, 0
 

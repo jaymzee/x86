@@ -1,9 +1,9 @@
 TARGET = boot.img
-OBJECTS = stage1.o serial.o string.o main.o
+OBJECTS = conio.o serial.o string.o main.o
 SOURCE = ../../isa/src
 INCLUDE = ../../isa/include
 CC = gcc
-CFLAGS = -g -std=c99 -pedantic -Wall -Os -m32 -ffreestanding
+CFLAGS = -g -std=c99 -pedantic -Wall -O2 -m32 -ffreestanding
 # these options keep the binary very small
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(INCLUDE)
@@ -19,14 +19,14 @@ vpath %.c src
 vpath %.c $(SOURCE)
 
 .PHONY: clean run debug
-$(TARGET): stage0.bin stage1.bin
+$(TARGET): stage0.bin stage1.bin main.bin
 	./mkboot $@ $^
 %.bin: %.elf
 	objcopy -O binary $< $@
-stage0.elf: stage0.o
-	$(LD) $(LDFLAGS) -T stage0.ld -o $@ $^
-stage1.elf: $(OBJECTS)
-	$(LD) $(LDFLAGS) -T stage1.ld -o $@ $^
+stage%.elf: stage%.o
+	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
+main.elf: $(OBJECTS)
+	$(LD) $(LDFLAGS) -T main.ld -o $@ $^
 %.o: %.asm
 	nasm $(ASFLAGS) -o $@ -l $(addsuffix .lst,$(basename $@)) $<
 %.o: %.c

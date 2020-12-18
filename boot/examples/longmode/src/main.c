@@ -3,6 +3,8 @@
 #include "serial.h"
 #include "string.h"
 
+#define TXT_ATTR    0x07
+
 void print(const char *str)
 {
     COM_WriteString(str);
@@ -25,10 +27,12 @@ void main()
     char buf[80];
     int n = 0;
 
-    WriteText(0, 0, "long mode (x64) entered sucessfully!", 0x57);
-    WriteText(0, 1, "switch to serial 0 for console", 0x57);
+    DisplayText("long mode (x64) entered sucessfully!", TXT_ATTR);
+    DisplayText("Initializing serial 0...", TXT_ATTR);
     COM_Init();
+    DisplayText("connect to serial 0 (COM1) for the console", TXT_ATTR);
     println("long mode demo");
+    println("page tables:");
     print("PML4T[0] = 0x");
     println(itoa(p[0], 16, buf));
     print("PDPT[0] = 0x");
