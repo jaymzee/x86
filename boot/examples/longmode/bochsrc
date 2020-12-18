@@ -1,4 +1,4 @@
-megs: 16
+megs: 4
 floppya: 1_44=boot.img, status=inserted
 boot: a
 log: bochs.log

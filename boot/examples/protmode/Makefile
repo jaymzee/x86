@@ -3,7 +3,7 @@ OBJECTS = conio.o serial.o string.o main.o
 SOURCE = ../../isa/src
 INCLUDE = ../../isa/include
 CC = gcc
-CFLAGS = -g -std=c99 -pedantic -Wall -O2 -m32 -ffreestanding
+CFLAGS = -g -std=c99 -pedantic -Wall -Werror -m32 -Os -ffreestanding
 # these options keep the binary very small
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(INCLUDE)
@@ -23,7 +23,9 @@ $(TARGET): stage0.bin stage1.bin main.bin
 	./mkboot $@ $^
 %.bin: %.elf
 	objcopy -O binary $< $@
-stage%.elf: stage%.o
+stage0.elf: stage0.o
+	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
+stage1.elf: stage1.o
 	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
 main.elf: $(OBJECTS)
 	$(LD) $(LDFLAGS) -T main.ld -o $@ $^
@@ -36,4 +38,4 @@ clean:
 run: $(TARGET)
 	@./qemu -display curses
 debug: $(TARGET)
-	gdb -x start.gdb
+	gdb -x init.gdb

@@ -145,9 +145,10 @@ INT 10h,  00h (0)        Set Video Mode
 
 // Attribute Controller register indices
 //   pallete registers (Index 00-0Fh)
-#define VGA_ATTR_MODE_CTRL  0x10    // Attribute Mode Control register
-#define VGA_ATTR_OS_COLOR   0x11    // Overscan Color register
-#define VGA_ATTR_COLORP_EN  0x12    // Color Plane Enable register
-#define VGA_ATTR_HORIZ_PAN  0x13    // Horizontal Pixel Panning register
-#define VGA_ATTR_COLOR_SEL  0x14    // Color Select register
+//   PAS bit (bit 5) is already set in all the values below
+#define VGA_ATTR_MODE_CTRL  0x30    // Attribute Mode Control register
+#define VGA_ATTR_OS_COLOR   0x31    // Overscan Color register
+#define VGA_ATTR_COLORP_EN  0x32    // Color Plane Enable register
+#define VGA_ATTR_HORIZ_PAN  0x33    // Horizontal Pixel Panning register
+#define VGA_ATTR_COLOR_SEL  0x34    // Color Select register
 

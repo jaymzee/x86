@@ -1,6 +1,6 @@
 #define outb(port, value) __asm__ __volatile__("outb %b0,%w1": :"a" (value), "Nd" (port));
 
-inline unsigned char
+static inline unsigned char
 inb(unsigned short port)
 {
     unsigned char v;

@@ -1,5 +1,26 @@
 #include "string.h"
 
+void *memcpy(void *dest, const void *src, int len)
+{
+    char *d = dest;
+    const char *s = src;
+    while (len--) {
+        *d++ = *s++;
+    }
+    return dest;
+}
+
+char *strcpy(char *dest, const char *src)
+{
+    return memcpy(dest, src, strlen(src) + 1);
+}
+
+char *strcat(char *dest, const char *src)
+{
+    strcpy(dest + strlen(dest), src);
+    return dest;
+}
+
 int strlen(const char *str)
 {
     int len = 0;

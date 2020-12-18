@@ -27,10 +27,12 @@ void main()
     char buf[80];
     int n = 0;
 
-    DisplayText("long mode (x64) entered sucessfully!", TXT_ATTR);
-    DisplayText("Initializing serial 0...", TXT_ATTR);
+    DisableBlink();
+    ClearScreen(0xF1);
+    DisplayText("long mode (x64) entered sucessfully!");
+    DisplayText("Initializing serial 0...");
     COM_Init();
-    DisplayText("connect to serial 0 (COM1) for the console", TXT_ATTR);
+    DisplayText("connect to serial 0 (COM1) for the console");
     println("long mode demo");
     println("page tables:");
     print("PML4T[0] = 0x");

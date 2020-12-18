@@ -3,7 +3,7 @@ OBJS = main.o conio.o serial.o string.o
 SOURCE = ../../isa/src
 INCLUDE = ../../isa/include
 CC = gcc
-CFLAGS = -g -std=c99 -pedantic -Wall -Os -m64 -ffreestanding
+CFLAGS = -g -std=c99 -pedantic -Wall -Werror -m64 -Os -ffreestanding
 # these options keep the binary very small
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(INCLUDE)
@@ -23,7 +23,9 @@ $(TARGET): stage0.bin stage1.bin main.bin
 	./mkboot $@ $^
 %.bin: %.elf
 	objcopy -O binary $< $@
-stage%.elf: stage%.o
+stage0.elf: stage0.o
+	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
+stage1.elf: stage1.o
 	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
 main.elf: $(OBJS)
 	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-megs=16
+megs=4
 boot=a
 media=floppy
 file=boot.img

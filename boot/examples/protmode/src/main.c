@@ -2,8 +2,8 @@
 #include <interrupt.h>
 #include <serial.h>
 #include <string.h>
-
-#define TXT_ATTR    0x07
+#include <system.h>
+#include <vga.h>
 
 void print(const char *str)
 {
@@ -29,10 +29,12 @@ int putchar(int ch)
 
 void main()
 {
-    DisplayText("32-bit protected mode entered successfully!", TXT_ATTR);
-    DisplayText("initializing serial port 0...", TXT_ATTR);
+    DisableBlink();
+    ClearScreen(0xF1);
+    DisplayText("32-bit protected mode entered successfully!");
+    DisplayText("initializing serial port 0...");
     COM_Init();
-    DisplayText("connect to serial 0 (COM1) for the console", TXT_ATTR);
+    DisplayText("connect to serial 0 (COM1) for the console");
     println("32-bit protected mode demo");
     while (1) {
         print("\npress a key ");
