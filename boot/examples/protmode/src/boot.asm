@@ -11,14 +11,33 @@ LOADADDR    EQU 0x8000
 
 	global _start
 _start:
+	xor	bp, bp		; initialize ss:sp and ss:bp
+	mov	ss, bp
+	mov	sp, 0x7c00
+
 	mov	si, greeting
 	call	_print
+	call	_load_program
 	call	_enable_a20_line
 	cli			; disable interrupts
 	call	_disable_nmi	; disable NMI
 	call	_enter_prot_mode
 	lgdt	[gdt.record]
 	jmp	0x08:start32
+
+; ax, cx, dx  clobbered
+_load_program:
+	push	bx
+	mov	ah, 2h		; read sectors from drive
+	mov	al, 32		; sector count (16K)
+	mov	ch, 0		; cylinder
+	mov	dh, 0		; head
+	mov	cl, 2		; sector
+	mov	dl, 0		; drive a (use 80h for 1st HD)
+	mov	bx, LOADADDR	; start address of main program
+	int	13h
+	pop	bx
+	ret
 
 %include "bios.asm"
 %include "cpumode.asm"

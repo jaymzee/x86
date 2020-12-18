@@ -1,9 +1,6 @@
 #include "conio.h"
-#include "interrupt.h"
 #include "serial.h"
 #include "string.h"
-
-#define TXT_ATTR    0x07
 
 void print(const char *str)
 {
@@ -27,11 +24,10 @@ void main()
     char buf[80];
     int n = 0;
 
+    COM_Init();
     DisableBlink();
     ClearScreen(0xF1);
     DisplayText("long mode (x64) entered sucessfully!");
-    DisplayText("Initializing serial 0...");
-    COM_Init();
     DisplayText("connect to serial 0 (COM1) for the console");
     println("long mode demo");
     println("page tables:");
@@ -47,7 +43,6 @@ void main()
         print("] = ");
         println(itoa(p[0x600 + n], 16, buf));
     }
-
     while (1) {
         print("press a key ");
         getchar();
@@ -62,6 +57,3 @@ void main()
         }
     }
 }
-
-void main() __attribute__((section(".text.main")));
-

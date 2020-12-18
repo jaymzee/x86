@@ -1,9 +1,5 @@
 #include <conio.h>
-#include <interrupt.h>
 #include <serial.h>
-#include <string.h>
-#include <system.h>
-#include <vga.h>
 
 void print(const char *str)
 {
@@ -30,7 +26,7 @@ int putchar(int ch)
 void main()
 {
     DisableBlink();
-    ClearScreen(0xF1);
+    ClearScreen(0x1F);
     DisplayText("32-bit protected mode entered successfully!");
     DisplayText("initializing serial port 0...");
     COM_Init();
@@ -43,5 +39,3 @@ void main()
         putchar(c);
     }
 }
-
-void main() __attribute__((section(".text.main")));

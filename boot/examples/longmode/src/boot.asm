@@ -14,6 +14,10 @@ LOADADDR    equ 0x8000		; address to load program into
 
 	global _start
 _start:
+	xor	bp, bp		; initialize ss:sp and ss:bp
+	mov	ss, bp
+	mov	sp, 0x7c00
+
 	mov	si, greeting
 	call	_print
 	call	_load_program
@@ -32,7 +36,7 @@ _load_program:
 	mov	al, 32		; sector count (16K)
 	mov	ch, 0		; cylinder
 	mov	dh, 0		; head
-	mov	cl, 3		; sector
+	mov	cl, 2		; sector
 	mov	dl, 0		; drive a (use 80h for 1st HD)
 	mov	bx, LOADADDR	; start address of main program
 	int	13h

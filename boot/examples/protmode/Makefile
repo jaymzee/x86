@@ -1,12 +1,12 @@
 TARGET = boot.img
-OBJECTS = conio.o serial.o string.o main.o
+OBJECTS = main.o conio.o serial.o string.o
 SOURCE = ../../isa/src
 INCLUDE = ../../isa/include
 CC = gcc
 CFLAGS = -g -std=c99 -pedantic -Wall -Werror -m32 -Os -ffreestanding
 # these options keep the binary very small
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
-CFLAGS += -nostdinc -I $(INCLUDE)
+CFLAGS += -nostdinc -I $(INCLUDE) -include _default.h
 ASFLAGS = -g -F dwarf -f elf -I $(addsuffix /,$(INCLUDE))
 LDFLAGS = -m elf_i386 --nmagic  # --nmagic eliminates gaps between sections
 GCCVERSION := $(shell gcc -dumpversion)
@@ -19,16 +19,14 @@ vpath %.c src
 vpath %.c $(SOURCE)
 
 .PHONY: clean run debug
-$(TARGET): stage0.bin stage1.bin main.bin
+$(TARGET): boot.bin main.bin
 	./mkboot $@ $^
 %.bin: %.elf
 	objcopy -O binary $< $@
-stage0.elf: stage0.o
-	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
-stage1.elf: stage1.o
+boot.elf: boot.o
 	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
 main.elf: $(OBJECTS)
-	$(LD) $(LDFLAGS) -T main.ld -o $@ $^
+	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
 %.o: %.asm
 	nasm $(ASFLAGS) -o $@ -l $(addsuffix .lst,$(basename $@)) $<
 %.o: %.c

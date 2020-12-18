@@ -1,5 +1,7 @@
-void *memcpy(void *dest, const void *src, int len);
+#include <stdint.h>
+
+void *memcpy(void *dest, const void *src, size_t len);
 char *strcpy(char *dest, const char *src);
 char *strcat(char *dest, const char *src);
-int strlen(const char *str);
+size_t strlen(const char *str);
 char *itoa(int num, int base, char *str);

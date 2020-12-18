@@ -1,6 +1,7 @@
 #include "string.h"
 
-void *memcpy(void *dest, const void *src, int len)
+void *
+memcpy(void *dest, const void *src, size_t len)
 {
     char *d = dest;
     const char *s = src;
@@ -10,18 +11,21 @@ void *memcpy(void *dest, const void *src, int len)
     return dest;
 }
 
-char *strcpy(char *dest, const char *src)
+char *
+strcpy(char *dest, const char *src)
 {
     return memcpy(dest, src, strlen(src) + 1);
 }
 
-char *strcat(char *dest, const char *src)
+char *
+strcat(char *dest, const char *src)
 {
     strcpy(dest + strlen(dest), src);
     return dest;
 }
 
-int strlen(const char *str)
+size_t
+strlen(const char *str)
 {
     int len = 0;
     while (*str++) {
@@ -30,7 +34,8 @@ int strlen(const char *str)
     return len;
 }
 
-static void reverse(char *str, int length)
+static void
+reverse(char *str, int length)
 {
     char *end = str + length - 1;
     while (str < end) {
@@ -40,7 +45,8 @@ static void reverse(char *str, int length)
     }
 }
 
-char *itoa(int num, int base, char *str)
+char *
+itoa(int num, int base, char *str)
 {
     int i = 0;
     int isNegative = 0;
