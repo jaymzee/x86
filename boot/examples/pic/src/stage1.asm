@@ -7,7 +7,7 @@ _start:
 	push	greeting
 	call	_print
 	cli				; disable interrupts
-	mov	dword [0x20], timerISR	; install ISR
+	mov	dword [0x80], timerISR	; install ISR
 	sti				; enable interrupts
 	call	0:Main
 .L1	jmp .L1				; forever

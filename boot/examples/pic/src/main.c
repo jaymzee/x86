@@ -25,6 +25,7 @@ void Main()
     COM_Init();
     print("Welcome to my first bootloader\n");
     print("Stay tuned for enabling protected mode\n");
+    PIC_RemapIVT(0x20, 0x28);
     while (1) {
         print("\ntick count: ");
         print(itoa(tick_counter, 10, buf));

@@ -1,5 +1,5 @@
 TARGET = boot.img
-OBJECTS = main.o conio.o serial.o string.o
+OBJECTS = main.o conio.o serial.o string.o interrupt.o isr.o
 SOURCE = ../../isa/src
 INCLUDE = ../../isa/include
 CC = gcc
