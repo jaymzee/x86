@@ -4,6 +4,9 @@
 
 STACK32_TOP EQU 0x1000000		; top of 16MB memory
 LOADADDR    EQU 0x8000
+GDT         equ 0x2000
+GDT_SIZE    equ gdt.end - gdt
+GDTR        equ GDT + GDT_SIZE
 
 ; 16 bit functions that run in real mode
 
@@ -26,12 +29,32 @@ _start:
 	call	_print
 	call	_load_program
 	call	_enable_a20_line
+	call	_copy_gdt
 	cli			; disable interrupts
 	call	_disable_nmi	; disable NMI
 	call	_enter_prot_mode
-	lgdt	[gdt.record]
+	lgdt	[GDTR]
 	jmp	0x08:start32
 
+; copy the gdt to GDT
+; this way the memory used by this bootloader can be reclaimed for 
+; something else
+;   cx  clobbered
+_copy_gdt:
+	push	si
+	push	di
+	mov	di, GDT
+	mov	si, gdt
+	mov	cx, GDT_SIZE - 1
+	mov	[di + GDT_SIZE], cx		; gdt size
+	inc	cx
+	mov	dword [di + GDT_SIZE + 2], gdt	; gdt offset
+	rep	stosb
+	pop	di
+	pop	si
+	ret
+
+; load the main program into memory
 ; ax, cx, dx  clobbered
 _load_program:
 	push	es
@@ -99,8 +122,7 @@ gdt:
 	db 0b10010010	; access P GPL S Type Ex DC W Ac
 	db 0b11001111	; flags Gr Sz L, Limit 16:19
 	db 0		; base 24:31
-.record	dw $ - gdt - 1	; size
-	dd gdt		; offset
+.end:
 
 greeting:
 	db `Entering Protected Mode...\r\n`, 0

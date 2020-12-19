@@ -21,9 +21,9 @@ int getchar(void)
 void main()
 {
     long *pt = (long *)0x8000;
-    long *pdt = (long *)0x5000;
-    long *pdpt = (long *)0x4000;
-    long *pml4t = (long *)0x3000;
+    long *pdt = (long *)0x6000;
+    long *pdpt = (long *)0x5000;
+    long *pml4t = (long *)0x4000;
     char buf[80];
     int n = 0;
 

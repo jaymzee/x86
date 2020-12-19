@@ -74,7 +74,7 @@ _load_program:
 ; eax, ecx, edx  clobbered
 _init_page_tables:
 	push	edi
-	mov	edi, 0x3000	; start of page tables
+	mov	edi, 0x4000	; start of page tables
 	mov	cr3, edi
 	xor	eax, eax
 	cld
@@ -89,7 +89,7 @@ _init_page_tables:
 	add	edx, eax
 	mov	[edi], edx	; PDPT[0] -> PDT
 	add	edi, eax
-	add	edx, 0x3000
+	add	edx, 0x2000
 	mov	ecx, 8
 .pdt	mov	[edi], edx	; PDT[n] -> nth PT
 	add	edx, eax

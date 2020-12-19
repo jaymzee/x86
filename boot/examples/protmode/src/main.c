@@ -4,6 +4,17 @@
 #include <string.h>
 #include <system.h>
 
+#define IDT_ENTRIES 256
+#define IDT_ADDRESS 0x1000
+#define IDT_SIZE (IDT_ENTRIES * sizeof(struct IDT_entry))
+
+extern int timer_count;
+extern void load_idt(void *);
+extern void keyboard_handler(void);
+extern void timer_handler(void);
+extern void divbyzero_handler(void);
+extern void gpfault_handler(void);
+
 void print(const char *str)
 {
     COM_WriteString(str);
@@ -26,50 +37,13 @@ int putchar(int ch)
     return ch;
 }
 
-extern int timer_count;
-extern void load_idt(void *);
-extern void keyboard_handler(void);
-
-#define IDT_SIZE 256
-
-struct IDT_descriptor IDT[IDT_SIZE];
-struct IDT_info {
-    uint16_t size;
-    uint32_t offset;
-} __attribute__((packed)) IDT_info;
-
-void InitializeIDT(void)
+// interrupts are disabled when main is called
+// this sets up the interrupt descriptor tables then enables interrupts
+void EnableInterrupts(void)
 {
-    for (int i = 0; i < 256; i++) {
-        IDT[i].type_attr = 0;
-        IDT[i].zero = 0;
-        IDT[i].offset_hi = 0;
-        IDT[i].offset_lo = 0;
-        IDT[i].selector = 0;
-    }
-
-    IDT[0x21].offset_hi = (uint32_t)keyboard_handler >> 16;
-    IDT[0x21].offset_lo = (uint32_t)keyboard_handler & 0xffff;
-    IDT[0x21].selector = 0x08;
-    IDT[0x21].type_attr = 0x8E;
-    IDT[0x21].zero = 0;
-
-    IDT_info.offset = (uint32_t)IDT;
-    IDT_info.size = sizeof(IDT) - 1;
-
-    load_idt(&IDT_info);    // enables cpu interrupts
-}
-
-void main()
-{
-    char buf[80];
-    DisableBlink();
-    ClearScreen(0x1F);
-    DisplayText("32-bit protected mode entered successfully!");
-    DisplayText("initializing serial port 0...");
-    COM_Init();
-    DisplayText("connect to serial 0 (COM1) for the console");
-    println("32-bit protected mode demo");
+    struct IDT_entry *idt = (void *)IDT_ADDRESS;
+    struct IDT_entry *descr;
+    struct IDTR *idtr = (void *)(IDT_ADDRESS + IDT_SIZE);
 
     PIC_RemapIVT(0x20, 0x28);
     PIC_MaskIRQ(0);
@@ -84,8 +58,64 @@ void main()
     PIC_MaskIRQ(13);
     PIC_MaskIRQ(14);
     PIC_MaskIRQ(15);
-    InitializeIDT();
-    PIC_UnmaskIRQ(1);
+
+    for (int i = 0; i < 256; i++) {
+        idt[i].type_attr = 0;
+        idt[i].zero = 0;
+        idt[i].offset_hi = 0;
+        idt[i].offset_lo = 0;
+        idt[i].selector = 0;
+    }
+
+    /*
+    descr = idt + 0;
+    descr->offset_hi = (uint32_t)divbyzero_handler >> 16;
+    descr->offset_lo = (uint32_t)divbyzero_handler & 0xffff;
+    descr->selector = 0x08;
+    descr->type_attr = 0x8F;
+    descr->zero = 0;
+
+    descr = idt + 0x0d;
+    descr->offset_hi = (uint32_t)gpfault_handler >> 16;
+    descr->offset_lo = (uint32_t)gpfault_handler & 0xffff;
+    descr->selector = 0x08;
+    descr->type_attr = 0x8F;
+    descr->zero = 0;
+
+    descr = idt + 0x20;
+    descr->offset_hi = (uint32_t)timer_handler >> 16;
+    descr->offset_lo = (uint32_t)timer_handler & 0xffff;
+    descr->selector = 0x08;
+    descr->type_attr = 0x8E;
+    descr->zero = 0;
+*/
+    descr = idt + 0x21;
+    descr->offset_hi = (uint32_t)keyboard_handler >> 16;
+    descr->offset_lo = (uint32_t)keyboard_handler & 0xffff;
+    descr->selector = 0x08;
+    descr->type_attr = 0x8E;
+    descr->zero = 0;
+
+    idtr->offset = (uint32_t)idt;
+    idtr->limit = IDT_SIZE - 1;
+
+    load_idt(idtr); // also enables cpu interrupts
+}
+
+void main()
+{
+    char buf[80];
+    DisableBlink();
+    ClearScreen(0x1F);
+    DisplayText("32-bit protected mode entered successfully!");
+    DisplayText("initializing serial port 0...");
+    COM_Init();
+    DisplayText("connect to serial 0 (COM1) for the console");
+    println("32-bit protected mode demo");
+
+    EnableInterrupts();
+    PIC_UnmaskIRQ(1);   // keyboard
+    //PIC_UnmaskIRQ(0);   // timer
 
     while (1) {
         print("\npress a key ");
@@ -97,9 +127,11 @@ void main()
     }
 }
 
+extern char kbd_decode[];
+
 void keyboard_handler_main(void) {
     unsigned char status;
-    char keycode;
+    int keycode;
     char buf[80];
 
     // write EOI
@@ -112,5 +144,6 @@ void keyboard_handler_main(void) {
         if (keycode < 0)
             return;
         DisplayText(itoa(keycode, 16, buf));
+        //println(itoa(kbd_decode[keycode], 16, buf));
     }
 }
