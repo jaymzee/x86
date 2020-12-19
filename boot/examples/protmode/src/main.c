@@ -67,7 +67,6 @@ void EnableInterrupts(void)
         idt[i].selector = 0;
     }
 
-    /*
     descr = idt + 0;
     descr->offset_hi = (uint32_t)divbyzero_handler >> 16;
     descr->offset_lo = (uint32_t)divbyzero_handler & 0xffff;
@@ -88,7 +87,7 @@ void EnableInterrupts(void)
     descr->selector = 0x08;
     descr->type_attr = 0x8E;
     descr->zero = 0;
-*/
+
     descr = idt + 0x21;
     descr->offset_hi = (uint32_t)keyboard_handler >> 16;
     descr->offset_lo = (uint32_t)keyboard_handler & 0xffff;
@@ -115,7 +114,7 @@ void main()
 
     EnableInterrupts();
     PIC_UnmaskIRQ(1);   // keyboard
-    //PIC_UnmaskIRQ(0);   // timer
+    PIC_UnmaskIRQ(0);   // timer
 
     while (1) {
         print("\npress a key ");
@@ -141,9 +140,9 @@ void keyboard_handler_main(void) {
     // Lowest bit of status will be set if buffer is not empty
     if (status & 0x01) {
         keycode = inb(0x60);
-        if (keycode < 0)
+        if (keycode & 0x80)
             return;
         DisplayText(itoa(keycode, 16, buf));
-        //println(itoa(kbd_decode[keycode], 16, buf));
+        println(itoa(kbd_decode[keycode], 16, buf));
     }
 }
