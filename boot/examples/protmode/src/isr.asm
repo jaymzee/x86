@@ -2,25 +2,6 @@
 
 	extern keyboard_handler_main
 
-	global divbyzero_fault
-divbyzero_fault:
-	inc	dword [timer_count]
-	iret
-
-	global gp_fault
-gp_fault:
-	inc	dword [timer_count]
-	iret
-
-	global timer_isr
-timer_isr:
-	push	eax
-	inc	dword [timer_count]
-	mov	al, 0x20
-	out	0x20, al	; issue EOI
-	pop	eax
-	iret
-
 	global keyboard_handler
 keyboard_handler:
 	call	keyboard_handler_main
