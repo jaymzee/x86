@@ -30,6 +30,8 @@ KeyboardHandler:
 	push eax
 	push ecx
 	push edx
+	mov	al, 0x20
+	out	0x20, al	; issue EOI
 	call	KeyboardHandlerMain
 	pop	edx
 	pop	ecx

@@ -1,7 +1,5 @@
-#include <conio.h>
 #include <interrupt.h>
 #include <string.h>
-#include <system.h>
 #include "intsetup.h"
 
 #define IDT_ENTRIES 256
@@ -39,27 +37,3 @@ void EnableInterrupts(void)
     PIC_UnmaskIRQ(0); // enable timer IRQ
     PIC_UnmaskIRQ(1); // enable keyboard IRQ
 }
-
-void KeyboardHandlerMain(void) {
-    unsigned char status;
-    int keycode;
-    char buf[80];
-
-    // write EOI
-    outb(0x20, 0x20);
-
-    status = inb(0x64);
-    // Lowest bit of status will be set if buffer is not empty
-    if (status & 0x01) {
-        keycode = inb(0x60);
-        if (keycode & 0x80)
-            return;
-        strcpy(buf, "0x");
-        itoa(keycode, 16, buf+2);
-        strcat(buf, "  ");
-        int len = strlen(buf);
-        buf[len - 1] = kbd_decode[keycode];
-        DisplayText(buf);
-    }
-}
-

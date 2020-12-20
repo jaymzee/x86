@@ -30,3 +30,17 @@ void main()
     }
 }
 
+void KeyboardHandlerMain(void) {
+    int keycode = ScanKeyboard();
+    // Lowest bit of status will be set if buffer is not empty
+    if (keycode >= 0 && keycode < 128) {
+        char buf[80];
+        char ch = kbd_decode[keycode];
+        strcpy(buf, "0x");
+        itoa(keycode, 16, buf+2);
+        strcat(buf, "  ");
+        int len = strlen(buf);
+        buf[len - 1] = ch;
+        DisplayText(buf);
+    }
+}

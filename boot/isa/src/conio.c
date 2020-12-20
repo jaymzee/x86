@@ -8,6 +8,11 @@
 #define TEXT_ROWS   25
 #define VIDEOMEM    0xB8000
 
+// 8042 PS/2 Controller
+#define KB_DATA     0x60    // Read/Write
+#define KB_CMD      0x64    // Write
+#define KB_STATUS   0x64    // Read
+
 void ClearScreen(unsigned char attr)
 {
     unsigned short *screen = (unsigned short *)VIDEOMEM;
@@ -78,4 +83,13 @@ void DisableBlink(void)
     inb(VGA_INPUT_STAT1); // this will reset index/data flip-flop
     outb(VGA_ATTR_ADDR, VGA_ATTR_MODE_CTRL); // select attr mode control reg
     outb(VGA_ATTR_DATA_WR, 0xf7 & inb(VGA_ATTR_DATA_RD)); // turn off bit 3
+}
+
+int ScanKeyboard(void)
+{
+    int status = inb(KB_STATUS);
+    if (status & 1) {
+        return inb(KB_DATA);
+    }
+    return -1; // kb buffer empty
 }

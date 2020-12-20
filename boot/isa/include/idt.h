@@ -10,7 +10,7 @@ struct IDT_entry {
     uint16_t    offset_hi;  // offset bits 16..31
     uint32_t    offset_hihi;// offset bits 32..63
     uint32_t    zero;       // unused, set to zero
-};
+} __attribute__((packed));
 #else
 struct IDT_entry {
     uint16_t    offset_lo;  // offset bits 0..15
@@ -18,7 +18,7 @@ struct IDT_entry {
     uint8_t     zero;       // unused, set to zero
     uint8_t     type_attr;  // type and attributes
     uint16_t    offset_hi;  // offset bits 16..31
-};
+} __attribute__((packed));
 #endif
 
 // descriptor for the entire IDT
