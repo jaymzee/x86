@@ -1,37 +1,43 @@
 	bits 32
 
 	extern DisplayText
-	extern keyboard_handler_main
+	extern KeyboardHandlerMain
 
-get_eip:
+GetEIP:
 	mov eax, [esp]
 	ret
 
-	global gpfault_handler
-gpfault_handler:
-	push gpfault
+	global GPFaultHandler
+GPFaultHandler:
+	push gp_fault
 	call DisplayText
 	pop ecx
 .halt	hlt
 	jmp .halt
 	iret
 
-	global divbyzero_handler
-divbyzero_handler:
-	push divbyzero
+	global DivByZeroHandler
+DivByZeroHandler:
+	push div_by_zero
 	call DisplayText
 	pop ecx
 .halt	hlt
 	jmp .halt
 	iret
 
-	global keyboard_handler
-keyboard_handler:
-	call	keyboard_handler_main
+	global KeyboardHandler
+KeyboardHandler:
+	push eax
+	push ecx
+	push edx
+	call	KeyboardHandlerMain
+	pop	edx
+	pop	ecx
+	pop	eax
 	iret
 
-	global timer_handler
-timer_handler:
+	global TimerHandler
+TimerHandler:
 	push	eax
 	inc	dword [timer_count]
 	mov	al, 0x20
@@ -39,20 +45,13 @@ timer_handler:
 	pop	eax
 	iret
 
-	global load_idt
-load_idt:
-	mov eax, [esp + 4]
-	lidt [eax]
-	sti
-	ret
-
 	section .data
 
 	global timer_count
 timer_count:
 	dd 0
 
-divbyzero:
+div_by_zero:
 	db "division by zero, cpu halted",0
-gpfault:
+gp_fault:
 	db "general protection fault, cpu halted",0

@@ -65,7 +65,7 @@ _load_program:
 	mov	dh, 0		; head
 	mov	cl, 2		; sector
 	mov	dl, 0		; drive a (use 80h for 1st HD)
-	mov	bx, LOADADDR << 4
+	mov	bx, (LOADADDR << 4) & 0xFFFF
 	mov	es, bx
 	mov	bx, LOADADDR & 0xFFFF ; start address of main program
 	int	13h

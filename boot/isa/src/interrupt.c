@@ -2,8 +2,8 @@
  * intel 8259 interrupt controller
  */
 
-#include "interrupt.h"
-#include "system.h"
+#include <interrupt.h>
+#include <system.h>
 
 #define PIC1            0x20        // PIC controller 1 base address
 #define PIC2            0xA0        // PIC controller 2 base address
@@ -108,6 +108,11 @@ void PIC_UnmaskIRQ(unsigned char irq) {
     outb(port, value);
 }
 
+void PIC_MaskAllIRQ(void) {
+    outb(PIC1_DATA, 0xff);
+    outb(PIC2_DATA, 0xff);
+}
+
 // helper function
 static unsigned short PIC_IssueOCW3(unsigned char ocw3)
 {
@@ -140,4 +145,24 @@ void NMI_Enable(void)
 void NMI_Disable(void)
 {
      outb(RTC, inb(RTC) | 0x80);
+}
+
+void
+IDT_IntGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
+{
+    descr->offset_hi = (uint32_t)hndlr >> 16;
+    descr->offset_lo = (uint32_t)hndlr & 0xffff;
+    descr->selector = sel;
+    descr->type_attr = (dpl << 5) | 0x8E; // 32-bit interupt gate
+    descr->zero = 0;
+}
+
+void
+IDT_TrapGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
+{
+    descr->offset_hi = (uint32_t)hndlr >> 16;
+    descr->offset_lo = (uint32_t)hndlr & 0xffff;
+    descr->selector = sel;
+    descr->type_attr = (dpl << 5) | 0x8F; // 32-bit trap gate
+    descr->zero = 0;
 }

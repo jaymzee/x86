@@ -1,14 +1,18 @@
 TARGET = boot.img
-OBJECTS = main.o conio.o serial.o string.o interrupt.o handlers.o kbd_US.o
+OBJECTS = main.o intsetup.o handlers.o
+OBJECTS += stdio.o serial.o string.o conio.o interrupt.o kbd_US.o
 SOURCE = ../../isa/src
 INCLUDE = ../../isa/include
 CC = gcc
-CFLAGS = -g -std=c99 -pedantic -Wall -Werror -m32 -ffreestanding
+CFLAGS = -g -Os -std=c99 -pedantic -Wall -Werror -m32 -ffreestanding
 # these options keep the binary very small
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
+# -mtune=pentium3 will have gcc code-gen pop instructions instead of mov
+CFLAGS += -mtune=pentium3
 CFLAGS += -nostdinc -I $(INCLUDE) -include _default.h
 ASFLAGS = -g -F dwarf -f elf -I $(addsuffix /,$(INCLUDE))
-LDFLAGS = -m elf_i386 --nmagic  # --nmagic eliminates gaps between sections
+# --nmagic eliminates gaps between sections
+LDFLAGS = -m elf_i386 --nmagic
 GCCVERSION := $(shell gcc -dumpversion)
 ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
     # disable CET endbr32 instructions in function entry point

@@ -5,3 +5,4 @@ void LocateText(int x, int y, const char *str, unsigned char attr);
 void DisplayText(const char *str);
 void EnableBlink(void);
 void DisableBlink(void);
+extern char kbd_decode[128];

@@ -1,22 +1,7 @@
-#include "conio.h"
-#include "serial.h"
-#include "string.h"
-
-void print(const char *str)
-{
-    COM_WriteString(str);
-}
-
-void println(const char *str)
-{
-    COM_WriteString(str);
-    COM_WriteString("\n");
-}
-
-int getchar(void)
-{
-    return COM_ReadChar();
-}
+#include <conio.h>
+#include <serial.h>
+#include <stdio.h>
+#include <string.h>
 
 void main()
 {

@@ -1,5 +1,5 @@
 ; 16-bit functions that run in real mode
-; include this file
+; you should include this file
 
 ; enter long mode (64-bit protected mode)
 ;   eax, ecx  clobbered

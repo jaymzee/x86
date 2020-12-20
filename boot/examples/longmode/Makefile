@@ -1,9 +1,9 @@
 TARGET = boot.img
-OBJS = main.o conio.o serial.o string.o
+OBJECTS = main.o stdio.o serial.o string.o conio.o
 SOURCE = ../../isa/src
 INCLUDE = ../../isa/include
 CC = gcc
-CFLAGS = -g -std=c99 -pedantic -Wall -Werror -m64 -Os -ffreestanding
+CFLAGS = -g -std=c99 -pedantic -Wall -Werror -m64 -ffreestanding
 # these options keep the binary very small
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(INCLUDE) -include _default.h
@@ -25,7 +25,7 @@ $(TARGET): boot.bin main.bin
 	objcopy -O binary $< $@
 boot.elf: boot.o
 	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
-main.elf: $(OBJS)
+main.elf: $(OBJECTS)
 	$(LD) $(LDFLAGS) -T $(addsuffix .ld,$(basename $@)) -o $@ $^
 %.o: %.asm
 	nasm $(ASFLAGS) -o $@ -l $(addsuffix .lst,$(basename $@)) $<

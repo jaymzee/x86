@@ -1,5 +1,6 @@
 ; basic i/o using the BIOS ;)
-; include this file
+; you should include this file.
+; it's intended to be used in 16-bit real mode code
 
 ; print to screen using calls to BIOS INT 10h
 ;   si  pointer to null terminated string
