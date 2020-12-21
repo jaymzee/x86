@@ -1,3 +1,5 @@
+	section .text
+
 	bits 32
 
 	extern DisplayText
@@ -12,7 +14,9 @@ GPFaultHandler:
 	push gp_fault
 	call DisplayText
 	pop ecx
-.halt	hlt
+	mov eax,[esp]
+.halt	cli
+	hlt
 	jmp .halt
 	iret
 
@@ -21,7 +25,8 @@ DivByZeroHandler:
 	push div_by_zero
 	call DisplayText
 	pop ecx
-.halt	hlt
+.halt	cli
+	hlt
 	jmp .halt
 	iret
 
@@ -46,6 +51,13 @@ TimerHandler:
 	out	0x20, al	; issue EOI
 	pop	eax
 	iret
+
+	global CrashMe
+CrashMe:
+	mov	eax, 42
+	mov	ds, eax
+	mov	eax, [0x1000]
+	ret
 
 	section .data
 

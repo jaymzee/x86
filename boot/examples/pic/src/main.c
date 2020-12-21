@@ -28,7 +28,7 @@ void Main()
     PIC_RemapIVT(0x20, 0x28);
     while (1) {
         print("\ntick count: ");
-        print(itoa(tick_counter, 10, buf));
+        print(itoa(tick_counter, 10, 0, buf));
         print("\npress a key ");
         int c = getchar();
         print("\nyou pressed: ");

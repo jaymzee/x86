@@ -56,14 +56,13 @@ reverse(char *str, int length)
 }
 
 char *
-itoa(int num, int base, char *str)
+itoa(int num, int base, int width, char *str)
 {
     int i = 0;
     int isNegative = 0;
     if (num == 0) {
         str[i++] = '0';
-        str[i] = '\0';
-        return str;
+        goto finish;
     }
     // In standard itoa(), negative numbers are handled only with
     // base 10. Otherwise numbers are considered unsigned.
@@ -79,6 +78,16 @@ itoa(int num, int base, char *str)
     }
     if (isNegative) {
         str[i++] = '-';
+    }
+finish:
+    while (i < width) {
+        if (base == 10)
+            str[i++] = ' ';
+        else
+            str[i++] = '0';
+    }
+    if (base != 10 && width > 0) {
+        i = width;
     }
     str[i] = '\0';
     reverse(str, i);

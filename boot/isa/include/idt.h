@@ -25,12 +25,12 @@ struct IDT_entry {
 #if __WORDSIZE == 64
 struct IDTR {
     uint16_t    limit;      // size in bytes - 1
-    uint32_t    offset;     // pointer to IDT
+    uint64_t    offset;     // pointer to IDT
 } __attribute__((packed));
 #else
 struct IDTR {
     uint16_t    limit;      // size in bytes - 1
-    uint64_t    offset;     // pointer to IDT
+    uint32_t    offset;     // pointer to IDT
 } __attribute__((packed));
 #endif
 

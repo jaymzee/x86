@@ -29,7 +29,7 @@ void Main()
     print("Real time clock demo\n");
     while (1) {
         print("\ntick count: ");
-        print(itoa(tick_counter, 10, buf));
+        print(itoa(tick_counter, 10, 0, buf));
         print("\npress a key ");
         int c = getchar();
         print("\nyou pressed: ");
@@ -46,11 +46,11 @@ void Main()
         case 't':
             RTC_GetTime(&now);
             print("\nTime is ");
-            print(itoa(now.hour, 10, buf));
+            print(itoa(now.hour, 10, 2, buf));
             print(":");
-            print(itoa(now.minute, 10, buf));
+            print(itoa(now.minute, 10, 2, buf));
             print(":");
-            print(itoa(now.second, 10, buf));
+            print(itoa(now.second, 10, 2, buf));
         }
     }
 }

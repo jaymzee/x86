@@ -9,6 +9,8 @@ LOADADDR    equ 0x10000		; address to load program into
 GDT         equ 0x2000
 GDT_SIZE    equ gdt.end - gdt
 GDTR        equ GDT + GDT_SIZE
+PML4T       equ 0x4000
+PT_START    equ 0x8000
 
 
 ; 16 bit functions that run in real mode
@@ -28,26 +30,15 @@ _start:
 	call	_load_program
 	call	_enable_a20_line
 	call	_init_page_tables
+	mov	si, gdt
+	mov	di, GDT
+	mov	cx, GDT_SIZE
 	call	_copy_gdt
 	cli			; disable interrupts
 	call	_disable_nmi	; disable NMI
 	call	_enter_long_mode
 	lgdt	[GDTR]		; load the copied version
 	jmp	0x08:start64
-
-_copy_gdt:
-	push	si
-	push	di
-	mov	di, GDT
-	mov	si, gdt
-	mov	cx, GDT_SIZE - 1
-	mov	[di + GDT_SIZE], cx		; gdt size
-	inc	cx
-	mov	dword [di + GDT_SIZE + 2], gdt	; gdt offset
-	rep	stosb
-	pop	di
-	pop	si
-	ret
 
 ; ax, cx, dx  clobbered
 _load_program:
@@ -74,7 +65,7 @@ _load_program:
 ; eax, ecx, edx  clobbered
 _init_page_tables:
 	push	edi
-	mov	edi, 0x4000	; start of page tables
+	mov	edi, PML4T	; start of page tables
 	mov	cr3, edi
 	xor	eax, eax
 	cld
@@ -89,17 +80,17 @@ _init_page_tables:
 	add	edx, eax
 	mov	[edi], edx	; PDPT[0] -> PDT
 	add	edi, eax
-	add	edx, 0x2000
+	mov	edx, PT_START | 3
 	mov	ecx, 8
 .pdt	mov	[edi], edx	; PDT[n] -> nth PT
 	add	edx, eax
 	add	edi, 8
 	loop	.pdt
-	mov	edi, 0x8000
+	mov	edi, PT_START
 	mov	edx, 3		; R/W and Present
 	mov	ecx, 4096	; identity map first 16MB
 .fillpt	mov	[edi], edx	; PT[n] = n*4096 + 3
-	add	edx, 0x1000
+	add	edx, eax
 	add	edi, 8
 	loop	.fillpt
 	pop	edi
@@ -151,8 +142,6 @@ gdt:
 	db 0b10101111		; flags Gr Sz L, Limit 16:19
 	db 0			; base 24:31
 .end:
-.record	dw $ - gdt - 1		; size
-	dd gdt			; offset
 
 greeting:
 	db `loading x86_64 program...\r\n`, 0

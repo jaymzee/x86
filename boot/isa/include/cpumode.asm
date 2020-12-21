@@ -56,3 +56,21 @@ _enable_nmi:
 	and	al, 0x7f
 	out	0x70, al
 	ret
+
+; copy the gdt so that the memory used by the bootloader
+; can be reclaimed for something else
+;   ds:si  offset to copy the gdt from
+;   es:di  offset to copy the gdt to
+;      cx  gdt size
+_copy_gdt:
+	push	bx
+	mov	bx,di
+	add	bx,cx
+	dec	cx
+	mov	[bx], cx	; write GDTR limit
+	inc	cx
+	mov	word [bx+2],di	; write GDTR offset bits 15..0
+	mov	word [bx+4],0	; write GDTR offset bits 31..16
+	rep	movsb
+	pop	bx
+	ret

@@ -2,8 +2,8 @@
 ; second stage bootloader enters 32-bit protected mode
 ; assemble with nasm
 
-STACK32_TOP EQU 0x1000000		; top of 16MB memory
-LOADADDR    EQU 0x8000
+STACK32_TOP equ 0x1000000		; top of 16MB memory
+LOADADDR    equ 0x10000
 GDT         equ 0x2000
 GDT_SIZE    equ gdt.end - gdt
 GDTR        equ GDT + GDT_SIZE
@@ -15,44 +15,26 @@ GDTR        equ GDT + GDT_SIZE
 	global _start
 _start:
 	xor	ax, ax
-	mov	bx, ax
-	mov	cx, ax
-	mov	dx, ax
-	mov	si, ax
-	mov	di, ax
 	mov	ds, ax
 	mov	es, ax
 	mov	ss, ax
-	mov	bp, ax		; initialize ss:sp and ss:bp
-	mov	sp, 0x7c00
+	mov	bp, ax
+	mov	sp, 0x7c00	; initialize ss:sp and ss:bp
 	mov	si, greeting
 	call	_print
 	call	_load_program
+	mov	si, greeting2
+	call	_print
 	call	_enable_a20_line
+	mov	si, gdt
+	mov	di, GDT
+	mov	cx, GDT_SIZE
 	call	_copy_gdt
 	cli			; disable interrupts
-	call	_disable_nmi	; disable NMI
+	call	_disable_nmi
 	call	_enter_prot_mode
 	lgdt	[GDTR]
 	jmp	0x08:start32
-
-; copy the gdt to GDT
-; this way the memory used by this bootloader can be reclaimed for 
-; something else
-;   cx  clobbered
-_copy_gdt:
-	push	si
-	push	di
-	mov	di, GDT
-	mov	si, gdt
-	mov	cx, GDT_SIZE - 1
-	mov	[di + GDT_SIZE], cx		; gdt size
-	inc	cx
-	mov	dword [di + GDT_SIZE + 2], gdt	; gdt offset
-	rep	stosb
-	pop	di
-	pop	si
-	ret
 
 ; load the main program into memory
 ; ax, cx, dx  clobbered
@@ -65,7 +47,7 @@ _load_program:
 	mov	dh, 0		; head
 	mov	cl, 2		; sector
 	mov	dl, 0		; drive a (use 80h for 1st HD)
-	mov	bx, (LOADADDR << 4) & 0xFFFF
+	mov	bx, LOADADDR >> 4
 	mov	es, bx
 	mov	bx, LOADADDR & 0xFFFF ; start address of main program
 	int	13h
@@ -105,25 +87,26 @@ start32:
 
 	align 8
 gdt:
-	dq 0		; First entry is always the Null Descriptor
+	dq 0			; First entry is always the Null Descriptor
 .code	equ $ - gdt
 	; 4gb flat read/executable code descriptor
-	dw 0xFFFF	; limit 0:15
-	dw 0		; base 0:15
-	db 0		; base 16:23
-	db 0b10011010	; access P GPL S, Type Ex DC R Ac
-	db 0b11001111	; flags Gr Sz L, Limit 16:19
-	db 0		; base 24:31
+	dw 0xFFFF		; limit 0:15
+	dw 0			; base 0:15
+	db 0			; base 16:23
+	db 0b10011010		; access P GPL S, Type Ex DC R Ac
+	db 0b11001111		; flags Gr Sz L, Limit 16:19
+	db 0			; base 24:31
 .data	equ $ - gdt
 	; 4gb flat read/write data descriptor
-	dw 0xFFFF	; limit 0:15
-	dw 0		; base 0:15
-	db 0		; base 16:23
-	db 0b10010010	; access P GPL S Type Ex DC W Ac
-	db 0b11001111	; flags Gr Sz L, Limit 16:19
-	db 0		; base 24:31
+	dw 0xFFFF		; limit 0:15
+	dw 0			; base 0:15
+	db 0			; base 16:23
+	db 0b10010010		; access P GPL S Type Ex DC W Ac
+	db 0b11001111		; flags Gr Sz L, Limit 16:19
+	db 0			; base 24:31
 .end:
 
 greeting:
+	db `Loading Program...\r\n`, 0
+greeting2:
 	db `Entering Protected Mode...\r\n`, 0
-

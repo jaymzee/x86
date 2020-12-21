@@ -4,6 +4,8 @@
 #include <string.h>
 #include "intsetup.h"
 
+extern void CrashMe(void);
+
 void main()
 {
     char buf[80];
@@ -26,7 +28,7 @@ void main()
         print("\nyou pressed: ");
         putchar(c);
         print("\n");
-        print(itoa(timer_count, 10, buf));
+        print(itoa(timer_count, 10, 0, buf));
     }
 }
 
@@ -37,7 +39,7 @@ void KeyboardHandlerMain(void) {
         char buf[80];
         char ch = kbd_decode[keycode];
         strcpy(buf, "0x");
-        itoa(keycode, 16, buf+2);
+        itoa(keycode, 16, 2, buf+2);
         strcat(buf, "  ");
         int len = strlen(buf);
         buf[len - 1] = ch;

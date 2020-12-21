@@ -1,26 +1,5 @@
-#include "serial.h"
-
-static void print(const char *str)
-{
-    COM_WriteString(str);
-}
-
-static void println(const char *str)
-{
-    COM_WriteString(str);
-    COM_WriteString("\n");
-}
-
-static int getchar(void)
-{
-    return COM_ReadChar();
-}
-
-static int putchar(int ch)
-{
-    COM_WriteChar(ch);
-    return ch;
-}
+#include <serial.h>
+#include <stdio.h>
 
 void Main(void)
 {

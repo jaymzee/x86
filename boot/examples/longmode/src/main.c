@@ -19,21 +19,21 @@ void main()
     DisplayText("connect to serial 0 (COM1) for the console");
     println("long mode demo");
     println("page tables:");
-    print("PML4T[0] = ");
-    println(itoa(pml4t[0], 16, buf));
-    print("PDPT[0] = ");
-    println(itoa(pdpt[0], 16, buf));
-    for (int i = 0; i < 8; i++) {
+    print("PML4T[0] = 0x");
+    println(itoa(pml4t[0], 16, 8, buf));
+    print("PDPT[0] = 0x");
+    println(itoa(pdpt[0], 16, 8, buf));
+    for (int i = 0; i < 2; i++) {
         print("PDT[");
-        print(itoa(i, 10, buf));
-        print("] = ");
-        println(itoa(pdt[i], 16, buf));
+        print(itoa(i, 10, 0, buf));
+        print("] = 0x");
+        println(itoa(pdt[i], 16, 8, buf));
     }
     for (int i = 0; i < 8; i++, n++) {
         print("PT[");
-        print(itoa(n, 10, buf));
-        print("] = ");
-        println(itoa(pt[n], 16, buf));
+        print(itoa(n, 10, 0, buf));
+        print("] = 0x");
+        println(itoa(pt[n], 16, 8, buf));
     }
     while (1) {
         print("press a key ");
@@ -42,9 +42,9 @@ void main()
         for (int i = 0; i < 16; i++, n++) {
             if (n < 4096) {
                 print("PT[");
-                print(itoa(n, 10, buf));
-                print("] = ");
-                println(itoa(pt[n], 16, buf));
+                print(itoa(n, 10, 0, buf));
+                print("] = 0x");
+                println(itoa(pt[n], 16, 8, buf));
             }
         }
     }

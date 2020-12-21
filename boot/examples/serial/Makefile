@@ -1,5 +1,5 @@
 TARGET = demo.img
-OBJECTS = stage1.o serial.o main.o
+OBJECTS = stage1.o main.o stdio.o serial.o
 SOURCE = ../../isa/src
 INCLUDE = ../../isa/include
 CC = gcc

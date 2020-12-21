@@ -2,10 +2,12 @@
 ; second stage bootloader enters 32-bit protected mode
 ; assemble with nasm
 
-STACK32_TOP EQU 0x1000000		; top of 16MB memory
-VIDEOMEM    EQU 0x0b8000
-
-	extern Main
+STACK32_TOP equ 0x1000000		; top of 16MB memory
+LOADADDR    equ 0x10000
+VIDEOMEM    equ 0x0b8000
+GDT         equ 0x2000
+GDT_SIZE    equ gdt.end - gdt
+GDTR        equ GDT + GDT_SIZE
 
 ; 16 bit functions that run in real mode
 
@@ -13,14 +15,50 @@ VIDEOMEM    EQU 0x0b8000
 
 	global _start
 _start:
+	xor	ax, ax
+	mov	ds, ax
+	mov	es, ax
+	mov	ss, ax
+	mov	bp, ax
+	mov	sp, 0x7c00	; initialize ss:sp and ss:bp
+	mov	si, greeting
+	call	_print
+	call	_load_program
+	mov	si, greeting2
+	call	_print
 	mov	ax, 0x0013
-	int	10h		; swtich to vga mode 13h
+	int	10h		; switch to vga mode 13h
 	call	_enable_a20_line
+	mov	si, gdt
+	mov	di, GDT
+	mov	cx, GDT_SIZE
+	call	_copy_gdt
 	cli			; disable interrupts
+	call	_disable_nmi
 	call	_enter_prot_mode
-	lgdt	[gdtr]
+	lgdt	[GDTR]
 	jmp	0x08:start32
 
+; load the main program into memory
+; ax, cx, dx  clobbered
+_load_program:
+	push	es
+	push	bx
+	mov	ah, 2h		; read sectors from drive
+	mov	al, 32		; sector count (16K)
+	mov	ch, 0		; cylinder
+	mov	dh, 0		; head
+	mov	cl, 2		; sector
+	mov	dl, 0		; drive a (use 80h for 1st HD)
+	mov	bx, LOADADDR >> 4
+	mov	es, bx
+	mov	bx, LOADADDR & 0xFFFF ; start address of main program
+	int	13h
+	pop	bx
+	pop	es
+	ret
+
+%include "bios.asm"
 %include "cpumode.asm"
 
 
@@ -41,7 +79,7 @@ start32:
 	mov	esp,STACK32_TOP ; Should set ESP to a usable memory location
 				; Stack will be grow down from this location
 	mov	ebp, 0		; terminate chain of frame pointers
-	call	Main		; it's not expected for Main to ever return
+	call	LOADADDR	; it's not expected for main to ever return
 				; but just in case:
 	cli			;   disable interrupts
 .halt	hlt			;   Halt CPU with infinite loop
@@ -51,24 +89,27 @@ start32:
 	section .data
 
 	align 8
-gdtr:
-.size	dw gdt.end - gdt	; size of descriptor table - 1
-.offset	dd gdt
-
-	align 8
 gdt:
 	dq 0			; First entry is always the Null Descriptor
+.code	equ $ - gdt
 	; 4gb flat read/executable code descriptor
-.code	dw 0xFFFF		; limit 0:15
+	dw 0xFFFF		; limit 0:15
 	dw 0			; base 0:15
 	db 0			; base 16:23
 	db 0b10011010		; access P GPL S, Type Ex DC R Ac
 	db 0b11001111		; flags Gr Sz L, Limit 16:19
 	db 0			; base 24:31
+.data	equ $ - gdt
 	; 4gb flat read/write data descriptor
-.data	dw 0xFFFF		; limit 0:15
+	dw 0xFFFF		; limit 0:15
 	dw 0			; base 0:15
 	db 0			; base 16:23
 	db 0b10010010		; access P GPL S Type Ex DC W Ac
 	db 0b11001111		; flags Gr Sz L, Limit 16:19
-.end	db 0			; base 24:31
+	db 0			; base 24:31
+.end:
+
+greeting:
+	db `Loading Program...\r\n`, 0
+greeting2:
+	db `Entering Protected Mode...\r\n`, 0
