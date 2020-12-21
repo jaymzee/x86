@@ -8,10 +8,10 @@ GDT         equ 0x2000
 GDT_SIZE    equ gdt.end - gdt
 GDTR        equ GDT + GDT_SIZE
 
-; 16 bit functions that run in real mode
+%include "bios.asm"
+%include "cpumode.asm"
 
-	bits 16
-
+	section .text.start exec align=16
 	global _start
 _start:
 	xor	ax, ax
@@ -25,16 +25,17 @@ _start:
 	call	_load_program
 	mov	si, greeting2
 	call	_print
-	call	_enable_a20_line
+	a20enbio
 	mov	si, gdt
 	mov	di, GDT
-	mov	cx, GDT_SIZE
-	call	_copy_gdt
+	gdtcpy GDT_SIZE
 	cli			; disable interrupts
-	call	_disable_nmi
-	call	_enter_prot_mode
+	clnmi			; disable NMI
+	stprmd			; set protected mode bit
 	lgdt	[GDTR]
 	jmp	0x08:start32
+
+	section .text
 
 ; load the main program into memory
 ; ax, cx, dx  clobbered
@@ -54,10 +55,6 @@ _load_program:
 	pop	bx
 	pop	es
 	ret
-
-%include "bios.asm"
-%include "cpumode.asm"
-
 
 ; 32 bit code that will run in 32-bit protected mode
 

@@ -12,11 +12,12 @@ GDTR        equ GDT + GDT_SIZE
 PML4T       equ 0x4000
 PT_START    equ 0x8000
 
-
-; 16 bit functions that run in real mode
+%include "bios.asm"
+%include "cpumode.asm"
 
 	bits 16
 
+	section .text.start exec align=16
 	global _start
 _start:
 	xor	ax, ax
@@ -28,15 +29,14 @@ _start:
 	mov	si, greeting
 	call	_print
 	call	_load_program
-	call	_enable_a20_line
+	a20enbio
 	call	_init_page_tables
 	mov	si, gdt
 	mov	di, GDT
-	mov	cx, GDT_SIZE
-	call	_copy_gdt
+	gdtcpy	GDT_SIZE
 	cli			; disable interrupts
-	call	_disable_nmi	; disable NMI
-	call	_enter_long_mode
+	clnmi			; disable NMI
+	stlgmd
 	lgdt	[GDTR]		; load the copied version
 	jmp	0x08:start64
 
@@ -57,9 +57,6 @@ _load_program:
 	pop	bx
 	pop	es
 	ret
-
-%include "bios.asm"
-%include "cpumode.asm"
 
 ; initialize page tables
 ; eax, ecx, edx  clobbered

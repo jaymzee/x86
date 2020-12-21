@@ -21,7 +21,7 @@ void main()
     println("installing handlers and enabling interrupts...");
     EnableInterrupts();
     println("32-bit protected mode demo");
-
+    CrashMe();
     while (1) {
         print("\npress a key ");
         int c = getchar();
@@ -30,6 +30,27 @@ void main()
         print("\n");
         print(itoa(timer_count, 10, 0, buf));
     }
+}
+
+void DumpException(const char *type, int error, int eip, int cs, int eflags)
+{
+    char sbuf[128];
+    char nbuf[20];
+
+    strcpy(sbuf, type);
+    strcat(sbuf, ": Error Code=");
+    itoa(error, 16, 4, nbuf);
+    strcat(sbuf, nbuf);
+    strcat(sbuf, " EIP=");
+    itoa(cs, 16, 4, nbuf);
+    strcat(sbuf, nbuf);
+    strcat(sbuf, ":");
+    itoa(eip, 16, 8, nbuf);
+    strcat(sbuf, nbuf);
+    strcat(sbuf, " EFLAGS=");
+    itoa(eflags, 16, 8, nbuf);
+    strcat(sbuf, nbuf);
+    DisplayText(sbuf);
 }
 
 void KeyboardHandlerMain(void) {

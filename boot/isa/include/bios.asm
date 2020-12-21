@@ -1,3 +1,6 @@
+	bits 16
+	section .text
+
 ; basic i/o using the BIOS ;)
 ; you should include this file.
 ; it's intended to be used in 16-bit real mode code

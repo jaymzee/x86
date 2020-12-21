@@ -2,6 +2,7 @@
 
 	bits 32
 
+	extern DumpException
 	extern DisplayText
 	extern KeyboardHandlerMain
 
@@ -11,10 +12,19 @@ GetEIP:
 
 	global GPFaultHandler
 GPFaultHandler:
-	push gp_fault
-	call DisplayText
-	pop ecx
-	mov eax,[esp]
+	push	gp_fault
+	call	DumpException
+	add	sp, 4
+.halt	cli
+	hlt
+	jmp .halt
+	iret
+
+	global PageFaultHandler
+PageFaultHandler:
+	push	page_fault
+	call	DumpException
+	add	sp, 4
 .halt	cli
 	hlt
 	jmp .halt
@@ -54,9 +64,7 @@ TimerHandler:
 
 	global CrashMe
 CrashMe:
-	mov	eax, 42
-	mov	ds, eax
-	mov	eax, [0x1000]
+	mov	eax, [0]
 	ret
 
 	section .data
@@ -68,4 +76,6 @@ timer_count:
 div_by_zero:
 	db "division by zero, cpu halted",0
 gp_fault:
-	db "general protection fault, cpu halted",0
+	db "GP Fault",0
+page_fault:
+	db "Page Fault",0

@@ -150,8 +150,15 @@ void NMI_Disable(void)
 void
 IDT_IntGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
 {
+#if __WORDSIZE == 64
+    descr->offset_hihi = (uint64_t)hndlr >> 32;
+    descr->offset_hi = ((uint64_t)hndlr >> 16) & 0xffff;
+    descr->offset_lo = (uint64_t)hndlr & 0xffff;
+    descr->ist = 0;
+#else
     descr->offset_hi = (uint32_t)hndlr >> 16;
     descr->offset_lo = (uint32_t)hndlr & 0xffff;
+#endif
     descr->selector = sel;
     descr->type_attr = (dpl << 5) | 0x8E; // 32-bit interupt gate
     descr->zero = 0;
@@ -160,8 +167,15 @@ IDT_IntGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
 void
 IDT_TrapGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
 {
+#if __WORDSIZE == 64
+    descr->offset_hihi = (uint64_t)hndlr >> 32;
+    descr->offset_hi = ((uint64_t)hndlr >> 16) & 0xffff;
+    descr->offset_lo = (uint64_t)hndlr & 0xffff;
+    descr->ist = 0;
+#else
     descr->offset_hi = (uint32_t)hndlr >> 16;
     descr->offset_lo = (uint32_t)hndlr & 0xffff;
+#endif
     descr->selector = sel;
     descr->type_attr = (dpl << 5) | 0x8F; // 32-bit trap gate
     descr->zero = 0;

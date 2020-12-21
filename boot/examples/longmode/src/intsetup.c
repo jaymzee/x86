@@ -8,9 +8,6 @@
 
 extern void KeyboardHandler(void);
 extern void TimerHandler(void);
-extern void DivByZeroHandler(void);
-extern void GPFaultHandler(void);
-extern void PageFaultHandler(void);
 
 // this sets up the interrupt descriptor tables then enables interrupts
 void EnableInterrupts(void)
@@ -25,17 +22,14 @@ void EnableInterrupts(void)
 
     memset(idt, 0, IDT_SIZE); // clear IDT
 
-    IDT_TrapGate(idt + 0x00, DivByZeroHandler, 8, 0);
-    IDT_TrapGate(idt + 0x0d, GPFaultHandler, 8, 0);
-    IDT_TrapGate(idt + 0x0e, PageFaultHandler, 8, 0);
-    IDT_IntGate(idt + 0x20, TimerHandler, 8, 0);
     IDT_IntGate(idt + 0x21, KeyboardHandler, 8, 0);
+    IDT_IntGate(idt + 0x20, TimerHandler, 8, 0);
 
-    idtr->offset = (uint32_t)idt;
+    idtr->offset = (uint64_t)idt;
     idtr->limit = IDT_SIZE - 1;
 
     LoadIDT(idtr); // also enables cpu interrupts
 
-    PIC_UnmaskIRQ(0); // enable timer IRQ
     PIC_UnmaskIRQ(1); // enable keyboard IRQ
+    PIC_UnmaskIRQ(0); // enable timer IRQ
 }

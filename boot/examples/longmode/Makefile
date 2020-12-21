@@ -1,12 +1,13 @@
 TARGET = boot.img
-OBJECTS = main.o stdio.o serial.o string.o conio.o
+OBJECTS = main.o handlers.o intsetup.o
+OBJECTS += stdio.o serial.o string.o conio.o kbd_US.o interrupt.o
 SOURCE = ../../isa/src
 INCLUDE = ../../isa/include
 CC = gcc
 CFLAGS = -g -std=c99 -pedantic -Wall -Werror -m64 -ffreestanding
 # these options keep the binary very small
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
-CFLAGS += -nostdinc -I $(INCLUDE) -include _default.h
+CFLAGS += -nostdinc -I $(INCLUDE) -include _default.h -D __WORDSIZE=64
 ASFLAGS = -g -F dwarf -f elf64 -I $(addsuffix /,$(INCLUDE))
 LDFLAGS = --nmagic  # --nmagic eliminates gaps between sections
 GCCVERSION := $(shell gcc -dumpversion)

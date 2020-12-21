@@ -1,7 +1,9 @@
 #include <conio.h>
+#include <interrupt.h>
 #include <serial.h>
 #include <stdio.h>
 #include <string.h>
+#include "intsetup.h"
 
 void main()
 {
@@ -14,10 +16,13 @@ void main()
 
     COM_Init();
     DisableBlink();
-    ClearScreen(0xF1);
+    ClearScreen(0x1F);
     DisplayText("long mode (x64) entered sucessfully!");
     DisplayText("connect to serial 0 (COM1) for the console");
     println("long mode demo");
+
+    EnableInterrupts();
+
     println("page tables:");
     print("PML4T[0] = 0x");
     println(itoa(pml4t[0], 16, 8, buf));
@@ -47,5 +52,42 @@ void main()
                 println(itoa(pt[n], 16, 8, buf));
             }
         }
+        println(itoa(timer_count, 10, 0, buf));
+    }
+}
+
+void DumpException(const char *type, int error, int eip, int cs, int eflags)
+{
+    char sbuf[128];
+    char nbuf[20];
+
+    strcpy(sbuf, type);
+    strcat(sbuf, ": Error Code=");
+    itoa(error, 16, 4, nbuf);
+    strcat(sbuf, nbuf);
+    strcat(sbuf, " EIP=");
+    itoa(cs, 16, 4, nbuf);
+    strcat(sbuf, nbuf);
+    strcat(sbuf, ":");
+    itoa(eip, 16, 8, nbuf);
+    strcat(sbuf, nbuf);
+    strcat(sbuf, " EFLAGS=");
+    itoa(eflags, 16, 8, nbuf);
+    strcat(sbuf, nbuf);
+    DisplayText(sbuf);
+}
+
+void KeyboardHandlerMain(void) {
+    int keycode = ScanKeyboard();
+    // Lowest bit of status will be set if buffer is not empty
+    if (keycode >= 0 && keycode < 128) {
+        char buf[80];
+        char ch = kbd_decode[keycode];
+        strcpy(buf, "0x");
+        itoa(keycode, 16, 2, buf+2);
+        strcat(buf, "  ");
+        int len = strlen(buf);
+        buf[len - 1] = ch;
+        DisplayText(buf);
     }
 }
