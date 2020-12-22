@@ -1,12 +1,13 @@
 #include <conio.h>
+#include <cpu.h>
 #include <interrupt.h>
 #include <serial.h>
 #include <stdio.h>
 #include <string.h>
-#include <x86_64.h>
 #include "intsetup.h"
 
-void CrashMe(void);
+void CauseGPFault(void);
+void CausePageFault(void);
 
 void main()
 {
@@ -19,13 +20,13 @@ void main()
 
     COM_Init();
     DisableBlink();
-    ClearScreen(0x1F);
+    ClearScreen(0x07);
     DisplayText("long mode (x64) entered sucessfully!");
     DisplayText("connect to serial 0 (COM1) for the console");
     println("long mode demo");
 
     EnableInterrupts();
-    CrashMe();
+    CausePageFault();
 
     println("page tables:");
     print("PML4T[0] = 0x");
@@ -60,82 +61,38 @@ void main()
     }
 }
 
-void DumpError(const char *exception, int errcode, struct x86_64_regs *r)
+void GPFaultHandlerM(int errcode, struct cpu_reg *reg)
 {
-    char sbuf[128];
-    char nbuf[20];
+    char mesg[80], selector[20];
 
-    DisplayText("");
-    strcpy(sbuf, "PANIC: CPU Exception: ");
-    strcat(sbuf, exception);
-    strcat(sbuf, ", Error Code: ");
-    strcat(sbuf, itoa(errcode, 16, 4, nbuf));
-    DisplayText(sbuf);
+    strcpy(mesg, "PANIC: GP Fault, selector: ");
+    strcat(mesg, itoa(errcode, 16, 4, selector));
 
-    strcpy(sbuf, "  rip: ");
-    strcat(sbuf, itoa(r->rip, 16, 16, nbuf));
-    strcat(sbuf, "     rsp: ");
-    strcat(sbuf, itoa(r->rsp, 16, 16, nbuf));
-    strcat(sbuf, "   flags: ");
-    strcat(sbuf, itoa(r->rflags, 16, 16, nbuf));
-    DisplayText(sbuf);
+    DisplayText(mesg); // print to screen
+    DumpCPURegisters(reg, 1); // dump to screen
 
-    strcpy(sbuf, "  rax: ");
-    strcat(sbuf, itoa(r->rax, 16, 16, nbuf));
-    strcat(sbuf, "     rbx: ");
-    strcat(sbuf, itoa(r->rbx, 16, 16, nbuf));
-    strcat(sbuf, "     rcx: ");
-    strcat(sbuf, itoa(r->rcx, 16, 16, nbuf));
-    DisplayText(sbuf);
-
-    strcpy(sbuf, "  rdx: ");
-    strcat(sbuf, itoa(r->rdx, 16, 16, nbuf));
-    strcat(sbuf, "     rsi: ");
-    strcat(sbuf, itoa(r->rsi, 16, 16, nbuf));
-    strcat(sbuf, "     rdi: ");
-    strcat(sbuf, itoa(r->rdi, 16, 16, nbuf));
-    DisplayText(sbuf);
-
-    strcpy(sbuf, "  rbp: ");
-    strcat(sbuf, itoa(r->rbp, 16, 16, nbuf));
-    strcat(sbuf, "      r8: ");
-    strcat(sbuf, itoa(r->r8, 16, 16, nbuf));
-    strcat(sbuf, "      r9: ");
-    strcat(sbuf, itoa(r->r9, 16, 16, nbuf));
-    DisplayText(sbuf);
-
-    strcpy(sbuf, "  r10: ");
-    strcat(sbuf, itoa(r->r10, 16, 16, nbuf));
-    strcat(sbuf, "     r11: ");
-    strcat(sbuf, itoa(r->r11, 16, 16, nbuf));
-    strcat(sbuf, "     r12: ");
-    strcat(sbuf, itoa(r->r12, 16, 16, nbuf));
-    DisplayText(sbuf);
-
-    strcpy(sbuf, "  r13: ");
-    strcat(sbuf, itoa(r->r13, 16, 16, nbuf));
-    strcat(sbuf, "     r14: ");
-    strcat(sbuf, itoa(r->r14, 16, 16, nbuf));
-    strcat(sbuf, "     r15: ");
-    strcat(sbuf, itoa(r->r15, 16, 16, nbuf));
-    DisplayText(sbuf);
-
-    strcpy(sbuf, "  cs: ");
-    strcat(sbuf, itoa(r->cs, 16, 4, nbuf));
-    strcat(sbuf, "  ss: ");
-    strcat(sbuf, itoa(r->ss, 16, 4, nbuf));
-    strcat(sbuf, "  ds: ");
-    strcat(sbuf, itoa(r->ds, 16, 4, nbuf));
-    strcat(sbuf, "  es: ");
-    strcat(sbuf, itoa(r->es, 16, 4, nbuf));
-    strcat(sbuf, "  fs: ");
-    strcat(sbuf, itoa(r->fs, 16, 4, nbuf));
-    strcat(sbuf, "  gs: ");
-    strcat(sbuf, itoa(r->gs, 16, 4, nbuf));
-    DisplayText(sbuf);
+    print("\n");
+    println(mesg); // print to serial 0
+    DumpCPURegisters(reg, 0); // dump to serial 0
 }
 
-void KeyboardHandlerMain(void) {
+void PageFaultHandlerM(int errcode, struct cpu_reg *reg)
+{
+    char mesg[80], errstr[20];
+
+    strcpy(mesg, "PANIC: Page Fault, error code: ");
+    strcat(mesg, itoa(errcode, 16, 4, errstr));
+    strcat(mesg, " IRUWP");
+
+    DisplayText(mesg); // print to screen
+    DumpCPURegisters(reg, 1); // dump to screen
+
+    print("\n");
+    println(mesg); // print to serial 0
+    DumpCPURegisters(reg, 0); // dump to serial 0
+}
+
+void KeyboardHandlerM(void) {
     int keycode = ScanKeyboard();
     // Lowest bit of status will be set if buffer is not empty
     if (keycode >= 0 && keycode < 128) {

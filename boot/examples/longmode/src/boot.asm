@@ -10,13 +10,12 @@ GDT         equ 0x2000
 GDT_SIZE    equ gdt.end - gdt
 GDTR        equ GDT + GDT_SIZE
 PML4T       equ 0x4000
-PT_START    equ 0x8000
+PT          equ 0x8000
 
 %include "bios.asm"
-%include "cpumode.asm"
+%include "cpu16.asm"
 
 	bits 16
-
 	section .text.start exec align=16
 	global _start
 _start:
@@ -34,9 +33,12 @@ _start:
 	mov	si, gdt
 	mov	di, GDT
 	gdtcpy	GDT_SIZE
+	xor	eax, eax
+	mov	[PT], eax	; unmap first page (0x00000000-0x00000FFF)
+	mov	[PT+4], eax
 	cli			; disable interrupts
 	clnmi			; disable NMI
-	stlgmd
+	stlgmd			; set long mode bit
 	lgdt	[GDTR]		; load the copied version
 	jmp	0x08:start64
 
@@ -77,13 +79,13 @@ _init_page_tables:
 	add	edx, eax
 	mov	[edi], edx	; PDPT[0] -> PDT
 	add	edi, eax
-	mov	edx, PT_START | 3
+	mov	edx, PT | 3	; point to first page table
 	mov	ecx, 8
 .pdt	mov	[edi], edx	; PDT[n] -> nth PT
 	add	edx, eax
 	add	edi, 8
 	loop	.pdt
-	mov	edi, PT_START
+	mov	edi, PT		; first page table
 	mov	edx, 3		; R/W and Present
 	mov	ecx, 4096	; identity map first 16MB
 .fillpt	mov	[edi], edx	; PT[n] = n*4096 + 3

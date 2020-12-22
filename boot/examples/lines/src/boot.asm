@@ -10,7 +10,7 @@ GDT_SIZE    equ gdt.end - gdt
 GDTR        equ GDT + GDT_SIZE
 
 %include "bios.asm"
-%include "cpumode.asm"
+%include "cpu16.asm"
 
 ; 16 bit functions that run in real mode
 

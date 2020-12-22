@@ -1,6 +1,6 @@
 TARGET = boot.img
 OBJECTS = main.o intsetup.o handlers.o
-OBJECTS += stdio.o serial.o string.o conio.o interrupt.o kbd_US.o
+OBJECTS += stdio.o serial.o string.o conio.o kbd_US.o cpu.o interrupt.o
 SOURCE = ../../ISA/src
 INCLUDE = ../../ISA/include
 CC = gcc

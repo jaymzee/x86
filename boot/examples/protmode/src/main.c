@@ -1,4 +1,5 @@
 #include <conio.h>
+#include <cpu.h>
 #include <serial.h>
 #include <stdio.h>
 #include <string.h>
@@ -9,6 +10,7 @@ extern void CrashMe(void);
 void main()
 {
     char buf[80];
+    struct cpu_reg reg;
 
     DisableBlink();
     ClearScreen(0x1F);
@@ -17,6 +19,9 @@ void main()
     DisplayText("bang on keyboard to show scan codes");
 
     COM_Init();
+
+    DumpCPURegisters(&reg, 0);
+    DumpCPURegisters(&reg, 1);
 
     println("installing handlers and enabling interrupts...");
     EnableInterrupts();
