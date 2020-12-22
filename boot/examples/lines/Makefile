@@ -1,7 +1,7 @@
 TARGET = boot.img
 OBJECTS = main.o serial.o string.o stdio.o graphics.o
-SOURCE = ../../isa/src
-INCLUDE = ../../isa/include
+SOURCE = ../../ISA/src
+INCLUDE = ../../ISA/include
 CC = gcc
 CFLAGS = -g -Os -std=c99 -pedantic -Wall -m32 -ffreestanding
 # these options keep the binary very small

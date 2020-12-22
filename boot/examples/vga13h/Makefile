@@ -1,6 +1,6 @@
 TARGET = demo.img
 OBJECTS = stage1.o graphics.o
-SOURCE = ../../isa/src
+SOURCE = ../../ISA/src
 INCLUDE = $(SOURCE)
 CFLAGS = -g -std=c99 -pedantic -Wall -Os -m16 -ffreestanding
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables

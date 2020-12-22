@@ -14,7 +14,7 @@ GetEIP:
 GPFaultHandler:
 	push	gp_fault
 	call	DumpException
-	add	sp, 4
+	pop	ecx
 .halt	cli
 	hlt
 	jmp .halt
@@ -24,7 +24,7 @@ GPFaultHandler:
 PageFaultHandler:
 	push	page_fault
 	call	DumpException
-	add	sp, 4
+	pop	ecx
 .halt	cli
 	hlt
 	jmp .halt

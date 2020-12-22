@@ -150,7 +150,7 @@ void NMI_Disable(void)
 void
 IDT_IntGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
 {
-#if __WORDSIZE == 64
+#if __x86_64__
     descr->offset_hihi = (uint64_t)hndlr >> 32;
     descr->offset_hi = ((uint64_t)hndlr >> 16) & 0xffff;
     descr->offset_lo = (uint64_t)hndlr & 0xffff;
@@ -167,7 +167,7 @@ IDT_IntGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
 void
 IDT_TrapGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
 {
-#if __WORDSIZE == 64
+#if __x86_64__
     descr->offset_hihi = (uint64_t)hndlr >> 32;
     descr->offset_hi = ((uint64_t)hndlr >> 16) & 0xffff;
     descr->offset_lo = (uint64_t)hndlr & 0xffff;

@@ -3,7 +3,10 @@
 #include <serial.h>
 #include <stdio.h>
 #include <string.h>
+#include <x86_64.h>
 #include "intsetup.h"
+
+void CrashMe(void);
 
 void main()
 {
@@ -22,6 +25,7 @@ void main()
     println("long mode demo");
 
     EnableInterrupts();
+    CrashMe();
 
     println("page tables:");
     print("PML4T[0] = 0x");
@@ -56,24 +60,78 @@ void main()
     }
 }
 
-void DumpException(const char *type, int error, int eip, int cs, int eflags)
+void DumpError(const char *exception, int errcode, struct x86_64_regs *r)
 {
     char sbuf[128];
     char nbuf[20];
 
-    strcpy(sbuf, type);
-    strcat(sbuf, ": Error Code=");
-    itoa(error, 16, 4, nbuf);
-    strcat(sbuf, nbuf);
-    strcat(sbuf, " EIP=");
-    itoa(cs, 16, 4, nbuf);
-    strcat(sbuf, nbuf);
-    strcat(sbuf, ":");
-    itoa(eip, 16, 8, nbuf);
-    strcat(sbuf, nbuf);
-    strcat(sbuf, " EFLAGS=");
-    itoa(eflags, 16, 8, nbuf);
-    strcat(sbuf, nbuf);
+    DisplayText("");
+    strcpy(sbuf, "PANIC: CPU Exception: ");
+    strcat(sbuf, exception);
+    strcat(sbuf, ", Error Code: ");
+    strcat(sbuf, itoa(errcode, 16, 4, nbuf));
+    DisplayText(sbuf);
+
+    strcpy(sbuf, "  rip: ");
+    strcat(sbuf, itoa(r->rip, 16, 16, nbuf));
+    strcat(sbuf, "     rsp: ");
+    strcat(sbuf, itoa(r->rsp, 16, 16, nbuf));
+    strcat(sbuf, "   flags: ");
+    strcat(sbuf, itoa(r->rflags, 16, 16, nbuf));
+    DisplayText(sbuf);
+
+    strcpy(sbuf, "  rax: ");
+    strcat(sbuf, itoa(r->rax, 16, 16, nbuf));
+    strcat(sbuf, "     rbx: ");
+    strcat(sbuf, itoa(r->rbx, 16, 16, nbuf));
+    strcat(sbuf, "     rcx: ");
+    strcat(sbuf, itoa(r->rcx, 16, 16, nbuf));
+    DisplayText(sbuf);
+
+    strcpy(sbuf, "  rdx: ");
+    strcat(sbuf, itoa(r->rdx, 16, 16, nbuf));
+    strcat(sbuf, "     rsi: ");
+    strcat(sbuf, itoa(r->rsi, 16, 16, nbuf));
+    strcat(sbuf, "     rdi: ");
+    strcat(sbuf, itoa(r->rdi, 16, 16, nbuf));
+    DisplayText(sbuf);
+
+    strcpy(sbuf, "  rbp: ");
+    strcat(sbuf, itoa(r->rbp, 16, 16, nbuf));
+    strcat(sbuf, "      r8: ");
+    strcat(sbuf, itoa(r->r8, 16, 16, nbuf));
+    strcat(sbuf, "      r9: ");
+    strcat(sbuf, itoa(r->r9, 16, 16, nbuf));
+    DisplayText(sbuf);
+
+    strcpy(sbuf, "  r10: ");
+    strcat(sbuf, itoa(r->r10, 16, 16, nbuf));
+    strcat(sbuf, "     r11: ");
+    strcat(sbuf, itoa(r->r11, 16, 16, nbuf));
+    strcat(sbuf, "     r12: ");
+    strcat(sbuf, itoa(r->r12, 16, 16, nbuf));
+    DisplayText(sbuf);
+
+    strcpy(sbuf, "  r13: ");
+    strcat(sbuf, itoa(r->r13, 16, 16, nbuf));
+    strcat(sbuf, "     r14: ");
+    strcat(sbuf, itoa(r->r14, 16, 16, nbuf));
+    strcat(sbuf, "     r15: ");
+    strcat(sbuf, itoa(r->r15, 16, 16, nbuf));
+    DisplayText(sbuf);
+
+    strcpy(sbuf, "  cs: ");
+    strcat(sbuf, itoa(r->cs, 16, 4, nbuf));
+    strcat(sbuf, "  ss: ");
+    strcat(sbuf, itoa(r->ss, 16, 4, nbuf));
+    strcat(sbuf, "  ds: ");
+    strcat(sbuf, itoa(r->ds, 16, 4, nbuf));
+    strcat(sbuf, "  es: ");
+    strcat(sbuf, itoa(r->es, 16, 4, nbuf));
+    strcat(sbuf, "  fs: ");
+    strcat(sbuf, itoa(r->fs, 16, 4, nbuf));
+    strcat(sbuf, "  gs: ");
+    strcat(sbuf, itoa(r->gs, 16, 4, nbuf));
     DisplayText(sbuf);
 }
 
