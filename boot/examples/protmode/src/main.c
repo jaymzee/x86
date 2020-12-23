@@ -5,12 +5,12 @@
 #include <string.h>
 #include "intsetup.h"
 
-extern void CrashMe(void);
+extern void CauseGPFault(void);
+extern void CauseDivByZeroFault(void);
 
 void main()
 {
     char buf[80];
-    struct cpu_reg reg;
 
     DisableBlink();
     ClearScreen(0x1F);
@@ -20,13 +20,10 @@ void main()
 
     COM_Init();
 
-    DumpCPURegisters(&reg, 0);
-    DumpCPURegisters(&reg, 1);
-
     println("installing handlers and enabling interrupts...");
     EnableInterrupts();
     println("32-bit protected mode demo");
-    CrashMe();
+
     while (1) {
         print("\npress a key ");
         int c = getchar();
@@ -37,28 +34,34 @@ void main()
     }
 }
 
-void DumpException(const char *type, int error, int eip, int cs, int eflags)
+void GPFaultHandlerM(int errcode, const struct cpu_reg *reg)
 {
-    char sbuf[128];
-    char nbuf[20];
+    char mesg[80], selector[20];
 
-    strcpy(sbuf, type);
-    strcat(sbuf, ": Error Code=");
-    itoa(error, 16, 4, nbuf);
-    strcat(sbuf, nbuf);
-    strcat(sbuf, " EIP=");
-    itoa(cs, 16, 4, nbuf);
-    strcat(sbuf, nbuf);
-    strcat(sbuf, ":");
-    itoa(eip, 16, 8, nbuf);
-    strcat(sbuf, nbuf);
-    strcat(sbuf, " EFLAGS=");
-    itoa(eflags, 16, 8, nbuf);
-    strcat(sbuf, nbuf);
-    DisplayText(sbuf);
+    strcpy(mesg, "PANIC: GP Fault, selector: ");
+    strcat(mesg, itoa(errcode, 16, 4, selector));
+
+    DisplayText(mesg); // print to screen
+    DumpCPURegisters(reg, 1); // dump to screen
+
+    print("\n");
+    println(mesg); // print to serial 0
+    DumpCPURegisters(reg, 0); // dump to serial 0
 }
 
-void KeyboardHandlerMain(void) {
+void DivByZeroHandlerM(const struct cpu_reg *reg)
+{
+    const char *mesg = "PANIC: div by zero";
+
+    DisplayText(mesg); // print to screen
+    DumpCPURegisters(reg, 1); // dump to screen
+
+    print("\n");
+    println(mesg); // print to serial 0
+    DumpCPURegisters(reg, 0); // dump to serial 0
+}
+
+void KeyboardHandlerM(void) {
     int keycode = ScanKeyboard();
     // Lowest bit of status will be set if buffer is not empty
     if (keycode >= 0 && keycode < 128) {

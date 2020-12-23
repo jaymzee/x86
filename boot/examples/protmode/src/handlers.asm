@@ -1,43 +1,41 @@
-	section .text
+%include "cpu32.asm"
+
+	extern GPFaultHandlerM
+	extern DivByZeroHandlerM
+	extern KeyboardHandlerM
 
 	bits 32
-
-	extern DumpException
-	extern DisplayText
-	extern KeyboardHandlerMain
-
-GetEIP:
-	mov eax, [esp]
-	ret
+	section .text
 
 	global GPFaultHandler
 GPFaultHandler:
-	push	gp_fault
-	call	DumpException
-	pop	ecx
+	cli
+	sub	esp, reg.size
+	savregs	esp
+	push	esp			; pointer to reg struct
+	push	dword [esp+reg.size]	; error code
+	call	GPFaultHandlerM
+	add	esp, 8
 .halt	cli
 	hlt
 	jmp .halt
-	iret
-
-	global PageFaultHandler
-PageFaultHandler:
-	push	page_fault
-	call	DumpException
-	pop	ecx
-.halt	cli
-	hlt
-	jmp .halt
+	mov	eax, [esp+reg.eax]
+	add	esp, reg.size
 	iret
 
 	global DivByZeroHandler
 DivByZeroHandler:
-	push div_by_zero
-	call DisplayText
-	pop ecx
+	cli
+	sub	esp, reg.size
+	savregs	esp
+	push	esp			; pointer to reg struct
+	call	DivByZeroHandlerM
+	add	esp, 4
 .halt	cli
 	hlt
 	jmp .halt
+	mov	eax, [esp+reg.eax]
+	add	esp, reg.size
 	iret
 
 	global KeyboardHandler
@@ -47,7 +45,7 @@ KeyboardHandler:
 	push edx
 	mov	al, 0x20
 	out	0x20, al	; issue EOI
-	call	KeyboardHandlerMain
+	call	KeyboardHandlerM
 	pop	edx
 	pop	ecx
 	pop	eax
@@ -62,9 +60,22 @@ TimerHandler:
 	pop	eax
 	iret
 
-	global CrashMe
-CrashMe:
-	mov	eax, [0]
+	global CauseGPFault
+CauseGPFault:
+	push	eax
+	mov	eax, 42
+	mov	ds, eax
+	pop	eax
+	ret
+
+	global CauseDivByZeroFault
+CauseDivByZeroFault:
+	push	eax
+	push	edx
+	mov	eax, 0
+	div	eax
+	pop	edx
+	pop	eax
 	ret
 
 	section .data

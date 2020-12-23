@@ -10,7 +10,6 @@ extern void KeyboardHandler(void);
 extern void TimerHandler(void);
 extern void DivByZeroHandler(void);
 extern void GPFaultHandler(void);
-extern void PageFaultHandler(void);
 
 // this sets up the interrupt descriptor tables then enables interrupts
 void EnableInterrupts(void)
@@ -27,7 +26,6 @@ void EnableInterrupts(void)
 
     IDT_TrapGate(idt + 0x00, DivByZeroHandler, 8, 0);
     IDT_TrapGate(idt + 0x0d, GPFaultHandler, 8, 0);
-    IDT_TrapGate(idt + 0x0e, PageFaultHandler, 8, 0);
     IDT_IntGate(idt + 0x20, TimerHandler, 8, 0);
     IDT_IntGate(idt + 0x21, KeyboardHandler, 8, 0);
 
