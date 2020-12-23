@@ -2,6 +2,7 @@
 
 	extern GPFaultHandlerM
 	extern PageFaultHandlerM
+	extern DivbyzeroHandlerM
 	extern KeyboardHandlerM
 	extern println
 
@@ -11,19 +12,12 @@
 	global GPFaultHandler
 GPFaultHandler:
 	cli
-	sub	rsp, reg.size
+	push	rbp
+	mov	rbp, rsp
+	sub	rsp, reg.size+8
 	savregs	rsp
-	mov	rax, [rsp+reg.size+8]	; fault rip
-	mov	[rsp+reg.rip], rax
-	mov	ax,[rsp+reg.size+10h]	; fault cs
-	mov	[rsp+reg.cs], ax
-	mov	rax, [rsp+reg.size+18h]	; fault rflags
-	mov	[rsp+reg.rflags], rax
-	mov	rax, [rsp+reg.size+20h]	; fault rsp
-	mov	[rsp+reg.rsp], rax
-	mov	ax, [rsp+reg.size+28h]	; fault ss
-	mov	[rsp+reg.ss], ax
-	mov	rdi, [rsp+reg.size]	; fault error code
+	savisf	rsp, rbp+10h		; fault rip, rflags, rsp, etc.
+	mov	rdi, [rbp+8h]		; fault error code
 	mov	rsi, rsp		; pointer to reg struct
 	call	GPFaultHandlerM
 	mov	rdi, cpu_halted
@@ -34,25 +28,18 @@ GPFaultHandler:
 	mov	rsi, [rsp+reg.rsi]
 	mov	rdi, [rsp+reg.rdi]
 	mov	rax, [rsp+reg.rax]
-	add	rsp, reg.size
+	leave
 	iretq
 
 	global PageFaultHandler
 PageFaultHandler:
 	cli
-	sub	rsp, reg.size
+	push	rbp
+	mov	rbp, rsp
+	sub	rsp, reg.size+8
 	savregs	rsp
-	mov	rax, [rsp+reg.size+8]	; fault rip
-	mov	[rsp+reg.rip], rax
-	mov	ax, [rsp+reg.size+10h]	; fault cs
-	mov	[rsp+reg.cs], ax
-	mov	rax, [rsp+reg.size+18h]	; fault rflags
-	mov	[rsp+reg.rflags], rax
-	mov	rax, [rsp+reg.size+20h]	; fault rsp
-	mov	[rsp+reg.rsp], rax
-	mov	ax, [rsp+reg.size+28h]	; fault ss
-	mov	[rsp+reg.ss], ax
-	mov	rdi, [rsp+reg.size]	; fault error code
+	savisf	rsp, rbp+10h		; fault rip, rflags, rsp, etc.
+	mov	rdi, [rbp+8h]		; fault error code
 	mov	rsi, rsp		; pointer to regs struct
 	call	PageFaultHandlerM
 	mov	rdi, cpu_halted
@@ -63,7 +50,27 @@ PageFaultHandler:
 	mov	rsi, [rsp+reg.rsi]
 	mov	rdi, [rsp+reg.rdi]
 	mov	rax, [rsp+reg.rax]
-	add	rsp, reg.size
+	leave
+	iretq
+
+	global DivbyzeroHandler
+DivbyzeroHandler:
+	cli
+	push	rbp
+	mov	rbp, rsp
+	sub	rsp, reg.size+8
+	savregs	rsp
+	savisf	rsp, rbp+8		; fault rip, rflags, rsp, etc.
+	mov	rdi, rsp		; pointer to regs struct
+	call	DivbyzeroHandlerM
+	mov	rdi, cpu_halted
+	call	println
+.halt	cli
+	hlt
+	jmp	.halt
+	mov	rdi, [rsp+reg.rdi]
+	mov	rax, [rsp+reg.rax]
+	leave
 	iretq
 
 	global KeyboardHandler
@@ -104,13 +111,25 @@ TimerHandler:
 
 	global CauseGPFault
 CauseGPFault:
+	push	rax
+	mov	eax, ds
+	push	rax
 	mov	ax, 0x42
-	mov	ds, ax
+	mov	ds, ax			; should cause GP Fault
+	pop	rax
+	mov	ds, eax
+	pop	rax
 	ret
 
 	global CausePageFault
 CausePageFault:
-	mov	[0x442], eax
+	mov	[0x442], eax		; First page is not mapped to catch
+	ret				; null pointer exceptions.
+
+	global CauseDivbyzero
+CauseDivbyzero:
+	mov	eax, 0
+	div	eax
 	ret
 
 	section .data
@@ -120,4 +139,4 @@ timer_count:
 	dd 0
 
 cpu_halted:
-	db "CPU halted", 0
+	db "system halted", 0

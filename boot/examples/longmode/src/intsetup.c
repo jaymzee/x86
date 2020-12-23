@@ -8,6 +8,7 @@
 
 extern void GPFaultHandler(void);
 extern void PageFaultHandler(void);
+extern void DivbyzeroHandler(void);
 extern void KeyboardHandler(void);
 extern void TimerHandler(void);
 
@@ -24,6 +25,7 @@ void EnableInterrupts(void)
 
     memset(idt, 0, IDT_SIZE); // clear IDT
 
+    IDT_TrapGate(idt + 0x00, DivbyzeroHandler, 8, 0);
     IDT_TrapGate(idt + 0x0d, GPFaultHandler, 8, 0);
     IDT_TrapGate(idt + 0x0e, PageFaultHandler, 8, 0);
     IDT_IntGate(idt + 0x21, KeyboardHandler, 8, 0);

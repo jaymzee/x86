@@ -48,17 +48,17 @@ struct cpu_reg {
     uint32_t cr2;   // 44
     uint32_t cr3;   // 48
     uint32_t cr4;   // 52
-    uint32_t cr8;   // 56
-    uint16_t es;    // 60
-    uint16_t cs;    // 62
-    uint16_t ss;    // 64
-    uint16_t ds;    // 66
-    uint16_t fs;    // 68
-    uint16_t gs;    // 70
+    uint16_t es;    // 56
+    uint16_t cs;    // 58
+    uint16_t ss;    // 60
+    uint16_t ds;    // 62
+    uint16_t fs;    // 64
+    uint16_t gs;    // 66
 };
 #endif
 
 // DumpCPURegister dumps the CPU registers to the screen or serial port
 //   dest = 1 for screen
 //   dest = 0 for serial port 0 (COM1)
-void DumpCPURegisters(const struct cpu_reg *reg, int dest);
+//   ctrl = 1 show cpu control registers
+void DumpCPURegisters(const struct cpu_reg *reg, int dest, int ctrl);

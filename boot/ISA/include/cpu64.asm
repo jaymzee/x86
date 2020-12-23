@@ -28,9 +28,10 @@ struc reg
 .ds 	resw	1	; 190
 .fs 	resw	1	; 192
 .gs 	resw	1	; 194
-.size	equ	($ + 15) & 0xFFF0
+.size	equ	($ + 15) & 0xFFF0	; 16 byte aligned
 endstruc
 
+; save all registers to register save area
 ; eax (rax) is clobbered but it is saved first
 %macro	savregs	1
 	mov	[%1+reg.rax], rax
@@ -73,3 +74,19 @@ endstruc
 	mov	[%1+reg.cr8], rax
 %endmacro
 
+; save interrupt stack frame
+;   saves info about the faulting code to register save area
+;   rbp is the frame pointer and should be initialized first
+;   rax is clobbered
+%macro savisf 2
+	mov	rax, [%2+0]		; fault rip
+	mov	[%1+reg.rip], rax
+	mov	ax, [%2+8]		; fault cs
+	mov	[%1+reg.cs], ax
+	mov	rax, [%2+10h]		; fault rflags
+	mov	[%1+reg.rflags], rax
+	mov	rax, [%2+18h]		; fault rsp
+	mov	[%1+reg.rsp], rax
+	mov	ax, [%2+20h]		; fault ss
+	mov	[%1+reg.ss], ax
+%endmacro

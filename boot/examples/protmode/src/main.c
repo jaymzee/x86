@@ -42,11 +42,11 @@ void GPFaultHandlerM(int errcode, const struct cpu_reg *reg)
     strcat(mesg, itoa(errcode, 16, 4, selector));
 
     DisplayText(mesg); // print to screen
-    DumpCPURegisters(reg, 1); // dump to screen
+    DumpCPURegisters(reg, 1, 1); // dump to screen
 
     print("\n");
     println(mesg); // print to serial 0
-    DumpCPURegisters(reg, 0); // dump to serial 0
+    DumpCPURegisters(reg, 0, 1); // dump to serial 0
 }
 
 void DivByZeroHandlerM(const struct cpu_reg *reg)
@@ -54,11 +54,11 @@ void DivByZeroHandlerM(const struct cpu_reg *reg)
     const char *mesg = "PANIC: div by zero";
 
     DisplayText(mesg); // print to screen
-    DumpCPURegisters(reg, 1); // dump to screen
+    DumpCPURegisters(reg, 1, 1); // dump to screen
 
     print("\n");
     println(mesg); // print to serial 0
-    DumpCPURegisters(reg, 0); // dump to serial 0
+    DumpCPURegisters(reg, 0, 1); // dump to serial 0
 }
 
 void KeyboardHandlerM(void) {

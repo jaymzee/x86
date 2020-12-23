@@ -13,13 +13,12 @@ struc reg
 .cr2	resd	1	; 44
 .cr3	resd	1	; 48
 .cr4	resd	1	; 52
-.cr8	resd	1	; 56
-.es 	resw	1	; 60
-.cs 	resw	1	; 62
-.ss 	resw	1	; 64
-.ds 	resw	1	; 66
-.fs 	resw	1	; 68
-.gs 	resw	1	; 70
+.es 	resw	1	; 56
+.cs 	resw	1	; 58
+.ss 	resw	1	; 60
+.ds 	resw	1	; 62
+.fs 	resw	1	; 64
+.gs 	resw	1	; 66
 .size	equ	($ + 3) & 0xFFFC	; 4 byte alignment
 endstruc
 
@@ -53,7 +52,5 @@ endstruc
 	mov	[%1+reg.cr3], eax
 	mov	eax, cr4
 	mov	[%1+reg.cr4], eax
-	mov	eax, cr8
-	mov	[%1+reg.cr8], eax
 %endmacro
 

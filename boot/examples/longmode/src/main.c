@@ -8,6 +8,7 @@
 
 void CauseGPFault(void);
 void CausePageFault(void);
+void CauseDivbyzero(void);
 
 void main()
 {
@@ -26,7 +27,6 @@ void main()
     println("long mode demo");
 
     EnableInterrupts();
-    CausePageFault();
 
     println("page tables:");
     print("PML4T[0] = 0x");
@@ -69,11 +69,23 @@ void GPFaultHandlerM(int errcode, struct cpu_reg *reg)
     strcat(mesg, itoa(errcode, 16, 4, selector));
 
     DisplayText(mesg); // print to screen
-    DumpCPURegisters(reg, 1); // dump to screen
+    DumpCPURegisters(reg, 1, 1); // dump to screen
 
     print("\n");
     println(mesg); // print to serial 0
-    DumpCPURegisters(reg, 0); // dump to serial 0
+    DumpCPURegisters(reg, 0, 1); // dump to serial 0
+}
+
+void DivbyzeroHandlerM(struct cpu_reg *reg)
+{
+    const char *mesg = "PANIC: divide by zero";
+
+    DisplayText(mesg); // print to screen
+    DumpCPURegisters(reg, 1, 1); // dump to screen
+
+    print("\n");
+    println(mesg); // print to serial 0
+    DumpCPURegisters(reg, 0, 1); // dump to serial 0
 }
 
 void PageFaultHandlerM(int errcode, struct cpu_reg *reg)
@@ -85,11 +97,11 @@ void PageFaultHandlerM(int errcode, struct cpu_reg *reg)
     strcat(mesg, " IRUWP");
 
     DisplayText(mesg); // print to screen
-    DumpCPURegisters(reg, 1); // dump to screen
+    DumpCPURegisters(reg, 1, 1); // dump to screen
 
     print("\n");
     println(mesg); // print to serial 0
-    DumpCPURegisters(reg, 0); // dump to serial 0
+    DumpCPURegisters(reg, 0, 1); // dump to serial 0
 }
 
 void KeyboardHandlerM(void) {
