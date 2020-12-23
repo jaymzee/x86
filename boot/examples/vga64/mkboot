@@ -3,16 +3,16 @@
 import sys
 
 if len(sys.argv) != 4:
-    print("Usage: mkboot image stage0 stage1")
+    print("Usage: mkboot image bootloader program")
     exit(1)
 
 with open(sys.argv[2], mode='rb') as file:
-    stage0 = file.read()
+    boot = file.read()
 with open(sys.argv[3], mode='rb') as file:
-    stage1 = file.read()
+    prog = file.read()
 with open(sys.argv[1], mode='wb') as file:
-    file.write(stage0)
-    file.write(stage1)
+    file.write(boot)
+    file.write(prog)
     # fill remaining blocks with zero
-    count = len(stage0) + len(stage1)
+    count = len(boot) + len(prog)
     file.write(bytes(2880*512 - count))

@@ -1,2 +1,0 @@
-#!/bin/sh
-qemu-system-i386 -m 16 -drive format=raw,if=floppy,file=hello.img,readonly -curses

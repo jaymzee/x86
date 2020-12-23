@@ -36,6 +36,8 @@ _start:
 	xor	eax, eax
 	mov	[PT], eax	; unmap first page (0x00000000-0x00000FFF)
 	mov	[PT+4], eax
+	mov	ax, 0x0013
+	int	10h		; switch to VGA mode 13h
 	cli			; disable interrupts
 	clnmi			; disable NMI
 	stlgmd			; set long mode bit

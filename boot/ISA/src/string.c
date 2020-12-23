@@ -93,3 +93,13 @@ finish:
     reverse(str, i);
     return str;
 }
+
+char *strtr(char *str, char repl, char with)
+{
+    for (char *p = str; *p != 0; p++) {
+        if (*p == repl) {
+            *p = with;
+        }
+    }
+    return str;
+}

@@ -1,35 +1,21 @@
-#include "interrupt.h"
-#include "serial.h"
-#include "string.h"
-#include "time.h"
-
-static void print(const char *str)
-{
-    COM_WriteString(str);
-}
-
-static int getchar(void)
-{
-    return COM_ReadChar();
-}
-
-static int putchar(int ch)
-{
-    COM_WriteChar(ch);
-    return ch;
-}
+#include <interrupt.h>
+#include <serial.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
 
 void Main()
 {
     extern int tick_counter;
-    char buf[32];
+    char sbuf[80];
+    char nbuf[20];
     struct time now;
 
     COM_Init();
     print("Real time clock demo\n");
     while (1) {
         print("\ntick count: ");
-        print(itoa(tick_counter, 10, 0, buf));
+        print(itoa(tick_counter, 10, 0, sbuf));
         print("\npress a key ");
         int c = getchar();
         print("\nyou pressed: ");
@@ -45,12 +31,12 @@ void Main()
             break;
         case 't':
             RTC_GetTime(&now);
+            strcat(itoa(now.hour, 10, 2, sbuf), ":");
+            strcat(sbuf, itoa(now.minute, 10, 2, nbuf));
+            strcat(sbuf, ":");
+            strcat(sbuf, itoa(now.second, 10, 2, nbuf));
             print("\nTime is ");
-            print(itoa(now.hour, 10, 2, buf));
-            print(":");
-            print(itoa(now.minute, 10, 2, buf));
-            print(":");
-            print(itoa(now.second, 10, 2, buf));
+            print(strtr(sbuf, ' ', '0'));
         }
     }
 }
