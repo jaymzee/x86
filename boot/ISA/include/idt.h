@@ -42,3 +42,5 @@ static inline void LoadIDT(struct IDTR *idtr)
 
 void IDT_IntGate(struct IDT_entry *d, void (*hndlr)(void), int sel, int dpl);
 void IDT_TrapGate(struct IDT_entry *d, void (*hndlr)(void), int sel, int dpl);
+
+extern const char *cpu_exceptions[32];

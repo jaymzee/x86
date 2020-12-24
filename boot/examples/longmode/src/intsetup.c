@@ -7,6 +7,13 @@
 #define IDT_SIZE (IDT_ENTRIES * sizeof(struct IDT_entry))
 
 void GPFaultHandler(void);
+void NMIHandler(void);
+void InvalidOpcodeHandler(void);
+void DoubleFaultHandler(void);
+void SegNotPresentHandler(void);
+void StackSegFaultHandler(void);
+void x87FPExceptHandler(void);
+void SIMDFPExceptHandler(void);
 void PageFaultHandler(void);
 void DivbyzeroHandler(void);
 void KeyboardHandler(void);
@@ -26,8 +33,15 @@ void EnableInterrupts(void)
     memset(idt, 0, IDT_SIZE); // clear IDT
 
     IDT_TrapGate(idt + 0x00, DivbyzeroHandler, 8, 0);
+    IDT_TrapGate(idt + 0x02, NMIHandler, 8, 0);
+    IDT_TrapGate(idt + 0x06, InvalidOpcodeHandler, 8, 0);
+    IDT_TrapGate(idt + 0x08, DoubleFaultHandler, 8, 0);
+    IDT_TrapGate(idt + 0x0b, SegNotPresentHandler, 8, 0);
+    IDT_TrapGate(idt + 0x0c, StackSegFaultHandler, 8, 0);
     IDT_TrapGate(idt + 0x0d, GPFaultHandler, 8, 0);
     IDT_TrapGate(idt + 0x0e, PageFaultHandler, 8, 0);
+    IDT_TrapGate(idt + 0x10, x87FPExceptHandler, 8, 0);
+    IDT_TrapGate(idt + 0x13, SIMDFPExceptHandler, 8, 0);
     IDT_IntGate(idt + 0x21, KeyboardHandler, 8, 0);
     IDT_IntGate(idt + 0x20, TimerHandler, 8, 0);
 

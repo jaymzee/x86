@@ -24,10 +24,10 @@ void main()
     ClearText(0x1F);
     fputs("long mode (x64) entered sucessfully!\n", console);
     fputs("connect to serial 0 (COM1) for the console\n", console);
-    println("long mode demo");
 
     EnableInterrupts();
 
+    println("long mode demo");
     println("page tables:");
     print("PML4T[0] = 0x");
     println(itoa(pml4t[0], 16, 8, buf));
@@ -62,43 +62,19 @@ void main()
     }
 }
 
-void GPFaultHandlerM(struct cpu_reg *reg, int errcode)
+void CPUException(struct cpu_reg *reg, int exception, int errcode)
 {
-    char regs[1000], mesg[80], selector[20];
+    char regs[1000], msg[80], ecs[20];
 
-    strcpy(mesg, "\nPANIC: GP Fault, selector: ");
-    strcat(mesg, itoa(errcode, 16, 4, selector));
-    strcat(mesg, "\n");
+    strcpy(msg, "\nPANIC: ");
+    strcat(msg, cpu_exceptions[exception]);
+    strcat(msg, ", error code: ");
+    strcat(msg, itoa(errcode, 16, 4, ecs));
+    strcat(msg, "\n");
     DumpCPURegisters(regs, reg, 1);
-    fputs(mesg, console);
+    fputs(msg, console);
     fputs(regs, console);
-    fputs(mesg, stdout);
-    fputs(regs, stdout);
-}
-
-void PageFaultHandlerM(struct cpu_reg *reg, int errcode)
-{
-    char regs[1000], mesg[80], errstr[20];
-
-    strcpy(mesg, "\nPANIC: Page Fault, error code: ");
-    strcat(mesg, itoa(errcode, 16, 4, errstr));
-    strcat(mesg, " IRUWP\n");
-    DumpCPURegisters(regs, reg, 1);
-    fputs(mesg, console);
-    fputs(regs, console);
-    fputs(mesg, stdout);
-    fputs(regs, stdout);
-}
-
-void DivbyzeroHandlerM(struct cpu_reg *reg)
-{
-    char regs[2000];
-    const char *mesg = "\nPANIC: divide by zero\n";
-
-    DumpCPURegisters(regs, reg, 1);
-    fputs(mesg, console);
-    fputs(regs, console);
-    fputs(mesg, stdout);
+    fputs(msg, stdout);
     fputs(regs, stdout);
 }
 
