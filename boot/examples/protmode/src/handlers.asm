@@ -10,17 +10,22 @@
 	global GPFaultHandler
 GPFaultHandler:
 	cli
+	push	ebp
+	mov	ebp, esp
 	sub	esp, reg.size
 	savregs	esp
-	push	esp			; pointer to reg struct
-	push	dword [esp+reg.size]	; error code
+	savisf	esp, ebp+8		; save fault eip, cs, flags etc.
+	mov	eax, esp		; save address of reg struct
+	push	dword [ebp+4]		; 2nd arg: error code
+	push	eax			; 1st arg: pointer to reg struct
 	call	GPFaultHandlerM
 	add	esp, 8
 .halt	cli
 	hlt
 	jmp .halt
 	mov	eax, [esp+reg.eax]
-	add	esp, reg.size
+	leave
+	add	esp, 4			; pop error code
 	iret
 
 	global DivbyzeroHandler
@@ -28,6 +33,7 @@ DivbyzeroHandler:
 	cli
 	sub	esp, reg.size
 	savregs	esp
+	savisf	esp, esp+reg.size
 	push	esp			; pointer to reg struct
 	call	DivbyzeroHandlerM
 	add	esp, 4
@@ -63,7 +69,7 @@ TimerHandler:
 	global CauseGPFault
 CauseGPFault:
 	push	eax
-	mov	eax, 42
+	mov	eax, 0x42
 	mov	ds, eax
 	pop	eax
 	ret

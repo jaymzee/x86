@@ -54,3 +54,15 @@ endstruc
 	mov	[%1+reg.cr4], eax
 %endmacro
 
+; save interrupt stack frame
+;   saves info about the faulting code to register save area
+;   ebp is the frame pointer and should be initialized first
+;   eax is clobbered
+%macro savisf 2
+	mov	eax, [%2+0]		; fault rip
+	mov	[%1+reg.eip], eax
+	mov	ax, [%2+4]		; fault cs
+	mov	[%1+reg.cs], ax
+	mov	eax, [%2+8]		; fault eflags
+	mov	[%1+reg.eflags], eax
+%endmacro

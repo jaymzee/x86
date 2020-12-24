@@ -29,6 +29,7 @@ GPFaultHandler:
 	mov	rdi, [rsp+reg.rdi]
 	mov	rax, [rsp+reg.rax]
 	leave
+	add	rsp, 8			; pop error code
 	iretq
 
 	global PageFaultHandler

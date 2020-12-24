@@ -20,8 +20,6 @@ void main()
 
     COM_Init();
 
-    CauseDivbyzeroFault();
-
     println("installing handlers and enabling interrupts...");
     EnableInterrupts();
     println("32-bit protected mode demo");
@@ -36,9 +34,9 @@ void main()
     }
 }
 
-void GPFaultHandlerM(int errcode, const struct cpu_reg *reg)
+void GPFaultHandlerM(const struct cpu_reg *reg, int errcode)
 {
-    char regs[1000], mesg[80], selector[20];
+    char regs[500], mesg[80], selector[20];
 
     strcpy(mesg, "\nPANIC: GP Fault, selector: ");
     strcat(mesg, itoa(errcode, 16, 4, selector));
@@ -53,16 +51,16 @@ void GPFaultHandlerM(int errcode, const struct cpu_reg *reg)
 
 void DivbyzeroHandlerM(const struct cpu_reg *reg)
 {
-   // char regs[1000];
+    char regs[500];
     const char *mesg;
 
     mesg = "\nPANIC: div by zero\n";
-    //DumpCPURegisters(regs, reg, 1);
+    DumpCPURegisters(regs, reg, 1);
 
     fputs(mesg, console);
-    //fputs(regs, console);
-    //fputs(mesg, stdout);
-    //fputs(regs, stdout);
+    fputs(regs, console);
+    fputs(mesg, stdout);
+    fputs(regs, stdout);
 }
 
 void KeyboardHandlerM(void) {
