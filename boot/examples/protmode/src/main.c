@@ -6,19 +6,21 @@
 #include "intsetup.h"
 
 extern void CauseGPFault(void);
-extern void CauseDivByZeroFault(void);
+extern void CauseDivbyzeroFault(void);
 
 void main()
 {
     char buf[80];
 
     DisableBlink();
-    ClearScreen(0x1F);
-    DisplayText("32-bit protected mode entered successfully!");
-    DisplayText("connect to serial 0 (COM1) for the console");
-    DisplayText("bang on keyboard to show scan codes");
+    ClearText(0x1F);
+    fputs("32-bit protected mode entered successfully!\n", console);
+    fputs("connect to serial 0 (COM1) for the console\n", console);
+    fputs("bang on keyboard to show scan codes\n", console);
 
     COM_Init();
+
+    CauseDivbyzeroFault();
 
     println("installing handlers and enabling interrupts...");
     EnableInterrupts();
@@ -36,29 +38,31 @@ void main()
 
 void GPFaultHandlerM(int errcode, const struct cpu_reg *reg)
 {
-    char mesg[80], selector[20];
+    char regs[1000], mesg[80], selector[20];
 
-    strcpy(mesg, "PANIC: GP Fault, selector: ");
+    strcpy(mesg, "\nPANIC: GP Fault, selector: ");
     strcat(mesg, itoa(errcode, 16, 4, selector));
+    strcat(mesg, "\n");
+    DumpCPURegisters(regs, reg, 1);
 
-    DisplayText(mesg); // print to screen
-    DumpCPURegisters(reg, 1, 1); // dump to screen
-
-    print("\n");
-    println(mesg); // print to serial 0
-    DumpCPURegisters(reg, 0, 1); // dump to serial 0
+    fputs(mesg, console);
+    fputs(regs, console);
+    fputs(mesg, stdout);
+    fputs(regs, stdout);
 }
 
-void DivByZeroHandlerM(const struct cpu_reg *reg)
+void DivbyzeroHandlerM(const struct cpu_reg *reg)
 {
-    const char *mesg = "PANIC: div by zero";
+   // char regs[1000];
+    const char *mesg;
 
-    DisplayText(mesg); // print to screen
-    DumpCPURegisters(reg, 1, 1); // dump to screen
+    mesg = "\nPANIC: div by zero\n";
+    //DumpCPURegisters(regs, reg, 1);
 
-    print("\n");
-    println(mesg); // print to serial 0
-    DumpCPURegisters(reg, 0, 1); // dump to serial 0
+    fputs(mesg, console);
+    //fputs(regs, console);
+    //fputs(mesg, stdout);
+    //fputs(regs, stdout);
 }
 
 void KeyboardHandlerM(void) {
@@ -69,9 +73,9 @@ void KeyboardHandlerM(void) {
         char ch = kbd_decode[keycode];
         strcpy(buf, "0x");
         itoa(keycode, 16, 2, buf+2);
-        strcat(buf, "  ");
+        strcat(buf, "  \n");
         int len = strlen(buf);
-        buf[len - 1] = ch;
-        DisplayText(buf);
+        buf[len - 2] = ch;
+        fputs(buf, console);
     }
 }

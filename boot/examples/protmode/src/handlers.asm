@@ -1,7 +1,7 @@
 %include "cpu32.asm"
 
 	extern GPFaultHandlerM
-	extern DivByZeroHandlerM
+	extern DivbyzeroHandlerM
 	extern KeyboardHandlerM
 
 	bits 32
@@ -23,13 +23,13 @@ GPFaultHandler:
 	add	esp, reg.size
 	iret
 
-	global DivByZeroHandler
-DivByZeroHandler:
+	global DivbyzeroHandler
+DivbyzeroHandler:
 	cli
 	sub	esp, reg.size
 	savregs	esp
 	push	esp			; pointer to reg struct
-	call	DivByZeroHandlerM
+	call	DivbyzeroHandlerM
 	add	esp, 4
 .halt	cli
 	hlt
@@ -68,8 +68,8 @@ CauseGPFault:
 	pop	eax
 	ret
 
-	global CauseDivByZeroFault
-CauseDivByZeroFault:
+	global CauseDivbyzeroFault
+CauseDivbyzeroFault:
 	push	eax
 	push	edx
 	mov	eax, 0

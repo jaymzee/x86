@@ -1,6 +1,6 @@
 TARGET = demo.img
 OBJECTS = stage1.o main.o
-OBJECTS += serial.o string.o stdio.o interrupt.o time.o
+OBJECTS += serial.o string.o stdio.o serial.o conio.o interrupt.o time.o
 SOURCE = ../../ISA/src
 INCLUDE = ../../ISA/include
 CC = gcc

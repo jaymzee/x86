@@ -1,2 +1,0 @@
-#!/bin/sh
-qemu-system-i386 -m 16 -boot a -drive format=raw,if=floppy,file=demo.img,readonly

@@ -8,7 +8,7 @@ void main()
         DrawLine(0, i, 319, i, i);
     }
     COM_Init();
-    println("protected mode demo");
+    println("VGA graphics in protected mode demo");
     while (1) {
         print("\npress a key ");
         int c = getchar();

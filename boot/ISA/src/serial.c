@@ -27,12 +27,21 @@ int COM_IsTxEmpty(void)
 }
 
 // blocking
-void COM_WriteChar(char a)
+static void COM_SendChar(char a)
 {
     while (!COM_IsTxEmpty())
        ;
 
     outb(COM1_PORT, a);
+}
+
+// blocking
+void COM_WriteChar(char a)
+{
+    if (a == 10) {
+        COM_SendChar(13);
+    }
+    COM_SendChar(a);
 }
 
 // does serial receive have data
@@ -53,9 +62,6 @@ char COM_ReadChar(void)
 void COM_WriteString(const char *str)
 {
     for (char ch = *str; ch; ch = *++str) {
-        if (ch == 10) {
-            COM_WriteChar(13);
-        }
         COM_WriteChar(ch);
     }
 }

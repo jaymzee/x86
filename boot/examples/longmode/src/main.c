@@ -21,9 +21,9 @@ void main()
 
     COM_Init();
     DisableBlink();
-    ClearScreen(0x07);
-    DisplayText("long mode (x64) entered sucessfully!");
-    DisplayText("connect to serial 0 (COM1) for the console");
+    ClearText(0x1F);
+    fputs("long mode (x64) entered sucessfully!\n", console);
+    fputs("connect to serial 0 (COM1) for the console\n", console);
     println("long mode demo");
 
     EnableInterrupts();
@@ -48,7 +48,7 @@ void main()
     while (1) {
         print("press a key ");
         getchar();
-        print("\n");
+        println("");
         for (int i = 0; i < 16; i++, n++) {
             if (n < 4096) {
                 print("PT[");
@@ -57,51 +57,49 @@ void main()
                 println(itoa(pt[n], 16, 8, buf));
             }
         }
+        print("timer_count: ");
         println(itoa(timer_count, 10, 0, buf));
     }
 }
 
-void GPFaultHandlerM(int errcode, struct cpu_reg *reg)
+void GPFaultHandlerM(struct cpu_reg *reg, int errcode)
 {
-    char mesg[80], selector[20];
+    char regs[1000], mesg[80], selector[20];
 
-    strcpy(mesg, "PANIC: GP Fault, selector: ");
+    strcpy(mesg, "\nPANIC: GP Fault, selector: ");
     strcat(mesg, itoa(errcode, 16, 4, selector));
+    strcat(mesg, "\n");
+    DumpCPURegisters(regs, reg, 1);
+    fputs(mesg, console);
+    fputs(regs, console);
+    fputs(mesg, stdout);
+    fputs(regs, stdout);
+}
 
-    DisplayText(mesg); // print to screen
-    DumpCPURegisters(reg, 1, 1); // dump to screen
+void PageFaultHandlerM(struct cpu_reg *reg, int errcode)
+{
+    char regs[1000], mesg[80], errstr[20];
 
-    print("\n");
-    println(mesg); // print to serial 0
-    DumpCPURegisters(reg, 0, 1); // dump to serial 0
+    strcpy(mesg, "\nPANIC: Page Fault, error code: ");
+    strcat(mesg, itoa(errcode, 16, 4, errstr));
+    strcat(mesg, " IRUWP\n");
+    DumpCPURegisters(regs, reg, 1);
+    fputs(mesg, console);
+    fputs(regs, console);
+    fputs(mesg, stdout);
+    fputs(regs, stdout);
 }
 
 void DivbyzeroHandlerM(struct cpu_reg *reg)
 {
-    const char *mesg = "PANIC: divide by zero";
+    char regs[2000];
+    const char *mesg = "\nPANIC: divide by zero\n";
 
-    DisplayText(mesg); // print to screen
-    DumpCPURegisters(reg, 1, 1); // dump to screen
-
-    print("\n");
-    println(mesg); // print to serial 0
-    DumpCPURegisters(reg, 0, 1); // dump to serial 0
-}
-
-void PageFaultHandlerM(int errcode, struct cpu_reg *reg)
-{
-    char mesg[80], errstr[20];
-
-    strcpy(mesg, "PANIC: Page Fault, error code: ");
-    strcat(mesg, itoa(errcode, 16, 4, errstr));
-    strcat(mesg, " IRUWP");
-
-    DisplayText(mesg); // print to screen
-    DumpCPURegisters(reg, 1, 1); // dump to screen
-
-    print("\n");
-    println(mesg); // print to serial 0
-    DumpCPURegisters(reg, 0, 1); // dump to serial 0
+    DumpCPURegisters(regs, reg, 1);
+    fputs(mesg, console);
+    fputs(regs, console);
+    fputs(mesg, stdout);
+    fputs(regs, stdout);
 }
 
 void KeyboardHandlerM(void) {
@@ -112,9 +110,11 @@ void KeyboardHandlerM(void) {
         char ch = kbd_decode[keycode];
         strcpy(buf, "0x");
         itoa(keycode, 16, 2, buf+2);
-        strcat(buf, "  ");
+        strcat(buf, "  \n");
         int len = strlen(buf);
-        buf[len - 1] = ch;
-        DisplayText(buf);
+        if (ch > 31 && ch < 127) {
+            buf[len - 2] = ch;
+        }
+        fputs(buf, console);
     }
 }

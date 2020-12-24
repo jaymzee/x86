@@ -4,7 +4,7 @@
 	extern PageFaultHandlerM
 	extern DivbyzeroHandlerM
 	extern KeyboardHandlerM
-	extern println
+	extern puts
 
 	bits 64
 	section .text
@@ -17,11 +17,11 @@ GPFaultHandler:
 	sub	rsp, reg.size+8
 	savregs	rsp
 	savisf	rsp, rbp+10h		; fault rip, rflags, rsp, etc.
-	mov	rdi, [rbp+8h]		; fault error code
-	mov	rsi, rsp		; pointer to reg struct
+	mov	rdi, rsp		; pointer to reg struct
+	mov	rsi, [rbp+8h]		; fault error code
 	call	GPFaultHandlerM
 	mov	rdi, cpu_halted
-	call	println
+	call	puts
 .halt	cli
 	hlt
 	jmp	.halt
@@ -39,11 +39,11 @@ PageFaultHandler:
 	sub	rsp, reg.size+8
 	savregs	rsp
 	savisf	rsp, rbp+10h		; fault rip, rflags, rsp, etc.
-	mov	rdi, [rbp+8h]		; fault error code
-	mov	rsi, rsp		; pointer to regs struct
+	mov	rdi, rsp		; pointer to regs struct
+	mov	rsi, [rbp+8h]		; fault error code
 	call	PageFaultHandlerM
 	mov	rdi, cpu_halted
-	call	println
+	call	puts
 .halt	cli
 	hlt
 	jmp	.halt
@@ -64,7 +64,7 @@ DivbyzeroHandler:
 	mov	rdi, rsp		; pointer to regs struct
 	call	DivbyzeroHandlerM
 	mov	rdi, cpu_halted
-	call	println
+	call	puts
 .halt	cli
 	hlt
 	jmp	.halt

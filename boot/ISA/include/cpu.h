@@ -61,4 +61,4 @@ struct cpu_reg {
 //   dest = 1 for screen
 //   dest = 0 for serial port 0 (COM1)
 //   ctrl = 1 show cpu control registers
-void DumpCPURegisters(const struct cpu_reg *reg, int dest, int ctrl);
+void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl);

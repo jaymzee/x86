@@ -6,11 +6,11 @@
 #define IDT_ADDRESS 0x1000
 #define IDT_SIZE (IDT_ENTRIES * sizeof(struct IDT_entry))
 
-extern void GPFaultHandler(void);
-extern void PageFaultHandler(void);
-extern void DivbyzeroHandler(void);
-extern void KeyboardHandler(void);
-extern void TimerHandler(void);
+void GPFaultHandler(void);
+void PageFaultHandler(void);
+void DivbyzeroHandler(void);
+void KeyboardHandler(void);
+void TimerHandler(void);
 
 // this sets up the interrupt descriptor tables then enables interrupts
 void EnableInterrupts(void)
