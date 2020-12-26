@@ -15,7 +15,7 @@ void main()
 {
     COM_Init();
     DisableBlink();
-    ClearText(0x1f);
+    ClearText(0x07);
     fputs("long mode (x64) entered sucessfully!\n", console);
     fputs("connect to serial 0 (COM1) for the console\n", console);
     println("long mode demo");

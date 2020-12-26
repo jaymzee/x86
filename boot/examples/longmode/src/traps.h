@@ -20,3 +20,4 @@ void SIMDFPExceptHandler(void);
 void CauseGPFault(void);
 void CausePageFault(void);
 void CauseDivbyzero(void);
+void CauseInvalidOpcode(void);

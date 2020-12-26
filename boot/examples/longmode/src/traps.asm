@@ -1,14 +1,12 @@
 %include "cpu64.asm"
 
 	extern CPUExceptionHandler
-	extern WriteText
-	extern puts
 
 %macro	traperr	1
 	cli
 	push	rbp
 	mov	rbp, rsp
-	sub	rsp, reg.size+8
+	sub	rsp, reg.size
 	savregs	rsp
 	savisf	rsp, rbp+10h		; fault rip, rflags, rsp, etc.
 	mov	rdi, rsp		; pointer to reg struct
@@ -33,7 +31,7 @@
 	cli
 	push	rbp
 	mov	rbp, rsp
-	sub	rsp, reg.size+8
+	sub	rsp, reg.size+8		; maintin 16 byte stack alignment
 	savregs	rsp
 	savisf	rsp, rbp+8		; fault rip, rflags, rsp, etc.
 	mov	rdi, rsp		; pointer to regs struct
@@ -179,3 +177,7 @@ CauseDivbyzero:
 	div	eax
 	ret
 
+	global CauseInvalidOpcode
+CauseInvalidOpcode:
+	ud2
+	ret
