@@ -65,25 +65,25 @@ static void ScrollText()
 
 void WriteText(const char *str)
 {
-    int x, y, offset;
+    int x, y;
     char ch;
 
     GetTextCursor(&x, &y);
-    offset = 2 * (TEXT_COLS * y + x);
     while ((ch = *str++) != '\0') {
         if (ch > 31 && ch < 127) {
-            vga_text[offset] = ch;
-            offset += 2;
+            vga_text[2 * (TEXT_COLS * y + x)] = ch;
             x++;
+            if (x > TEXT_COLS - 1) {
+                x = 0;
+                y++;
+            }
         } else if (ch == 10) {
             x = 0;
             y++;
-            while (y > TEXT_ROWS - 1) {
-                y--;
-                ScrollText();
-            }
-            // recalculate offset
-            offset = 2 * (TEXT_COLS * y + x);
+        }
+        while (y > TEXT_ROWS - 1) {
+            y--;
+            ScrollText();
         }
     }
     SetTextCursor(x, y);

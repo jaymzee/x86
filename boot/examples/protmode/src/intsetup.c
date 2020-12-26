@@ -1,3 +1,4 @@
+#include <cpu.h>
 #include <interrupt.h>
 #include <string.h>
 #include "intsetup.h"
@@ -19,7 +20,7 @@ void EnableInterrupts(void)
 
     // move IRQs to interrupts 0x20-2F
     // so they do not conflict with CPU exceptions
-    PIC_RemapIVT(0x20, 0x28);
+    PIC_OffsetIRQ(0x20, 0x28);
     PIC_MaskAllIRQ(); // mask all IRQ
 
     memset(idt, 0, IDT_SIZE); // clear IDT

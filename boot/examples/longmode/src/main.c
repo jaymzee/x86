@@ -8,6 +8,75 @@
 #include "isr.h"
 #include "traps.h"
 
+void ShowPageTables();
+void ShowTimer();
+
+void main()
+{
+    COM_Init();
+    DisableBlink();
+    ClearText(0x1f);
+    fputs("long mode (x64) entered sucessfully!\n", console);
+    fputs("connect to serial 0 (COM1) for the console\n", console);
+    println("long mode demo");
+    EnableInterrupts();
+    ShowTimer();
+}
+
+void KeyboardHandlerM(void) {
+    int keycode = ScanKeyboard();
+    // Lowest bit of status will be set if buffer is not empty
+    if (keycode >= 0 && keycode < 128) {
+        char buf[80];
+        char ch = kbd_decode[keycode];
+        strcpy(buf, "0x");
+        itoa(keycode, 16, 2, buf+2);
+        strcat(buf, "  \n");
+        int len = strlen(buf);
+        if (ch > 31 && ch < 127) {
+            buf[len - 2] = ch;
+        }
+        fputs(buf, console);
+    }
+}
+
+void CPUExceptionHandler(struct cpu_reg *reg, int exception, int errcode)
+{
+    char regs[1000], msg[80], ecs[20];
+    char *haltmsg = "system halted.\n";
+
+    strcpy(msg, "\nPANIC: ");
+    strcat(msg, cpu_exc_str[exception]);
+    strcat(msg, ", error code: ");
+    strcat(msg, itoa(errcode, 16, 4, ecs));
+    strcat(msg, "\n");
+    DumpCPURegisters(regs, reg, 1);
+    fputs(msg, console);
+    fputs(regs, console);
+    fputs(haltmsg, console);
+    fputs(msg, stdout);
+    fputs(regs, stdout);
+    fputs(haltmsg, stdout);
+
+    while (1) {
+        __asm__ ("cli");
+        __asm__ ("hlt");
+    }
+}
+
+void ShowTimer()
+{
+    char buf[80];
+
+    while (1) {
+        print("press a key ");
+        getchar();
+        println("");
+        print("timer_count: ");
+        println(itoa(timer_count, 10, 0, buf));
+    }
+}
+
 void ShowPageTables()
 {
     long *pt = (long *)0x8000;
@@ -46,73 +115,5 @@ void ShowPageTables()
                 println(itoa(pt[n], 16, 8, buf));
             }
         }
-    }
-}
-
-void ShowTimer()
-{
-    char buf[80];
-
-    while (1) {
-        print("press a key ");
-        getchar();
-        println("");
-        print("timer_count: ");
-        println(itoa(timer_count, 10, 0, buf));
-    }
-}
-
-void main()
-{
-    DisableBlink();
-    ClearText(0x07);
-    fputs("long mode (x64) entered sucessfully!\n", console);
-    fputs("connect to serial 0 (COM1) for the console\n", console);
-    COM_Init();
-    println("long mode demo");
-
-    EnableInterrupts();
-    CausePageFault();
-    //ShowPageTables();
-    ShowTimer();
-}
-
-void CPUExceptionHandler(struct cpu_reg *reg, int exception, int errcode)
-{
-    char regs[1000], msg[80], ecs[20];
-    char *halt = "system halted.\n";
-
-    strcpy(msg, "\nPANIC: ");
-    strcat(msg, cpu_exc_str[exception]);
-    strcat(msg, ", error code: ");
-    strcat(msg, itoa(errcode, 16, 4, ecs));
-    strcat(msg, "\n");
-    DumpCPURegisters(regs, reg, 1);
-    fputs(msg, console);
-    fputs(regs, console);
-    fputs(halt, console);
-    fputs(msg, stdout);
-    fputs(regs, stdout);
-    fputs(halt, stdout);
-
-    while(1) {
-        __asm__ ("cli\nhlt");
-    }
-}
-
-void KeyboardHandlerM(void) {
-    int keycode = ScanKeyboard();
-    // Lowest bit of status will be set if buffer is not empty
-    if (keycode >= 0 && keycode < 128) {
-        char buf[80];
-        char ch = kbd_decode[keycode];
-        strcpy(buf, "0x");
-        itoa(keycode, 16, 2, buf+2);
-        strcat(buf, "  \n");
-        int len = strlen(buf);
-        if (ch > 31 && ch < 127) {
-            buf[len - 2] = ch;
-        }
-        fputs(buf, console);
     }
 }

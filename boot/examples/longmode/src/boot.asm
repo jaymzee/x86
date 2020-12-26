@@ -12,8 +12,8 @@ GDTR        equ GDT + GDT_SIZE
 PML4T       equ 0x4000
 PT          equ 0x8000
 
-%include "bios.asm"
 %include "cpu16.asm"
+%include "real.asm"
 
 	bits 16
 	section .text.start exec align=16
