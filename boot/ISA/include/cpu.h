@@ -1,4 +1,32 @@
+#include <idt.h>
 #include <stdint.h>
+
+enum cpu_exc {
+    EXC_DIVBYZERO = 0,      // Divide-by-zero Error
+    EXC_DEBUG,
+    EXC_NMI,
+    EXC_BREAKPOINT,
+    EXC_OVERFLOW,
+    EXC_BOUND,              // Bound Range Exceeded
+    EXC_OPCODE,             // Invalid Opcode
+    EXC_DEV_NOT_AVAIL,      // Device (FPU) Not Available
+    EXC_DBL_FAULT,          // Double Fault
+    EXC_COPROC_OVERRUN,     // Coprocessor Segment Overrun (not used anymore)
+    EXC_TSS,                // Invalid TSS
+    EXC_SEGMENT,            // Segment not present
+    EXC_STACK,              // Stack Segment fault
+    EXC_GPF,                // General Protection Fault
+    EXC_PF,                 // Page Fault
+    EXC_X87_FLOAT = 0x10,   // x87 Floating point exception
+    EXC_ALIGN,              // Alignment Check
+    EXC_MACHINE,            // Machine Check
+    EXC_SIMD_FLOAT,         // SIMD Floating-Point exception
+    EXC_VIRT,               // Virtualization Exception
+    EXC_SECURITY = 0x1e,    // Security Exception
+    EXC_3X_FAULT = 0x1f     // Triple Fault
+};
+
+extern const char *cpu_exc_str[32];
 
 #if __x86_64__
 struct cpu_reg {
@@ -62,3 +90,4 @@ struct cpu_reg {
 //   dest = 0 for serial port 0 (COM1)
 //   ctrl = 1 show cpu control registers
 void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl);
+

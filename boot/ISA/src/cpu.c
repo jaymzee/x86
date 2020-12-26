@@ -3,6 +3,74 @@
 #include <stdio.h>
 #include <string.h>
 
+const char *cpu_exc_str[32] = {
+    "Divide-by-zero Error",         // 0x0
+    "Debug",                        // 0x1
+    "Non-maskable Interrupt",       // 0x2
+    "Breakpoint",                   // 0x3
+    "Overflow",                     // 0x4
+    "Bound Range Exceeded",         // 0x5
+    "Invalid Opcode",               // 0x6
+    "Device Not Available",         // 0x7
+    "Double Fault",                 // 0x8
+    "Coprocessor Overrun",          // 0x9
+    "Invalid TSS",                  // 0xa
+    "Segment Not Present",          // 0xb
+    "Stack Segment Fault",          // 0xc
+    "General Protection Fault",     // 0xd
+    "Page Fault",                   // 0xe
+    "Reserved 0x0f",                // 0xf
+    "x87 Floating-Point Exception", // 0x10
+    "Alignment Check",              // 0x11
+    "Machine Check",                // 0x12
+    "SIMD Floating-Point Exception",// 0x13
+    "Virtualization Exception",     // 0x14
+    "Reserved 0x15",                // 0x15
+    "Reserved 0x16",                // 0x16
+    "Reserved 0x17",                // 0x17
+    "Reserved 0x18",                // 0x18
+    "Reserved 0x19",                // 0x19
+    "Reserved 0x1a",                // 0x1a
+    "Reserved 0x1b",                // 0x1b
+    "Reserved 0x1c",                // 0x1c
+    "Reserved 0x1d",                // 0x1d
+    "Security Exception"            // 0x1e
+};
+
+void
+IDT_IntGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
+{
+#if __x86_64__
+    descr->offset_hihi = (uint64_t)hndlr >> 32;
+    descr->offset_hi = ((uint64_t)hndlr >> 16) & 0xffff;
+    descr->offset_lo = (uint64_t)hndlr & 0xffff;
+    descr->ist = 0;
+#else
+    descr->offset_hi = (uint32_t)hndlr >> 16;
+    descr->offset_lo = (uint32_t)hndlr & 0xffff;
+#endif
+    descr->selector = sel;
+    descr->type_attr = (dpl << 5) | 0x8E; // 32-bit interupt gate
+    descr->zero = 0;
+}
+
+void
+IDT_TrapGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
+{
+#if __x86_64__
+    descr->offset_hihi = (uint64_t)hndlr >> 32;
+    descr->offset_hi = ((uint64_t)hndlr >> 16) & 0xffff;
+    descr->offset_lo = (uint64_t)hndlr & 0xffff;
+    descr->ist = 0;
+#else
+    descr->offset_hi = (uint32_t)hndlr >> 16;
+    descr->offset_lo = (uint32_t)hndlr & 0xffff;
+#endif
+    descr->selector = sel;
+    descr->type_attr = (dpl << 5) | 0x8F; // 32-bit trap gate
+    descr->zero = 0;
+}
+
 #if __x86_64__
 // DumpCPURegister dumps the CPU registers to the screen or serial port
 //   dest = 1 for screen
@@ -140,3 +208,4 @@ void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl)
     strcat(sbuf, "\n");
 }
 #endif
+

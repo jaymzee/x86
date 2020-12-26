@@ -1,10 +1,10 @@
 %include "cpu64.asm"
 
-	extern CPUException
+	extern CPUExceptionHandler
 	extern WriteText
 	extern puts
 
-%macro	cpuexcepterr 1
+%macro	traperr	1
 	cli
 	push	rbp
 	mov	rbp, rsp
@@ -14,11 +14,22 @@
 	mov	rdi, rsp		; pointer to reg struct
 	mov	rsi, %1
 	mov	rdx, [rbp+8h]		; fault error code
-	call	CPUException			; dump registers
-	jmp	halt_system
+	call	CPUExceptionHandler
+	mov	rax, [rsp+reg.rax]
+	mov	rcx, [rsp+reg.rcx]
+	mov	rdx, [rsp+reg.rdx]
+	mov	rsi, [rsp+reg.rsi]
+	mov	rdi, [rsp+reg.rdi]
+	mov	r8, [rsp+reg.r8]
+	mov	r9, [rsp+reg.r9]
+	mov	r10, [rsp+reg.r10]
+	mov	r11, [rsp+reg.r11]
+	leave				; cleanup frame
+	add	rsp, 8			; pop error code so rsp -> ret addr
+	iretq
 %endmacro
 
-%macro	cpuexcept 1
+%macro	trap	1
 	cli
 	push	rbp
 	mov	rbp, rsp
@@ -27,111 +38,123 @@
 	savisf	rsp, rbp+8		; fault rip, rflags, rsp, etc.
 	mov	rdi, rsp		; pointer to regs struct
 	mov	rsi, %1
-	mov	rdx, 0			; no error code so set to 0
-	call	CPUException
-	jmp	halt_system
+	xor	rdx, rdx		; no error code so set to 0
+	call	CPUExceptionHandler
+	mov	rax, [rsp+reg.rax]
+	mov	rcx, [rsp+reg.rcx]
+	mov	rdx, [rsp+reg.rdx]
+	mov	rsi, [rsp+reg.rsi]
+	mov	rdi, [rsp+reg.rdi]
+	mov	r8, [rsp+reg.r8]
+	mov	r9, [rsp+reg.r9]
+	mov	r10, [rsp+reg.r10]
+	mov	r11, [rsp+reg.r11]
+	leave				; cleanup frame
+	iretq
 %endmacro
 
 	bits 64
 	section .text
-
-; prototype for a cpu exception with an error code
-%if 0
-ExceptionWithErrorHandler:
-	cli
-	push	rbp
-	mov	rbp, rsp
-	call	some_c_function
-	leave				; cleanup frame
-	add	rsp, 8			; pop error code so rsp -> ret addr
-	iretq
-%endif
 
 ; cpu exceptions
 
 	; Divide-by-zero Error: Fault
 	global DivbyzeroHandler
 DivbyzeroHandler:
-	cpuexcept 0x0
+	trap	0x0
+
+	; Debug: Fault/Trap
+	global DebugHandler
+DebugHandler:
+	trap	0x1
 
 	; Non-maskable Interrupt: Interrupt
 	global NMIHandler
 NMIHandler:
-	cpuexcept 0x2
+	trap	0x2
+
+	; Breakpoint: Trap
+	global BreakpointHandler
+BreakpointHandler:
+	trap	0x3
+
+	; Overflow: Trap
+	global OverflowHandler
+OverflowHandler:
+	trap	0x4
+
+	; Bound Range Exceeded: Fault
+	global BoundRangeHandler
+BoundRangeHandler:
+	trap	0x5
 
 	; Invalid Opcode: Fault
 	global InvalidOpcodeHandler
 InvalidOpcodeHandler:
-	cpuexcept 0x6
+	trap	0x6
 
 	; Double Fault: Abort with error code
 	global DoubleFaultHandler
 DoubleFaultHandler:
-	cpuexcepterr 0x8
+	traperr	0x8
 
 	; Invalid TSS: Fault with error code
 	global InvalidTSSHandler
 InvalidTSSHandler:
-	cpuexcepterr 0xa
+	traperr	0xa
 
 	; SegNotPresent: Fault with error code
 	global SegNotPresentHandler
 SegNotPresentHandler:
-	cpuexcepterr 0xb
+	traperr	0xb
 
 	; StackSegFault: Fault with error code
 	global StackSegFaultHandler
 StackSegFaultHandler:
-	cpuexcepterr 0xc
+	traperr	0xc
 
 	; General Protection Fault: Fault with error code
 	global GPFaultHandler
 GPFaultHandler:
-	cpuexcepterr 0xd
+	traperr	0xd
 
 	; Page Fault: Fault with error code
 	global PageFaultHandler
 PageFaultHandler:
-	cpuexcepterr 0xe
+	traperr	0xe
 
 	; x87 Floating-Point Exception: Fault
 	global x87FPExceptHandler
 x87FPExceptHandler:
-	cpuexcept 0x10
+	trap	0x10
 
 	; Alignment Check: Fault with error code
 	global AlignCheckHandler
 AlignCheckHandler:
-	cpuexcepterr 0x11
+	traperr	0x11
 
 	; Machine Check: Abort
 	global MachineCheckHandler
 MachineCheckHandler:
-	cpuexcept 0x12
+	trap	0x12
 
 	; SIMD Floating-Point Exception: Fault
 	global SIMDFPExceptHandler
 SIMDFPExceptHandler:
-	cpuexcept 0x13
+	trap	0x13
 
 	; Virtualization Exception: Fault
 	global VirtExceptHandler
 VirtExceptHandler:
-	cpuexcept 0x14
+	trap	0x14
 
 	; Security Exception: - with error
 	global SecurityExceptHandler
 SecurityExceptHandler:
-	cpuexcepterr 0x1e
+	traperr	0x1e
 
-halt_system:
-	mov	rdi, system_halted
-	call	WriteText
-	mov	rdi, system_halted
-	call	puts
-.halt	cli
-	hlt
-	jmp	.halt
+
+; for testing exceptions
 
 	global CauseGPFault
 CauseGPFault:
@@ -156,6 +179,3 @@ CauseDivbyzero:
 	div	eax
 	ret
 
-	section .data
-system_halted:
-	db `system halted.\n`, 0

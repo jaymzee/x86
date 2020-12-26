@@ -5,12 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "intsetup.h"
+#include "isr.h"
+#include "traps.h"
 
-void CauseGPFault(void);
-void CausePageFault(void);
-void CauseDivbyzero(void);
-
-void main()
+void ShowPageTables()
 {
     long *pt = (long *)0x8000;
     long *pdt = (long *)0x6000;
@@ -19,15 +17,6 @@ void main()
     char buf[80];
     int n = 0;
 
-    COM_Init();
-    DisableBlink();
-    ClearText(0x1F);
-    fputs("long mode (x64) entered sucessfully!\n", console);
-    fputs("connect to serial 0 (COM1) for the console\n", console);
-
-    EnableInterrupts();
-
-    println("long mode demo");
     println("page tables:");
     print("PML4T[0] = 0x");
     println(itoa(pml4t[0], 16, 8, buf));
@@ -45,7 +34,7 @@ void main()
         print("] = 0x");
         println(itoa(pt[n], 16, 8, buf));
     }
-    while (1) {
+    while (n < 4096) {
         print("press a key ");
         getchar();
         println("");
@@ -57,25 +46,58 @@ void main()
                 println(itoa(pt[n], 16, 8, buf));
             }
         }
+    }
+}
+
+void ShowTimer()
+{
+    char buf[80];
+
+    while (1) {
+        print("press a key ");
+        getchar();
+        println("");
         print("timer_count: ");
         println(itoa(timer_count, 10, 0, buf));
     }
 }
 
-void CPUException(struct cpu_reg *reg, int exception, int errcode)
+void main()
+{
+    DisableBlink();
+    ClearText(0x07);
+    fputs("long mode (x64) entered sucessfully!\n", console);
+    fputs("connect to serial 0 (COM1) for the console\n", console);
+    COM_Init();
+    println("long mode demo");
+
+    EnableInterrupts();
+    CausePageFault();
+    //ShowPageTables();
+    ShowTimer();
+}
+
+void CPUExceptionHandler(struct cpu_reg *reg, int exception, int errcode)
 {
     char regs[1000], msg[80], ecs[20];
+    char *halt = "system halted.\n";
 
     strcpy(msg, "\nPANIC: ");
-    strcat(msg, cpu_exceptions[exception]);
+    strcat(msg, cpu_exc_str[exception]);
     strcat(msg, ", error code: ");
     strcat(msg, itoa(errcode, 16, 4, ecs));
     strcat(msg, "\n");
     DumpCPURegisters(regs, reg, 1);
     fputs(msg, console);
     fputs(regs, console);
+    fputs(halt, console);
     fputs(msg, stdout);
     fputs(regs, stdout);
+    fputs(halt, stdout);
+
+    while(1) {
+        __asm__ ("cli\nhlt");
+    }
 }
 
 void KeyboardHandlerM(void) {
