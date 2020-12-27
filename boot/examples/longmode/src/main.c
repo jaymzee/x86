@@ -8,8 +8,8 @@
 #include "isr.h"
 #include "traps.h"
 
-void ShowPageTables();
-void ShowTimer();
+void ShowPageTables(void);
+void ShowTimer(void);
 
 void main()
 {
@@ -64,7 +64,7 @@ void CPUExceptionHandler(struct cpu_reg *reg, int exception, int errcode)
     }
 }
 
-void ShowTimer()
+void ShowTimer(void)
 {
     char buf[80];
 
@@ -77,7 +77,7 @@ void ShowTimer()
     }
 }
 
-void ShowPageTables()
+void ShowPageTables(void)
 {
     long *pt = (long *)0x8000;
     long *pdt = (long *)0x6000;

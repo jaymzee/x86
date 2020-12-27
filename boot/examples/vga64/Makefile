@@ -3,8 +3,8 @@ OBJECTS = main.o stdio.o conio.o serial.o string.o graphics.o
 SOURCE = ../../ISA/src
 INCLUDE = ../../ISA/include
 CC = gcc
-CFLAGS = -g -Os -std=c99 -pedantic -Wall -m64 -ffreestanding
-# these options keep the binary very small
+CFLAGS = -g -Os -std=c99 -pedantic -Wall -Werror
+CFLAGS += -m64 -ffreestanding -mno-red-zone
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(INCLUDE) -include _default.h
 ASFLAGS = -g -F dwarf -f elf64 -I $(addsuffix /,$(INCLUDE))

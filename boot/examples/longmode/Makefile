@@ -4,7 +4,8 @@ OBJECTS += stdio.o serial.o string.o conio.o kbd_US.o cpu.o interrupt.o
 SOURCE = ../../ISA/src
 INCLUDE = ../../ISA/include
 CC = gcc
-CFLAGS = -g -std=c99 -pedantic -Wall -Werror -m64 -ffreestanding
+CFLAGS = -g -Os -std=c99 -pedantic -Wall -Werror
+CFLAGS += -m64 -ffreestanding -mno-red-zone
 # these options keep the binary very small
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(INCLUDE) -include _default.h
