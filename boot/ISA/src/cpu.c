@@ -73,9 +73,7 @@ IDT_TrapGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
 
 #if __x86_64__
 // DumpCPURegister dumps the CPU registers to the screen or serial port
-//   dest = 1 for screen
-//   dest = 0 for serial port 0 (COM1)
-//   ctrl = 1 to show control registers
+//   ctrl = 1 to show cpu control registers
 void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl)
 {
     char nbuf[20];
@@ -152,9 +150,7 @@ void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl)
 }
 #else
 // DumpCPURegister dumps the CPU registers to the screen or serial port
-//   dest = 1 for screen
-//   dest = 0 for serial port 0 (COM1)
-//   ctrl = 1 to show configuration registers
+//   ctrl = 1 to show cpu control registers
 void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl)
 {
     char nbuf[20];

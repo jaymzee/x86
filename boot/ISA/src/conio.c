@@ -71,13 +71,9 @@ void WriteText(const char *str)
     GetTextCursor(&x, &y);
     while ((ch = *str++) != '\0') {
         if (ch > 31 && ch < 127) {
-            vga_text[2 * (TEXT_COLS * y + x)] = ch;
-            x++;
-            if (x > TEXT_COLS - 1) {
-                x = 0;
-                y++;
-            }
-        } else if (ch == 10) {
+            vga_text[2 * (TEXT_COLS * y + x++)] = ch;
+        }
+        if (ch == 10 || (x > TEXT_COLS - 1 && *str != 10)) {
             x = 0;
             y++;
         }
@@ -89,18 +85,40 @@ void WriteText(const char *str)
     SetTextCursor(x, y);
 }
 
-void EnableBlink(void)
+void EnableBlinkingText(void)
 {
     inb(VGA_INPUT_STAT1); // this will reset index/data flip-flop
     outb(VGA_ATTR_ADDR, VGA_ATTR_MODE_CTRL); // select attr mode control reg
     outb(VGA_ATTR_DATA_WR, 0x08 | inb(VGA_ATTR_DATA_RD)); // turn on bit 3
 }
 
-void DisableBlink(void)
+void DisableBlinkingText(void)
 {
     inb(VGA_INPUT_STAT1); // this will reset index/data flip-flop
     outb(VGA_ATTR_ADDR, VGA_ATTR_MODE_CTRL); // select attr mode control reg
     outb(VGA_ATTR_DATA_WR, 0xf7 & inb(VGA_ATTR_DATA_RD)); // turn off bit 3
+}
+
+void ShowTextCursor(void)
+{
+    outb(VGA_CRTC_ADDR, CRTC_CUR_STRT);
+    outb(VGA_CRTC_DATA, inb(VGA_CRTC_DATA) & 0xdf);
+}
+
+void HideTextCursor(void)
+{
+    outb(VGA_CRTC_ADDR, CRTC_CUR_STRT);
+    outb(VGA_CRTC_DATA, inb(VGA_CRTC_DATA) | 0x20);
+}
+
+void TextCursorShape(int top, int bot)
+{
+    outb(VGA_CRTC_ADDR, CRTC_CUR_STRT);
+    outb(VGA_CRTC_DATA, (inb(VGA_CRTC_DATA) & 0xe0) | (top & 0x1f));
+    outb(VGA_CRTC_ADDR, CRTC_CUR_END);
+    char b = inb(VGA_CRTC_DATA);
+    outb(VGA_CRTC_DATA, (b & 0xe0) | (bot & 0x1f));
+
 }
 
 int ScanKeyboard(void)

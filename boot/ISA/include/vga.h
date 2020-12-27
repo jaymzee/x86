@@ -110,13 +110,13 @@ INT 10h,  00h (0)        Set Video Mode
 #define CRTC_PRESET_ROW_SCAN    0x08    // Preset Row Scan register
 #define CRTC_MAX_SCAN_LINE      0x09    // Maximum Scan Line register
 #define CRTC_CUR_STRT           0x0A    // Cursor Start register
-#define CRTC_CUR_END            0x0B    // Cursor Start register
+#define CRTC_CUR_END            0x0B    // Cursor End register
 #define CRTC_STRT_ADDR_HI       0x0C    // Start Address High register
 #define CRTC_STRT_ADDR_LO       0x0D    // Start Address Low register
-#define CRTC_CUR_LOC_HI         0x0E    // Start Address Low register
-#define CRTC_CUR_LOC_LO         0x0F    // Start Address Low register
+#define CRTC_CUR_LOC_HI         0x0E    // Cursor Location High register
+#define CRTC_CUR_LOC_LO         0x0F    // Cursor Location Low register
 #define CRTC_VERT_RETRACE_STRT  0x10    // Vertical Retrace Start register
-#define CRTC_VERT_RETRACE_END   0x11    // Vertical Retrace Start register
+#define CRTC_VERT_RETRACE_END   0x11    // Vertical Retrace End register
 #define CRTC_VERT_DISP_END      0x12    // Vertical Display End register
 #define CRTC_OFFSET             0x13    // Offset register
 #define CRTC_UNDERLINE_LOC      0x14    // Underline Location register

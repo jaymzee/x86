@@ -14,8 +14,9 @@ void ShowTimer(void);
 void main()
 {
     COM_Init();
-    DisableBlink();
+    DisableBlinkingText(); // allows 16 background colors
     ClearText(0x07);
+    TextCursorShape(13, 14); // underline
     fputs("long mode (x64) entered sucessfully!\n", console);
     fputs("connect to serial 0 (COM1) for the console\n", console);
     println("long mode demo");
