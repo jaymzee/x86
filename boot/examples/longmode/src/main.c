@@ -4,17 +4,18 @@
 #include <serial.h>
 #include <stdio.h>
 #include <string.h>
+#include <timer.h>
 #include "intsetup.h"
 #include "isr.h"
 #include "traps.h"
-
-#include <system.h>
 
 void ShowTimer(void);
 
 void main()
 {
     COM_Init();
+    SetIntervalTimer(60);
+    EnableInterrupts();
     DisableBlinkingText(); // allows 16 background colors
     ClearText(0x07);
     TextCursorShape(13, 14); // underline
@@ -22,7 +23,7 @@ void main()
     fputs("connect to serial 0 (COM1) for the console\n", console);
     fputs("bang on the keyboard to show scan codes\n", console);
     println("long mode demo");
-    EnableInterrupts();
+
     ShowTimer();
 }
 
@@ -56,9 +57,13 @@ void ShowTimer(void)
 
     while (1) {
         print("press a key ");
-        getchar();
+        int ch = getchar();
         println("");
         print("timer_count: ");
         println(itoa(timer_count, 10, 0, buf));
+        if (ch == 'b')
+            Beep(1000);
+        if (ch == 's')
+            NoSound();
     }
 }

@@ -2,16 +2,12 @@
 #include <string.h>
 #include <system.h>
 #include <vga.h>
+#include <ps2.h>
 
 #define TEXT_ATTR   0x07
 #define TEXT_COLS   80
 #define TEXT_ROWS   25
 #define VIDEOMEM    0xB8000
-
-// 8042 PS/2 Controller
-#define KB_DATA     0x60    // Read/Write
-#define KB_CMD      0x64    // Write
-#define KB_STATUS   0x64    // Read
 
 static char *vga_text = (char *)VIDEOMEM;
 
