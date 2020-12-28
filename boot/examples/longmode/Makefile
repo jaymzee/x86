@@ -4,9 +4,9 @@ OBJECTS += stdio.o string.o conio.o kbd_US.o serial.o cpu.o interrupt.o
 SOURCE = ../../ISA/src
 INCLUDE = ../../ISA/include
 CC = gcc
-CFLAGS = -g -Os -std=c99 -pedantic -Wall -Werror
+CFLAGS = -g -std=c99 -pedantic -Wall -Werror
 CFLAGS += -m64 -ffreestanding -mno-red-zone
-CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
+CFLAGS += -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(INCLUDE) -include _default.h
 ASFLAGS = -g -F dwarf -f elf64 -I $(addsuffix /,$(INCLUDE))
 LDFLAGS = --nmagic

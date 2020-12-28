@@ -52,6 +52,7 @@
 %endmacro
 
 	bits 64
+	default rel
 	section .text
 
 ; cpu exceptions
@@ -168,7 +169,7 @@ CauseGPFault:
 
 	global CausePageFault
 CausePageFault:
-	mov	[0x442], eax		; First page is not mapped to catch
+	mov	[abs 0x442], eax	; First page is not mapped to catch
 	ret				; null pointer exceptions.
 
 	global CauseDivbyzero

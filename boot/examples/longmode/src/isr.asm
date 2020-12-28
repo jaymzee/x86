@@ -1,6 +1,7 @@
 	extern KeyboardHandlerM
 
 	bits 64
+	default rel
 	section .text
 
 	global KeyboardHandler

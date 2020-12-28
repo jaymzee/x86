@@ -101,8 +101,8 @@ _init_page_tables:
 ; 64 bit code that run in long mode
 
 	bits 64
+	default rel
 	section .text
-	align 8
 start64:
 	cld			; Direction flag forward
 	mov	eax, 0x10	; 0x10 is flat selector for data

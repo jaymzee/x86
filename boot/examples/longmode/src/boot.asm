@@ -47,7 +47,7 @@ _load_program:
 	push	es
 	push	bx
 	mov	ah, 2h		; read sectors from drive
-	mov	al, 32		; sector count (16K)
+	mov	al, 64		; sector count (32K)
 	mov	ch, 0		; cylinder
 	mov	dh, 0		; head
 	mov	cl, 2		; sector
@@ -99,8 +99,8 @@ _init_page_tables:
 ; 64 bit code that run in long mode
 
 	bits 64
+	default rel
 	section .text
-	align 8
 start64:
 	cld			; Direction flag forward
 	mov	eax, 0x10	; 0x10 is flat selector for data
