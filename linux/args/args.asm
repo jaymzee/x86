@@ -7,9 +7,9 @@
 ; ------------------------------------------------------------------------------
 
 	default rel
-	global	_start
 
 	section	.text
+	global	_start
 _start:
 	pop	rax		; argc
 	mov	rbx, rax	; save it in a nonvolatile register
@@ -31,6 +31,7 @@ _start:
 	xor	rdi, rdi	; exit code 0
 	syscall			; invoke operating system to exit
 
+	global	strlen
 strlen:
 	mov	rax, -1
 .L1	inc	rax

@@ -1,3 +1,6 @@
+#ifndef IDT_H_INCLUDED
+#define IDT_H_INCLUDED
+
 #include <stdint.h>
 
 #if __x86_64__
@@ -43,3 +46,4 @@ static inline void LoadIDT(struct IDTR *idtr)
 void IDT_IntGate(struct IDT_entry *d, void (*hndlr)(void), int sel, int dpl);
 void IDT_TrapGate(struct IDT_entry *d, void (*hndlr)(void), int sel, int dpl);
 
+#endif /* IDT_H_INCLUDED */

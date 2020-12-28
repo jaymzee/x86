@@ -1,7 +1,7 @@
 #include <idt.h>
 #include <stdint.h>
 
-enum cpu_exc {
+enum cpu_exception {
     EXC_DIVBYZERO = 0,      // Divide-by-zero Error
     EXC_DEBUG,
     EXC_NMI,
@@ -26,7 +26,7 @@ enum cpu_exc {
     EXC_3X_FAULT = 0x1f     // Triple Fault
 };
 
-extern const char *cpu_exc_str[32];
+extern const char *cpu_exception[32];
 
 #if __x86_64__
 struct cpu_reg {

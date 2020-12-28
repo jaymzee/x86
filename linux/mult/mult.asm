@@ -2,9 +2,9 @@
 ; ------------------------------------------------------------------------------
 
 	default rel
-	global	mult
 
 	section	.text
+	global	mult
 mult:
 	mulsd xmm0, xmm1
 	ret

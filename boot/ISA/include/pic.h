@@ -2,6 +2,9 @@
  * intel 8259 interrupt controller
  */
 
+#ifndef PIC_H_INCLUDED
+#define PIC_H_INCLUDED
+
 #define PIC1            0x20        // PIC controller 1 base address
 #define PIC2            0xA0        // PIC controller 2 base address
 #define PIC1_CMD        PIC1        // PIC controller 1 command port
@@ -49,3 +52,4 @@ unsigned short PIC_GetIRR(void);
 // Returns the combined value of the cascaded PICs in service register
 unsigned short PIC_GetISR(void);
 
+#endif

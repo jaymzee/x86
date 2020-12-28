@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-const char *cpu_exc_str[32] = {
+const char *cpu_exception[32] = {
     "Divide-by-zero Error",         // 0x0
     "Debug",                        // 0x1
     "Non-maskable Interrupt",       // 0x2

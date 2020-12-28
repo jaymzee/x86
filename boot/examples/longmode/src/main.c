@@ -8,7 +8,8 @@
 #include "isr.h"
 #include "traps.h"
 
-void ShowPageTables(void);
+#include <system.h>
+
 void ShowTimer(void);
 
 void main()
@@ -19,20 +20,21 @@ void main()
     TextCursorShape(13, 14); // underline
     fputs("long mode (x64) entered sucessfully!\n", console);
     fputs("connect to serial 0 (COM1) for the console\n", console);
+    fputs("bang on the keyboard to show scan codes\n", console);
     println("long mode demo");
     EnableInterrupts();
     ShowTimer();
 }
 
-void CPUExceptionHandler(struct cpu_reg *reg, int exception, int errcode)
+void CPUExceptionHandler(struct cpu_reg *reg, int except, int errcode)
 {
-    char regs[1000], msg[80], ecs[20];
+    char regs[1000], msg[80], errstr[20];
     char *haltmsg = "system halted.\n";
 
     strcpy(msg, "\nPANIC: ");
-    strcat(msg, cpu_exc_str[exception]);
+    strcat(msg, cpu_exception[except]);
     strcat(msg, ", error code: ");
-    strcat(msg, itoa(errcode, 16, 4, ecs));
+    strcat(msg, itoa(errcode, 16, 4, errstr));
     strcat(msg, "\n");
     DumpCPURegisters(regs, reg, 1);
     fputs(msg, console);
@@ -58,46 +60,5 @@ void ShowTimer(void)
         println("");
         print("timer_count: ");
         println(itoa(timer_count, 10, 0, buf));
-    }
-}
-
-void ShowPageTables(void)
-{
-    long *pt = (long *)0x8000;
-    long *pdt = (long *)0x6000;
-    long *pdpt = (long *)0x5000;
-    long *pml4t = (long *)0x4000;
-    char buf[80];
-    int n = 0;
-
-    println("page tables:");
-    print("PML4T[0] = 0x");
-    println(itoa(pml4t[0], 16, 8, buf));
-    print("PDPT[0] = 0x");
-    println(itoa(pdpt[0], 16, 8, buf));
-    for (int i = 0; i < 2; i++) {
-        print("PDT[");
-        print(itoa(i, 10, 0, buf));
-        print("] = 0x");
-        println(itoa(pdt[i], 16, 8, buf));
-    }
-    for (int i = 0; i < 8; i++, n++) {
-        print("PT[");
-        print(itoa(n, 10, 0, buf));
-        print("] = 0x");
-        println(itoa(pt[n], 16, 8, buf));
-    }
-    while (n < 4096) {
-        print("press a key ");
-        getchar();
-        println("");
-        for (int i = 0; i < 16; i++, n++) {
-            if (n < 4096) {
-                print("PT[");
-                print(itoa(n, 10, 0, buf));
-                print("] = 0x");
-                println(itoa(pt[n], 16, 8, buf));
-            }
-        }
     }
 }

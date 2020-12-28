@@ -9,9 +9,9 @@
 ; ------------------------------------------------------------------------------
 
 	default rel
-	global	_start
-
 	section	.text
+
+	global	_start
 _start	mov	rax, 1		; system call for write
 	mov	rdi, 1		; file handle 1 is stdout
 	lea	rsi, [mesg]	; address of string to output

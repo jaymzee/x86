@@ -27,7 +27,7 @@ char kbd_decode[256] =
     0,  /* Down Arrow */
     0,  /* Page Down */
     0,  /* Insert Key */
-    0,  /* Delete Key */
+    0,  /* Delete Key 0x53 */
     0,   0,   0,
     0,  /* F11 Key */
     0,  /* F12 Key 0x58 */
@@ -69,3 +69,43 @@ char kbd_decode[256] =
     0,  /* F12 Key */
     0,  /* All other keys are undefined */
 };
+
+char kbd_decode_numlock[128] =
+{
+    0,  27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+        '-', '=', '\b', '\t', /* <-- Tab */
+    'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+        '[', ']', '\n', 0, /* <-- control key */
+    'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0, '\\',
+    'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0,
+  '*',
+    0,  /* Alt */
+  ' ',  /* Space bar */
+    0,  /* Caps lock */
+    0,  /* 59 - F1 key ... > */
+    0,   0,   0,   0,   0,   0,   0,   0,
+    0,  /* < ... F10 */
+    0,  /* 69 - Num lock*/
+    0,  /* Scroll Lock */
+    '7',  /* Home key */
+    '8',  /* Up Arrow */
+    '9',  /* Page Up 0x49 */
+  '-',
+    '4',  /* Left Arrow 0x4b */
+    '5',
+    '6',  /* Right Arrow 0x4d */
+  '+',
+    '1',  /* End key 0x4f*/
+    '2',  /* Down Arrow */
+    '3',  /* Page Down */
+    '0',  /* Insert Key */
+    '.',  /* Delete Key 0x53 */
+    0,   0,   0,
+    0,  /* F11 Key */
+    0,  /* F12 Key 0x58 */
+    0,0,0,0,0,0,0,  /* All other keys are undefined */
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x60-0x6f */
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x70-0x7f */
+};
+
+

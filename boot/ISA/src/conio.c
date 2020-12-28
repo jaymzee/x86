@@ -121,6 +121,7 @@ void TextCursorShape(int top, int bot)
 
 }
 
+// read scancode from PS/2 port
 int ScanKeyboard(void)
 {
     int status = inb(KB_STATUS);
@@ -129,3 +130,125 @@ int ScanKeyboard(void)
     }
     return -1; // kb buffer empty
 }
+
+void DumpKeyboardScan(int scancode)
+{
+    char sbuf[80], nbuf[20];
+    char ch, chstr[] = " \n";
+
+    strcpy(sbuf, "0x");
+    strcat(sbuf, itoa(scancode, 16, 2, nbuf));
+    strcat(sbuf, " ");
+    // if key pressed
+    if (scancode >= 0 && scancode < 128) {
+        if (vkbd.lshft || vkbd.rshft) {
+            ch = kbd_decode[scancode + 128];
+        } else {
+            ch = kbd_decode[scancode];
+        }
+        if (vkbd.lctrl || vkbd.rctrl) {
+            strcat(sbuf, "CTRL+");
+            if (ch >= 'a' && ch <= 'z') {
+                ch &= 0xdf; // make uppercase
+            }
+        } else if (vkbd.lalt || vkbd.ralt) {
+            strcat(sbuf, "ALT+");
+            if (ch >= 'a' && ch <= 'z') {
+                ch &= 0xdf; // make uppercase
+            }
+        } else if (vkbd.capslock && ch >= 'a' && ch <= 'z') {
+            ch &= 0xdf; // make uppercase
+        } else if (vkbd.numlock) {
+            char chnum = kbd_decode_numlock[scancode];
+            if ((chnum >= '0' && chnum <= '9') || chnum == '.') {
+                ch = chnum;
+            }
+        }
+        if (ch == '\n') {
+            strcat(sbuf, "ENTER");
+        } else if (ch == '\b') {
+            strcat(sbuf, "BS");
+        } else if (ch == '\t') {
+            strcat(sbuf, "TAB");
+        } else if (ch == '\x1b') {
+            strcat(sbuf, "ESC");
+        }
+        if (ch > 31 && ch < 127) {
+            chstr[0] = ch;
+        }
+    }
+    strcat(sbuf, chstr);
+    WriteText(sbuf);
+}
+
+void KeyboardHandlerM(void) {
+    int scancode = ScanKeyboard();
+
+    switch (scancode) {
+    case 0x2a:
+        vkbd.lshft = 1;
+        break;
+    case 0xaa:
+        vkbd.lshft = 0;
+        break;
+    case 0x36:
+        vkbd.rshft = 1;
+        break;
+    case 0xb6:
+        vkbd.rshft = 0;
+        break;
+    case 0x1d:
+        if (vkbd.state == 0) {
+            vkbd.lctrl = 1;
+        } else if (vkbd.state == 1) {
+            vkbd.rctrl = 1;
+        } else if (vkbd.state == 2) {
+            vkbd.state = 3;
+        }
+        break;
+    case 0x9d:
+        if (vkbd.state == 0) {
+            vkbd.lctrl = 0;
+        } else if (vkbd.state == 2) {
+            vkbd.state = 3;
+        }
+        break;
+    case 0x38:
+        vkbd.lalt = 1;
+        break;
+    case 0x3A:
+        vkbd.capslock ^= 1;
+        break;
+    case 0xb8:
+        vkbd.lalt = 0;
+        break;
+    case 0xe0:
+        vkbd.state = 1;
+        break;
+    case 0xe1:
+        vkbd.state = 2;
+        break;
+    case 0x45:
+        if (vkbd.state == 0) {
+            vkbd.numlock ^= 1;
+        } else if (vkbd.state == 3) {
+            // pause pressed (part 1)
+            vkbd.state = 0;
+        }
+        break;
+    case 0xc5:
+        if (vkbd.state == 0) {
+            //vkbd.numlock = 0;
+        } else if (vkbd.state == 3) {
+            // pause pressed (part 2)
+            vkbd.state = 0;
+        }
+        break;
+    default:
+        if (scancode >= 0 && scancode < 128) {
+            DumpKeyboardScan(scancode);
+        }
+        break;
+    }
+}
+
