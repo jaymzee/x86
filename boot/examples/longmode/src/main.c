@@ -24,23 +24,6 @@ void main()
     ShowTimer();
 }
 
-void KeyboardHandlerM(void) {
-    int keycode = ScanKeyboard();
-    // Lowest bit of status will be set if buffer is not empty
-    if (keycode >= 0 && keycode < 128) {
-        char buf[80];
-        char ch = kbd_decode[keycode];
-        strcpy(buf, "0x");
-        itoa(keycode, 16, 2, buf+2);
-        strcat(buf, "  \n");
-        int len = strlen(buf);
-        if (ch > 31 && ch < 127) {
-            buf[len - 2] = ch;
-        }
-        fputs(buf, console);
-    }
-}
-
 void CPUExceptionHandler(struct cpu_reg *reg, int exception, int errcode)
 {
     char regs[1000], msg[80], ecs[20];

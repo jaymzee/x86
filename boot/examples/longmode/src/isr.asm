@@ -15,9 +15,9 @@ KeyboardHandler:
 	push	r9
 	push	r10
 	push	r11
+	call	KeyboardHandlerM
 	mov	al, 0x20
 	out	0x20, al	; issue EOI
-	call	KeyboardHandlerM
 	pop	r11
 	pop	r10
 	pop	r9

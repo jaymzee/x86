@@ -9,4 +9,4 @@ void HideTextCursor(void);
 void ShowTextCursor(void);
 void TextCursorShape(int top, int bot);
 int ScanKeyboard(void);
-extern char kbd_decode[128];
+extern char kbd_decode[256];
