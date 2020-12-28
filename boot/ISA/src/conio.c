@@ -181,6 +181,31 @@ void DumpKeyboardScan(int scancode)
     WriteText(sbuf);
 }
 
+char keyboard_buffer[256];
+unsigned char kbbuf_in;
+unsigned char kbbuf_out;
+
+char ScanCodeToASCII(int scancode)
+{
+    char ch;
+    if (vkbd.lshft || vkbd.rshft) {
+        ch = kbd_decode[scancode + 128];
+    } else {
+        ch = kbd_decode[scancode];
+    }
+    if ((vkbd.lctrl || vkbd.rctrl) && ch >= 'a' && ch <= 'z') {
+        ch &= 0x1f; // control character
+    } else if (vkbd.capslock && ch >= 'a' && ch <= 'z') {
+        ch &= 0xdf; // make uppercase
+    } else if (vkbd.numlock) {
+        char chnum = kbd_decode_numlock[scancode];
+        if ((chnum >= '0' && chnum <= '9') || chnum == '.') {
+            ch = chnum;
+        }
+    }
+    return ch;
+}
+
 void KeyboardHandlerM(void) {
     int scancode = ScanKeyboard();
 
@@ -246,7 +271,12 @@ void KeyboardHandlerM(void) {
         break;
     default:
         if (scancode >= 0 && scancode < 128) {
-            DumpKeyboardScan(scancode);
+            char ch = ScanCodeToASCII(scancode);
+            keyboard_buffer[kbbuf_in++] = ch;
+            // echo character
+            char chstr[] = " ";
+            chstr[0] = (ch == '\r') ? '\n' : ch;
+            WriteText(chstr);
         }
         break;
     }
