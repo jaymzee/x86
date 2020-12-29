@@ -38,16 +38,16 @@ struct cpu_reg {
     uint64_t rbp;   // 40
     uint64_t rsi;   // 48
     uint64_t rdi;   // 56
-    uint64_t r8;    // 64
-    uint64_t r9;    // 72
-    uint64_t r10;   // 80
-    uint64_t r11;   // 88
-    uint64_t r12;   // 96
-    uint64_t r13;   // 104
-    uint64_t r14;   // 112
-    uint64_t r15;   // 120
-    uint64_t rflags;// 128
-    uint64_t rip;   // 136
+    uint64_t rflags;// 64
+    uint64_t rip;   // 72
+    uint64_t r8;    // 80
+    uint64_t r9;    // 88
+    uint64_t r10;   // 96
+    uint64_t r11;   // 104
+    uint64_t r12;   // 112
+    uint64_t r13;   // 120
+    uint64_t r14;   // 128
+    uint64_t r15;   // 136
     uint64_t cr0;   // 144
     uint64_t cr2;   // 152
     uint64_t cr3;   // 160

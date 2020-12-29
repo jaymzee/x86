@@ -12,7 +12,7 @@ void main()
 {
     char buf[80];
 
-    DisableBlink();
+    DisableBlinkingText();
     ClearText(0x1F);
     fputs("32-bit protected mode entered successfully!\n", console);
     fputs("connect to serial 0 (COM1) for the console\n", console);
@@ -23,7 +23,6 @@ void main()
     println("installing handlers and enabling interrupts...");
     EnableInterrupts();
     println("32-bit protected mode demo");
-
     while (1) {
         print("\npress a key ");
         int c = getchar();
@@ -61,19 +60,4 @@ void DivbyzeroHandlerM(const struct cpu_reg *reg)
     fputs(regs, console);
     fputs(mesg, stdout);
     fputs(regs, stdout);
-}
-
-void KeyboardHandlerM(void) {
-    int keycode = ScanKeyboard();
-    // Lowest bit of status will be set if buffer is not empty
-    if (keycode >= 0 && keycode < 128) {
-        char buf[80];
-        char ch = kbd_decode[keycode];
-        strcpy(buf, "0x");
-        itoa(keycode, 16, 2, buf+2);
-        strcat(buf, "  \n");
-        int len = strlen(buf);
-        buf[len - 2] = ch;
-        fputs(buf, console);
-    }
 }

@@ -7,16 +7,16 @@ struc reg
 .rbp	resq	1	; 40
 .rsi	resq	1	; 48
 .rdi	resq	1	; 56
-.r8 	resq	1	; 64
-.r9 	resq	1	; 72
-.r10	resq	1	; 80
-.r11	resq	1	; 88
-.r12	resq	1	; 96
-.r13	resq	1	; 104
-.r14	resq	1	; 112
-.r15	resq	1	; 120
-.rflags	resq	1	; 128
-.rip	resq	1	; 136
+.rflags	resq	1	; 64
+.rip	resq	1	; 72
+.r8 	resq	1	; 80
+.r9 	resq	1	; 88
+.r10	resq	1	; 96
+.r11	resq	1	; 104
+.r12	resq	1	; 112
+.r13	resq	1	; 120
+.r14	resq	1	; 128
+.r15	resq	1	; 136
 .cr0	resq	1	; 144
 .cr2	resq	1	; 152
 .cr3	resq	1	; 160
@@ -50,6 +50,16 @@ endstruc
 	mov	[%1+reg.r13], r13
 	mov	[%1+reg.r14], r14
 	mov	[%1+reg.r15], r15
+	mov	rax, cr0
+	mov	[%1+reg.cr0], rax
+	mov	rax, cr2
+	mov	[%1+reg.cr2], rax
+	mov	rax, cr3
+	mov	[%1+reg.cr3], rax
+	mov	rax, cr4
+	mov	[%1+reg.cr4], rax
+	mov	rax, cr8
+	mov	[%1+reg.cr8], rax
 	mov	eax, es
 	mov	[%1+reg.es], ax
 	mov	eax, cs
@@ -62,23 +72,58 @@ endstruc
 	mov	[%1+reg.fs], ax
 	mov	eax, gs
 	mov	[%1+reg.gs], ax
-	mov	rax, cr0
-	mov	[%1+reg.cr0], rax
-	mov	rax, cr2
-	mov	[%1+reg.cr2], rax
-	mov	rax, cr3
-	mov	[%1+reg.cr3], rax
-	mov	rax, cr4
-	mov	[%1+reg.cr4], rax
+%endmacro
+
+%macro	pushall	1
+	push	rax			; save rax for now
+	sub	rsp, 12+%1		; padding for stack alignment
+	mov	eax, gs
+	push	ax
+	mov	eax, fs
+	push	ax
+	mov	eax, ds
+	push	ax
+	mov	eax, ss
+	push	ax
+	mov	eax, cs
+	push	ax
+	mov	eax, es
+	push	ax
 	mov	rax, cr8
-	mov	[%1+reg.cr8], rax
+	push	rax
+	mov	rax, cr4
+	push	rax
+	mov	rax, cr3
+	push	rax
+	mov	rax, cr2
+	push	rax
+	mov	rax, cr0
+	push	rax
+	push	r15
+	push	r14
+	push	r13
+	push	r12
+	push	r11
+	push	r10
+	push	r9
+	push	r8
+	sub	rsp, 16			; reserve storage for rflags and rip
+	push	rdi
+	push	rsi
+	push	rbp
+	push	rsp
+	push	rbx
+	push	rdx
+	push	rcx
+	mov	rax, [rsp + 200]	; restore saved rax
+	push	rax
 %endmacro
 
 ; save interrupt stack frame
 ;   saves info about the faulting code to register save area
 ;   rbp is the frame pointer and should be initialized first
 ;   rax is clobbered
-%macro savisf 2
+%macro	savisf	2
 	mov	rax, [%2+0]		; fault rip
 	mov	[%1+reg.rip], rax
 	mov	ax, [%2+8]		; fault cs

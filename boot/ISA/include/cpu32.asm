@@ -32,6 +32,14 @@ endstruc
 	mov	[%1+reg.ebp], ebp
 	mov	[%1+reg.esi], esi
 	mov	[%1+reg.edi], edi
+	mov	eax, cr0
+	mov	[%1+reg.cr0], eax
+	mov	eax, cr2
+	mov	[%1+reg.cr2], eax
+	mov	eax, cr3
+	mov	[%1+reg.cr3], eax
+	mov	eax, cr4
+	mov	[%1+reg.cr4], eax
 	mov	eax, es
 	mov	[%1+reg.es], ax
 	mov	eax, cs
@@ -44,14 +52,6 @@ endstruc
 	mov	[%1+reg.fs], ax
 	mov	eax, gs
 	mov	[%1+reg.gs], ax
-	mov	eax, cr0
-	mov	[%1+reg.cr0], eax
-	mov	eax, cr2
-	mov	[%1+reg.cr2], eax
-	mov	eax, cr3
-	mov	[%1+reg.cr3], eax
-	mov	eax, cr4
-	mov	[%1+reg.cr4], eax
 %endmacro
 
 ; save interrupt stack frame

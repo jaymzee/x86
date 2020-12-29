@@ -9,6 +9,8 @@
 #include "isr.h"
 #include "traps.h"
 
+#define STACK_TOP 0x1000000 // top of 16MB of memory
+
 void ShowTimer(void);
 
 void main()
@@ -23,26 +25,44 @@ void main()
     fputs("connect to serial 0 (COM1) for the console\n", console);
     fputs("bang on the keyboard to show scan codes\n", console);
     println("long mode demo");
-
     ShowTimer();
+}
+
+void DumpStack(char *sbuf, uint64_t *stkptr)
+{
+    char tmpstr[17];
+    strcpy(sbuf, "Stack:");
+    for (int i = 0; i < 12 && (long)stkptr < (STACK_TOP - 7); i++, stkptr++) {
+        if ((i % 3) == 0) {
+            strcat(sbuf, "\n  ");
+            strcat(sbuf, ltoa((long)stkptr, 16, 12, tmpstr));
+            strcat(sbuf, ":");
+        }
+        strcat(sbuf, " ");
+        strcat(sbuf, ltoa(*stkptr, 16, 16, tmpstr));
+    }
+    strcat(sbuf, "\n");
 }
 
 void CPUExceptionHandler(struct cpu_reg *reg, int except, int errcode)
 {
-    char regs[1000], msg[80], errstr[20];
+    char regs[768], stack[384], msg[81], tmpstr[17];
     char *haltmsg = "system halted.\n";
 
     strcpy(msg, "\nPANIC: ");
     strcat(msg, cpu_exception[except]);
     strcat(msg, ", error code: ");
-    strcat(msg, itoa(errcode, 16, 4, errstr));
+    strcat(msg, itoa(errcode, 16, 4, tmpstr));
     strcat(msg, "\n");
     DumpCPURegisters(regs, reg, 1);
+    DumpStack(stack, (uint64_t *)reg->rsp);
     fputs(msg, console);
     fputs(regs, console);
+    fputs(stack, console);
     fputs(haltmsg, console);
     fputs(msg, stdout);
     fputs(regs, stdout);
+    fputs(stack, stdout);
     fputs(haltmsg, stdout);
 
     while (1) {

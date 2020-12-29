@@ -1,6 +1,4 @@
-#include <conio.h>
 #include <cpu.h>
-#include <stdio.h>
 #include <string.h>
 
 const char *cpu_exception[32] = {
@@ -76,130 +74,130 @@ IDT_TrapGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
 //   ctrl = 1 to show cpu control registers
 void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl)
 {
-    char nbuf[20];
+    char nbuf[17];
 
-    strcpy(sbuf, "  rip: ");
-    strcat(sbuf, itoa(reg->rip, 16, 16, nbuf));
-    strcat(sbuf, "     rsp: ");
-    strcat(sbuf, itoa(reg->rsp, 16, 16, nbuf));
-    strcat(sbuf, "   flags: ");
-    strcat(sbuf, itoa(reg->rflags, 16, 16, nbuf));
+    strcpy(sbuf, " RIP: ");
+    strcat(sbuf, ltoa(reg->rip, 16, 16, nbuf));
+    strcat(sbuf, " RSP: ");
+    strcat(sbuf, ltoa(reg->rsp, 16, 16, nbuf));
+    strcat(sbuf, " FLG: ");
+    strcat(sbuf, ltoa(reg->rflags, 16, 16, nbuf));
     strcat(sbuf, "\n");
-    strcat(sbuf, "  rax: ");
-    strcat(sbuf, itoa(reg->rax, 16, 16, nbuf));
-    strcat(sbuf, "     rbx: ");
-    strcat(sbuf, itoa(reg->rbx, 16, 16, nbuf));
-    strcat(sbuf, "     rcx: ");
-    strcat(sbuf, itoa(reg->rcx, 16, 16, nbuf));
+    strcat(sbuf, " RAX: ");
+    strcat(sbuf, ltoa(reg->rax, 16, 16, nbuf));
+    strcat(sbuf, " RBX: ");
+    strcat(sbuf, ltoa(reg->rbx, 16, 16, nbuf));
+    strcat(sbuf, " RCX: ");
+    strcat(sbuf, ltoa(reg->rcx, 16, 16, nbuf));
     strcat(sbuf, "\n");
-    strcat(sbuf, "  rdx: ");
-    strcat(sbuf, itoa(reg->rdx, 16, 16, nbuf));
-    strcat(sbuf, "     rsi: ");
-    strcat(sbuf, itoa(reg->rsi, 16, 16, nbuf));
-    strcat(sbuf, "     rdi: ");
-    strcat(sbuf, itoa(reg->rdi, 16, 16, nbuf));
+    strcat(sbuf, " RDX: ");
+    strcat(sbuf, ltoa(reg->rdx, 16, 16, nbuf));
+    strcat(sbuf, " RSI: ");
+    strcat(sbuf, ltoa(reg->rsi, 16, 16, nbuf));
+    strcat(sbuf, " RDI: ");
+    strcat(sbuf, ltoa(reg->rdi, 16, 16, nbuf));
     strcat(sbuf, "\n");
-    strcat(sbuf, "  rbp: ");
-    strcat(sbuf, itoa(reg->rbp, 16, 16, nbuf));
-    strcat(sbuf, "      r8: ");
-    strcat(sbuf, itoa(reg->r8, 16, 16, nbuf));
-    strcat(sbuf, "      r9: ");
-    strcat(sbuf, itoa(reg->r9, 16, 16, nbuf));
+    strcat(sbuf, " RBP: ");
+    strcat(sbuf, ltoa(reg->rbp, 16, 16, nbuf));
+    strcat(sbuf, " R08: ");
+    strcat(sbuf, ltoa(reg->r8, 16, 16, nbuf));
+    strcat(sbuf, " R09: ");
+    strcat(sbuf, ltoa(reg->r9, 16, 16, nbuf));
     strcat(sbuf, "\n");
-    strcat(sbuf, "  r10: ");
-    strcat(sbuf, itoa(reg->r10, 16, 16, nbuf));
-    strcat(sbuf, "     r11: ");
-    strcat(sbuf, itoa(reg->r11, 16, 16, nbuf));
-    strcat(sbuf, "     r12: ");
-    strcat(sbuf, itoa(reg->r12, 16, 16, nbuf));
+    strcat(sbuf, " R10: ");
+    strcat(sbuf, ltoa(reg->r10, 16, 16, nbuf));
+    strcat(sbuf, " R11: ");
+    strcat(sbuf, ltoa(reg->r11, 16, 16, nbuf));
+    strcat(sbuf, " R12: ");
+    strcat(sbuf, ltoa(reg->r12, 16, 16, nbuf));
     strcat(sbuf, "\n");
-    strcat(sbuf, "  r13: ");
-    strcat(sbuf, itoa(reg->r13, 16, 16, nbuf));
-    strcat(sbuf, "     r14: ");
-    strcat(sbuf, itoa(reg->r14, 16, 16, nbuf));
-    strcat(sbuf, "     r15: ");
-    strcat(sbuf, itoa(reg->r15, 16, 16, nbuf));
+    strcat(sbuf, " R13: ");
+    strcat(sbuf, ltoa(reg->r13, 16, 16, nbuf));
+    strcat(sbuf, " R14: ");
+    strcat(sbuf, ltoa(reg->r14, 16, 16, nbuf));
+    strcat(sbuf, " R15: ");
+    strcat(sbuf, ltoa(reg->r15, 16, 16, nbuf));
     strcat(sbuf, "\n");
     if (ctrl) {
-        strcat(sbuf, "  cr0: ");
-        strcat(sbuf, itoa(reg->cr0, 16, 16, nbuf));
-        strcat(sbuf, "     cr2: ");
-        strcat(sbuf, itoa(reg->cr2, 16, 16, nbuf));
-        strcat(sbuf, "     cr3: ");
-        strcat(sbuf, itoa(reg->cr3, 16, 16, nbuf));
+        strcat(sbuf, " CR0: ");
+        strcat(sbuf, ltoa(reg->cr0, 16, 16, nbuf));
+        strcat(sbuf, " CR2: ");
+        strcat(sbuf, ltoa(reg->cr2, 16, 16, nbuf));
+        strcat(sbuf, " CR3: ");
+        strcat(sbuf, ltoa(reg->cr3, 16, 16, nbuf));
         strcat(sbuf, "\n");
-        strcat(sbuf, "  cr4: ");
-        strcat(sbuf, itoa(reg->cr4, 16, 16, nbuf));
-        strcat(sbuf, "     cr8: ");
-        strcat(sbuf, itoa(reg->cr8, 16, 16, nbuf));
+        strcat(sbuf, " CR4: ");
+        strcat(sbuf, ltoa(reg->cr4, 16, 16, nbuf));
+        strcat(sbuf, " CR8: ");
+        strcat(sbuf, ltoa(reg->cr8, 16, 16, nbuf));
         strcat(sbuf, "\n");
     }
-    strcat(sbuf, "   cs: ");
+    strcat(sbuf, "  CS: ");
     strcat(sbuf, itoa(reg->cs, 16, 4, nbuf));
-    strcat(sbuf, "    ss: ");
+    strcat(sbuf, "   SS: ");
     strcat(sbuf, itoa(reg->ss, 16, 4, nbuf));
-    strcat(sbuf, "      ds: ");
+    strcat(sbuf, "   DS: ");
     strcat(sbuf, itoa(reg->ds, 16, 4, nbuf));
-    strcat(sbuf, "    es: ");
+    strcat(sbuf, "   ES: ");
     strcat(sbuf, itoa(reg->es, 16, 4, nbuf));
-    strcat(sbuf, "      fs: ");
+    strcat(sbuf, "   FS: ");
     strcat(sbuf, itoa(reg->fs, 16, 4, nbuf));
-    strcat(sbuf, "    gs: ");
+    strcat(sbuf, "   GS: ");
     strcat(sbuf, itoa(reg->gs, 16, 4, nbuf));
     strcat(sbuf, "\n");
 }
-#else
+#else // 32-bit
 // DumpCPURegister dumps the CPU registers to the screen or serial port
 //   ctrl = 1 to show cpu control registers
 void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl)
 {
     char nbuf[20];
 
-    strcpy(sbuf, "  eip: ");
+    strcpy(sbuf, " EIP: ");
     strcat(sbuf, itoa(reg->eip, 16, 8, nbuf));
-    strcat(sbuf, "   esp: ");
+    strcat(sbuf, " ESP: ");
     strcat(sbuf, itoa(reg->esp, 16, 8, nbuf));
-    strcat(sbuf, "   ebp: ");
+    strcat(sbuf, " EBP: ");
     strcat(sbuf, itoa(reg->ebp, 16, 8, nbuf));
-    strcat(sbuf, " flags: ");
+    strcat(sbuf, " FLG: ");
     strcat(sbuf, itoa(reg->eflags, 16, 8, nbuf));
     strcat(sbuf, "\n");
-    strcat(sbuf, "  eax: ");
+    strcat(sbuf, " EAX: ");
     strcat(sbuf, itoa(reg->eax, 16, 8, nbuf));
-    strcat(sbuf, "   ebx: ");
+    strcat(sbuf, " EBX: ");
     strcat(sbuf, itoa(reg->ebx, 16, 8, nbuf));
-    strcat(sbuf, "   ecx: ");
+    strcat(sbuf, " ECX: ");
     strcat(sbuf, itoa(reg->ecx, 16, 8, nbuf));
-    strcat(sbuf, "   edx: ");
+    strcat(sbuf, " EDX: ");
     strcat(sbuf, itoa(reg->edx, 16, 8, nbuf));
     strcat(sbuf, "\n");
-    strcat(sbuf, "  esi: ");
+    strcat(sbuf, " ESI: ");
     strcat(sbuf, itoa(reg->esi, 16, 8, nbuf));
-    strcat(sbuf, "   edi: ");
+    strcat(sbuf, " EDI: ");
     strcat(sbuf, itoa(reg->edi, 16, 8, nbuf));
     strcat(sbuf, "\n");
     if (ctrl) {
-        strcat(sbuf, "  cr0: ");
+        strcat(sbuf, " CR0: ");
         strcat(sbuf, itoa(reg->cr0, 16, 8, nbuf));
-        strcat(sbuf, "   cr2: ");
+        strcat(sbuf, " CR2: ");
         strcat(sbuf, itoa(reg->cr2, 16, 8, nbuf));
-        strcat(sbuf, "   cr3: ");
+        strcat(sbuf, " CR3: ");
         strcat(sbuf, itoa(reg->cr3, 16, 8, nbuf));
-        strcat(sbuf, "   cr4: ");
+        strcat(sbuf, " CR4: ");
         strcat(sbuf, itoa(reg->cr4, 16, 8, nbuf));
         strcat(sbuf, "\n");
     }
-    strcat(sbuf, "   cs: ");
+    strcat(sbuf, "  CS: ");
     strcat(sbuf, itoa(reg->cs, 16, 4, nbuf));
-    strcat(sbuf, "  ss: ");
+    strcat(sbuf, " SS: ");
     strcat(sbuf, itoa(reg->ss, 16, 4, nbuf));
-    strcat(sbuf, "   ds: ");
+    strcat(sbuf, " DS: ");
     strcat(sbuf, itoa(reg->ds, 16, 4, nbuf));
-    strcat(sbuf, "  es: ");
+    strcat(sbuf, "  ES: ");
     strcat(sbuf, itoa(reg->es, 16, 4, nbuf));
-    strcat(sbuf, "   fs: ");
+    strcat(sbuf, " FS: ");
     strcat(sbuf, itoa(reg->fs, 16, 4, nbuf));
-    strcat(sbuf, "  gs: ");
+    strcat(sbuf, " GS: ");
     strcat(sbuf, itoa(reg->gs, 16, 4, nbuf));
     strcat(sbuf, "\n");
 }

@@ -6,9 +6,10 @@
 	cli
 	push	rbp
 	mov	rbp, rsp
-	sub	rsp, reg.size
-	savregs	rsp
+	pushall	0			; save all regs
 	savisf	rsp, rbp+10h		; fault rip, rflags, rsp, etc.
+	mov	rax, [rbp]		; get fault frame pointer
+	mov	[rsp+reg.rbp], rax	; save it
 	mov	rdi, rsp		; pointer to reg struct
 	mov	rsi, %1
 	mov	rdx, [rbp+8h]		; fault error code
@@ -31,8 +32,7 @@
 	cli
 	push	rbp
 	mov	rbp, rsp
-	sub	rsp, reg.size+8		; maintin 16 byte stack alignment
-	savregs	rsp
+	pushall	8			; save all regs and align stack
 	savisf	rsp, rbp+8		; fault rip, rflags, rsp, etc.
 	mov	rdi, rsp		; pointer to regs struct
 	mov	rsi, %1
@@ -161,7 +161,7 @@ CauseGPFault:
 	mov	eax, ds
 	push	rax
 	mov	ax, 0x42
-	mov	ds, ax			; should cause GP Fault
+	mov	ds, eax			; should cause GP Fault
 	pop	rax
 	mov	ds, eax
 	pop	rax
