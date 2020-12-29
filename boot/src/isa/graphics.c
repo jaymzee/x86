@@ -1,14 +1,23 @@
+#include <isa/graphics.h>
+#include <isa/vga.h>
+#include <sys/io.h>
+
+#define SCREEN_WIDTH 320
+#define SET_PIXEL(x,y,c) video_ram[SCREEN_WIDTH*y+x]=color
+
 /* VGA Mode 13h drawing functions */
 
-static unsigned char *video_ram = (unsigned char *)0xA0000;
+static unsigned char *video_ram = (unsigned char *)VGA_VIDEO_MEM;
 
-void DrawPixel(int x, int y, unsigned char color)
+void
+SetPixel(uint32_t x, uint32_t y, uint8_t color)
 {
-    video_ram[320 * y + x] = color;
+    SET_PIXEL(x, y, color);
 }
 
 // Midpoint algorithm for 2D line
-void DrawLine(int x0, int y0, int x1, int y1, unsigned char color)
+void
+DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t color)
 {
     int dx = x1 - x0;
     int dy = y1 - y0;
@@ -27,7 +36,7 @@ void DrawLine(int x0, int y0, int x1, int y1, unsigned char color)
         incy = -1;
     }
 
-    video_ram[320 * y + x] = color;
+    SET_PIXEL(x, y, color);
     if (dx > dy) {
         const int incrE = dy * 2;
         const int incrSE = (dy - dx) * 2;
@@ -41,7 +50,7 @@ void DrawLine(int x0, int y0, int x1, int y1, unsigned char color)
                 x += incx;
                 y += incy;
             }
-            video_ram[320 * y + x] = color;
+            SET_PIXEL(x, y, color);
         }
     } else {
         const int incrS = dx * 2;
@@ -56,7 +65,19 @@ void DrawLine(int x0, int y0, int x1, int y1, unsigned char color)
                 x += incx;
                 y += incy;
             }
-            video_ram[320 * y + x] = color;
+            SET_PIXEL(x, y, color);
         }
     }
 }
+
+void
+SetColorPalette(const struct color pal[])
+{
+    for (int i = 0; i < 256; i++) {
+        outb(VGA_DAC_ADDR_WR, i);
+        outb(VGA_DAC_DATA, pal[i].r);
+        outb(VGA_DAC_DATA, pal[i].g);
+        outb(VGA_DAC_DATA, pal[i].b);
+    }
+}
+

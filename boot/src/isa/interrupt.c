@@ -1,6 +1,6 @@
-#include <interrupt.h>
-#include <system.h>
-#include <pic.h>
+#include <isa/interrupt.h>
+#include <isa/pic.h>
+#include <sys/io.h>
 
 #define RTC             0x70    // CMOS/Real Time Clock/disable NMI
 

@@ -1,6 +1,6 @@
-#include <graphics.h>
-#include <serial.h>
 #include <stdio.h>
+#include <isa/graphics.h>
+#include <isa/serial.h>
 
 void main()
 {

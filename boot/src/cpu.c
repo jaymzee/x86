@@ -1,5 +1,5 @@
-#include <cpu.h>
 #include <string.h>
+#include <sys/cpu.h>
 
 const char *cpu_exception[32] = {
     "Divide-by-zero Error",         // 0x0

@@ -5,8 +5,8 @@
  * 16750 has a 64 byte FIFO
  */
 
-#include "serial.h"
-#include "system.h"
+#include <isa/serial.h>
+#include <sys/io.h>
 
 #define COM1_PORT 0x3f8      // COM1
 

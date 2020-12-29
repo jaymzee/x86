@@ -1,14 +1,15 @@
 TARGET = boot.img
 OBJECTS = main.o intsetup.o traps.o isr.o
 OBJECTS += stdio.o string.o conio.o kbd_US.o serial.o timer.o cpu.o interrupt.o
-SOURCE = ../../ISA/src
-INCLUDE = ../../ISA/include
+ISA = ../../src/isa
+COMMON = ../../src
+INCLUDE = ../../include
 CC = gcc
 CFLAGS = -g -std=c99 -pedantic -Wall -Werror
 CFLAGS += -m64 -ffreestanding -mno-red-zone
 CFLAGS += -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(INCLUDE) -include _default.h
-ASFLAGS = -g -F dwarf -f elf64 -I $(addsuffix /,$(INCLUDE))
+ASFLAGS = -g -F dwarf -f elf64 -i $(addsuffix /asm/,$(INCLUDE))
 LDFLAGS = --nmagic
 GCCVERSION := $(shell gcc -dumpversion)
 ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
@@ -16,8 +17,9 @@ ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
     CFLAGS += -fcf-protection=return
 endif
 vpath %.c src
-vpath %.c $(SOURCE)
 vpath %.asm src
+vpath %.c $(ISA)
+vpath %.c $(COMMON)
 
 .PHONY: clean run debug
 $(TARGET): boot.bin main.bin

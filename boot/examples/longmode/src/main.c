@@ -1,10 +1,10 @@
-#include <conio.h>
-#include <cpu.h>
-#include <interrupt.h>
-#include <serial.h>
 #include <stdio.h>
 #include <string.h>
-#include <timer.h>
+#include <isa/conio.h>
+#include <isa/interrupt.h>
+#include <isa/serial.h>
+#include <isa/timer.h>
+#include <sys/cpu.h>
 #include "intsetup.h"
 #include "isr.h"
 #include "traps.h"

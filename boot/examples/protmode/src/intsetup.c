@@ -1,6 +1,6 @@
-#include <cpu.h>
-#include <interrupt.h>
 #include <string.h>
+#include <sys/cpu.h>
+#include <isa/interrupt.h>
 #include "intsetup.h"
 
 #define IDT_ENTRIES 256

@@ -1,46 +1,44 @@
-#include <graphics.h>
-#include <serial.h>
 #include <stdio.h>
+#include <isa/graphics.h>
+#include <isa/serial.h>
+#include <isa/vga.h>
+#include <sys/io.h>
 
-#include <vga.h>
-#include <system.h>
-
-void set_palette()
+void init()
 {
+    COM_Init();
+    println("VGA graphics in long mode (64-bit) demo");
+    struct color pal[256];
     for (int i = 0; i < 64; i++) {
-        outb(VGA_DAC_ADDR_WR, i);
-        outb(VGA_DAC_DATA, i);
-        outb(VGA_DAC_DATA, i);
-        outb(VGA_DAC_DATA, i);
+        pal[i].r = i;
+        pal[i].g = i;
+        pal[i].b = i;
     }
     for (int i = 64; i < 128; i++) {
-        outb(VGA_DAC_ADDR_WR, i);
-        outb(VGA_DAC_DATA, i);
-        outb(VGA_DAC_DATA, 0);
-        outb(VGA_DAC_DATA, 0);
+        pal[i].r = i;
+        pal[i].g = 0;
+        pal[i].b = 0;
     }
     for (int i = 128; i < 196; i++) {
-        outb(VGA_DAC_ADDR_WR, i);
-        outb(VGA_DAC_DATA, 0);
-        outb(VGA_DAC_DATA, i);
-        outb(VGA_DAC_DATA, 0);
+        pal[i].r = 0;
+        pal[i].g = i;
+        pal[i].b = 0;
     }
     for (int i = 196; i < 256; i++) {
-        outb(VGA_DAC_ADDR_WR, i);
-        outb(VGA_DAC_DATA, 0);
-        outb(VGA_DAC_DATA, 0);
-        outb(VGA_DAC_DATA, i);
+        pal[i].r = 0;
+        pal[i].g = 0;
+        pal[i].b = i;
     }
+    SetColorPalette(pal);
 }
 
 void main()
 {
-    set_palette();
+    init();
     for (int i = 0; i < 256; i++) {
         DrawLine(i, 0, i, 199, i);
     }
-    COM_Init();
-    println("VGA graphics in long mode (64-bit) demo");
+    SetPixel(100,100,5);
     while (1) {
         print("\npress a key ");
         int c = getchar();

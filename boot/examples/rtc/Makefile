@@ -1,8 +1,9 @@
 TARGET = demo.img
 OBJECTS = stage1.o main.o
-OBJECTS += serial.o string.o stdio.o serial.o conio.o interrupt.o time.o
-SOURCE = ../../ISA/src
-INCLUDE = ../../ISA/include
+OBJECTS += stdio.o string.o serial.o conio.o kbd_US.o interrupt.o time.o
+ISA = ../../src/isa
+COMMON = ../../src
+INCLUDE = ../../include
 CC = gcc
 CFLAGS = -g -std=c99 -pedantic -Wall -Os -m16 -ffreestanding
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
@@ -16,7 +17,8 @@ ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
 endif
 vpath %.asm src
 vpath %.c src
-vpath %.c $(SOURCE)
+vpath %.c $(ISA)
+vpath %.c $(COMMON)
 
 .PHONY: clean run debug
 $(TARGET): stage0.bin stage1.bin

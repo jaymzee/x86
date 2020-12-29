@@ -9,7 +9,7 @@ GDT_SIZE    equ gdt.end - gdt
 GDTR        equ GDT + GDT_SIZE
 
 %include "cpu16.asm"
-%include "isa.asm"
+%include "isa/bootutil.asm"
 
 	section .text.start exec align=16
 	global _start

@@ -1,6 +1,6 @@
-#include <cpu.h>
-#include <interrupt.h>
 #include <string.h>
+#include <isa/interrupt.h>
+#include <sys/cpu.h>
 #include "intsetup.h"
 #include "isr.h"
 #include "traps.h"

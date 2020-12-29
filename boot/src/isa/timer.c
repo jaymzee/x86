@@ -1,6 +1,6 @@
-#include <pit.h>
-#include <ps2.h>
-#include <system.h>
+#include <isa/pit.h>
+#include <isa/ps2.h>
+#include <sys/io.h>
 
 void SetIntervalTimer(int frequency) {
     int divider;

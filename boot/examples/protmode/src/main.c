@@ -1,8 +1,8 @@
-#include <conio.h>
-#include <cpu.h>
-#include <serial.h>
 #include <stdio.h>
 #include <string.h>
+#include <isa/conio.h>
+#include <isa/serial.h>
+#include <sys/cpu.h>
 #include "intsetup.h"
 
 extern void CauseGPFault(void);

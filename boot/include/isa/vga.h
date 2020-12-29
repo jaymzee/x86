@@ -152,3 +152,4 @@ INT 10h,  00h (0)        Set Video Mode
 #define VGA_ATTR_HORIZ_PAN  0x33    // Horizontal Pixel Panning register
 #define VGA_ATTR_COLOR_SEL  0x34    // Color Select register
 
+#define VGA_VIDEO_MEM       0xA0000 // beginning of video memory window
