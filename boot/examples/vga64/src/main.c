@@ -1,12 +1,11 @@
 #include <stdio.h>
-#include <isa/graphics.h>
-#include <isa/serial.h>
-#include <isa/vga.h>
 #include <sys/io.h>
+#include <sys/graphics.h>
+#include <sys/serial.h>
+#include <sys/vga.h>
 
 void init()
 {
-    COM_Init();
     println("VGA graphics in long mode (64-bit) demo");
     struct color pal[256];
     for (int i = 0; i < 64; i++) {
@@ -32,7 +31,7 @@ void init()
     SetColorPalette(pal);
 }
 
-void main()
+int main(int argc, char *argv[], char *envp[])
 {
     init();
     for (int i = 0; i < 256; i++) {

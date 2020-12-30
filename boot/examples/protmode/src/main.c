@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <string.h>
-#include <isa/conio.h>
-#include <isa/serial.h>
+#include <sys/conio.h>
+#include <sys/serial.h>
 #include <sys/cpu.h>
 #include "intsetup.h"
 
 extern void CauseGPFault(void);
 extern void CauseDivbyzeroFault(void);
 
-void main()
+int main(int argc, char *argv[], char *envp[])
 {
     char buf[80];
 

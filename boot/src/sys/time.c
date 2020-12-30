@@ -1,4 +1,4 @@
-#include <isa/time.h>
+#include <sys/time.h>
 #include <sys/io.h>
 
 #define CMOS_ADDR       0x70

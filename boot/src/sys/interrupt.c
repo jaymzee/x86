@@ -1,12 +1,12 @@
-#include <isa/interrupt.h>
-#include <isa/pic.h>
 #include <sys/io.h>
+#include <sys/interrupt.h>
+#include <sys/pic.h>
 
 #define RTC             0x70    // CMOS/Real Time Clock/disable NMI
 
 // on older machines its necessary to give the PIC some time to react
 // to commands as they might not be processed quickly
-#define wait() __asm__("nop")
+#define wait() __asm__ __volatile__ ("nop")
 
 // Intel 8259 interrupt controller
 

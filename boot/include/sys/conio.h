@@ -1,4 +1,4 @@
-#include <isa/keyboard.h>
+#include <sys/keyboard.h>
 
 void SetTextCursor(int x, int y);
 void GetTextCursor(int *x, int *y);

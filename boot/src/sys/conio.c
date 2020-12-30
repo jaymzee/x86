@@ -1,8 +1,8 @@
 #include <string.h>
-#include <isa/conio.h>
-#include <isa/ps2.h>
-#include <isa/vga.h>
+#include <sys/conio.h>
 #include <sys/io.h>
+#include <sys/ps2.h>
+#include <sys/vga.h>
 
 #define TEXT_ATTR   0x07
 #define TEXT_COLS   80

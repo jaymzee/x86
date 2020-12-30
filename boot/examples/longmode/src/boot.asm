@@ -12,8 +12,8 @@ GDTR        equ GDT + GDT_SIZE
 PML4T       equ 0x4000
 PT          equ 0x8000
 
-%include "cpu16.asm"
-%include "isa/bootutil.asm"
+%include "cpumode.asm"
+%include "sys/bootutil.asm"
 
 	bits 16
 	section .text.start exec align=16
@@ -113,10 +113,9 @@ start64:
 				; Stack will be grow down from this location
 	mov	ebp, 0		; terminate chain of frame pointers
 	mov	rax, LOADADDR
-	call	rax		; call main()
-				; not expect for it to return but if it does:
-	cli			;   disable interrupts
-.halt	hlt			;   Halt CPU with infinite loop
+	call	rax		; call _start
+.halt	cli
+	hlt			; if _start returns spin forever
 	jmp	.halt
 
 	section .data

@@ -1,6 +1,6 @@
-#include <isa/graphics.h>
-#include <isa/vga.h>
 #include <sys/io.h>
+#include <sys/graphics.h>
+#include <sys/vga.h>
 
 #define SCREEN_WIDTH 320
 #define SET_PIXEL(x,y,c) video_ram[SCREEN_WIDTH*y+x]=color

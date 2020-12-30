@@ -1,4 +1,4 @@
-%include "cpu32.asm"
+%include "x86.asm"
 
 	extern GPFaultHandlerM
 	extern DivbyzeroHandlerM

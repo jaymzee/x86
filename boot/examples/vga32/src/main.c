@@ -1,13 +1,12 @@
 #include <stdio.h>
-#include <isa/graphics.h>
-#include <isa/serial.h>
+#include <sys/graphics.h>
+#include <sys/serial.h>
 
-void main()
+int main(int argc, char *argv[], char *envp[])
 {
     for (int i = 0; i < 200; i++) {
         DrawLine(0, i, 319, i, i);
     }
-    COM_Init();
     println("VGA graphics in protected mode demo");
     while (1) {
         print("\npress a key ");

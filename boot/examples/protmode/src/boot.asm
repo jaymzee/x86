@@ -8,8 +8,8 @@ GDT         equ 0x2000
 GDT_SIZE    equ gdt.end - gdt
 GDTR        equ GDT + GDT_SIZE
 
-%include "cpu16.asm"
-%include "isa/bootutil.asm"
+%include "cpumode.asm"
+%include "sys/bootutil.asm"
 
 	section .text.start exec align=16
 	global _start

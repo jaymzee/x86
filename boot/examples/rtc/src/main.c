@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
-#include <isa/interrupt.h>
-#include <isa/serial.h>
-#include <isa/time.h>
+#include <sys/interrupt.h>
+#include <sys/serial.h>
+#include <sys/time.h>
 
 void Main()
 {

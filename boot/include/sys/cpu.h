@@ -85,7 +85,12 @@ struct cpu_reg {
 };
 #endif
 
-// DumpCPURegister dumps the CPU registers to the screen or serial port
+// DumpCPURegister dumps the CPU registers to sbuf
 //   ctrl: set to true to show cpu control registers
+// make sure sbuf is large enough to hold contents
 void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl);
+
+// DumpMem dumps memory starting from ptr as n machine words to sbuf
+// make sure sbuf is large enough to hold contents
+void DumpMem(char *sbuf, void *ptr, int n);
 

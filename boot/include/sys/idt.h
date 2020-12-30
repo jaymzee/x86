@@ -39,8 +39,12 @@ struct IDTR {
 
 static inline void LoadIDT(struct IDTR *idtr)
 {
-    __asm__("lidt %0" :: "m"(*idtr));
-    __asm__("sti");
+    __asm__ __volatile__ (
+        "lidt %0\n\t"
+        "sti"
+        :
+        : "m"(*idtr)
+    );
 }
 
 void IDT_IntGate(struct IDT_entry *d, void (*hndlr)(void), int sel, int dpl);

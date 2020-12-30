@@ -1,4 +1,4 @@
-%include "cpu64.asm"
+%include "x86_64.asm"
 
 	extern CPUExceptionHandler
 

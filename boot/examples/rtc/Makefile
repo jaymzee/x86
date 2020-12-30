@@ -1,11 +1,12 @@
 TARGET = demo.img
 OBJECTS = stage1.o main.o
 OBJECTS += stdio.o string.o serial.o conio.o kbd_US.o interrupt.o time.o
-ISA = ../../src/isa
-COMMON = ../../src
+LIBC = ../../src
+LIBSYS = ../../src/sys
 INCLUDE = ../../include
 CC = gcc
-CFLAGS = -g -std=c99 -pedantic -Wall -Os -m16 -ffreestanding
+CFLAGS = -g -std=c99 -pedantic -Wall
+CFLAGS += -m16 -ffreestanding
 CFLAGS += -fno-pic -fno-exceptions -fno-asynchronous-unwind-tables
 CFLAGS += -nostdinc -I $(addsuffix /,$(INCLUDE))
 ASFLAGS = -g -F dwarf -f elf
@@ -17,8 +18,8 @@ ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
 endif
 vpath %.asm src
 vpath %.c src
-vpath %.c $(ISA)
-vpath %.c $(COMMON)
+vpath %.c $(LIBC)
+vpath %.c $(LIBSYS)
 
 .PHONY: clean run debug
 $(TARGET): stage0.bin stage1.bin

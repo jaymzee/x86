@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <isa/conio.h>
-#include <isa/serial.h>
+#include <sys/conio.h>
+#include <sys/serial.h>
 
 static FILE stdin_file = {0};
 static FILE stdout_file = {1};

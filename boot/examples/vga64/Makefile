@@ -1,7 +1,8 @@
 TARGET = boot.img
-OBJECTS = main.o stdio.o conio.o kbd_US.o serial.o string.o graphics.o
-ISA = ../../src/isa
-COMMON = ../../src
+OBJECTS = main.o
+OBJECTS += crt0.o stdio.o conio.o kbd_US.o serial.o string.o graphics.o cpu.o
+LIBC = ../../src
+LIBSYS = ../../src/sys
 INCLUDE = ../../include
 CC = gcc
 CFLAGS = -g -std=c99 -pedantic -Wall -Werror
@@ -17,8 +18,8 @@ ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
 endif
 vpath %.asm src
 vpath %.c src
-vpath %.c $(COMMON)
-vpath %.c $(ISA)
+vpath %.c $(LIBC)
+vpath %.c $(LIBSYS)
 
 .PHONY: clean run debug
 $(TARGET): boot.bin main.bin

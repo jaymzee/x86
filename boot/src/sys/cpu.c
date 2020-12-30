@@ -1,5 +1,10 @@
+#include <stdio.h>
 #include <string.h>
 #include <sys/cpu.h>
+
+// TODO: startup code should determine this rather than hard coding
+#define STACK_TOP 0x1000000
+#define min(a,b) (a)<(b)?a:b
 
 const char *cpu_exception[32] = {
     "Divide-by-zero Error",         // 0x0
@@ -70,7 +75,7 @@ IDT_TrapGate(struct IDT_entry *descr, void (*hndlr)(void), int sel, int dpl)
 }
 
 #if __x86_64__
-// DumpCPURegister dumps the CPU registers to the screen or serial port
+// DumpCPURegister dumps the CPU registers to sbuf
 //   ctrl = 1 to show cpu control registers
 void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl)
 {
@@ -146,8 +151,27 @@ void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl)
     strcat(sbuf, itoa(reg->gs, 16, 4, nbuf));
     strcat(sbuf, "\n");
 }
+
+// DumpMem dumps memory starting from ptr as n machine words to sbuf
+// make sure sbuf is large enough to hold contents
+void DumpMem(char *sbuf, void *ptr, int n)
+{
+    char tmpstr[17];
+    uint64_t *qwptr = ptr;
+    for (int i = 0; i < n; i++, qwptr++) {
+        if ((i % 3) == 0) {
+            strcat(sbuf, "\n  ");
+            strcat(sbuf, ltoa((long)qwptr, 16, 12, tmpstr));
+            strcat(sbuf, ":");
+        }
+        strcat(sbuf, " ");
+        strcat(sbuf, ltoa(*qwptr, 16, 16, tmpstr));
+    }
+    strcat(sbuf, "\n");
+}
+
 #else // 32-bit
-// DumpCPURegister dumps the CPU registers to the screen or serial port
+// DumpCPURegister dumps the CPU registers to sbuf
 //   ctrl = 1 to show cpu control registers
 void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl)
 {
@@ -201,5 +225,38 @@ void DumpCPURegisters(char *sbuf, const struct cpu_reg *reg, int ctrl)
     strcat(sbuf, itoa(reg->gs, 16, 4, nbuf));
     strcat(sbuf, "\n");
 }
-#endif
+#endif // 32-bit
+
+
+#ifdef __x86_64__
+void CPUExceptionHandler(struct cpu_reg *reg, int except, int errcode)
+{
+    char regs[768], stack[384], msg[81], tmpstr[17];
+    char *haltmsg = "system halted.\n";
+
+    strcpy(msg, "\nPANIC: ");
+    strcat(msg, cpu_exception[except]);
+    strcat(msg, ", error code: ");
+    strcat(msg, itoa(errcode, 16, 4, tmpstr));
+    strcat(msg, "\n");
+    DumpCPURegisters(regs, reg, 1);
+    strcpy(stack, "Stack:");
+    DumpMem(stack, (void *)reg->rsp, min(12,(STACK_TOP-reg->rsp)/8));
+    fputs(msg, console);
+    fputs(regs, console);
+    fputs(stack, console);
+    fputs(haltmsg, console);
+    fputs(msg, stdout);
+    fputs(regs, stdout);
+    fputs(stack, stdout);
+    fputs(haltmsg, stdout);
+
+    while (1) {
+        __asm__ __volatile__ (
+            "cli\n\t"
+            "hlt"
+        );
+    }
+}
+#endif // 64-bit
 
