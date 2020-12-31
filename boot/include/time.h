@@ -1,3 +1,6 @@
+#ifndef TIME_H_INCLUDED
+#define TIME_H_INCLUDED
+
 struct time {
     unsigned char second;
     unsigned char minute;
@@ -7,4 +10,4 @@ struct time {
     unsigned int year;
 };
 
-void RTC_GetTime(struct time *now);
+#endif

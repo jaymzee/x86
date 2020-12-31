@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <sys/interrupt.h>
+#include <sys/rtc.h>
 #include <sys/serial.h>
-#include <sys/time.h>
 
 void Main()
 {
