@@ -10,6 +10,10 @@
 #define VIDEOMEM    0xB8000
 
 static char *vga_text = (char *)VIDEOMEM;
+struct virt_kb vkbd;
+char keyboard_buffer[256];
+unsigned char kbbuf_in;
+unsigned char kbbuf_out;
 
 void ClearText(unsigned char attr)
 {
@@ -176,10 +180,6 @@ void DumpKeyboardScan(int scancode)
     strcat(sbuf, chstr);
     WriteText(sbuf);
 }
-
-char keyboard_buffer[256];
-unsigned char kbbuf_in;
-unsigned char kbbuf_out;
 
 char ScanCodeToASCII(int scancode)
 {

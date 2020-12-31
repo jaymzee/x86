@@ -16,7 +16,9 @@ struct virt_kb {
     unsigned int numlock:1;
     unsigned int capslock:1;
     unsigned int state:2;
-} vkbd;
+};
+
+extern struct virt_kb vkbd;
 
 int ScanKeyboard(void);
 void DumpKeyboardScan(int scancode);
