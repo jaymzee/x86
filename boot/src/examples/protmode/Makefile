@@ -1,9 +1,9 @@
 TARGET = boot.img
 OBJECTS = main.o intsetup.o handlers.o
 OBJECTS += crt0.o stdio.o serial.o string.o conio.o kbd_US.o cpu.o interrupt.o
-LIBC = ../../src
-LIBSYS = ../../src/sys
-INCLUDE = ../../include
+LIBC = ../../libc
+LIBSYS = ../../libsys
+INCLUDE = ../../../include
 CC = gcc
 CFLAGS = -g -Os -std=c99 -pedantic -Wall -Werror
 CFLAGS = -m32 -ffreestanding
