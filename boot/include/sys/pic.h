@@ -2,8 +2,8 @@
  * intel 8259 interrupt controller
  */
 
-#ifndef PIC_H_INCLUDED
-#define PIC_H_INCLUDED
+#ifndef SYS_PIC_H_INCLUDED
+#define SYS_PIC_H_INCLUDED
 
 #define PIC1            0x20        // PIC controller 1 base address
 #define PIC2            0xA0        // PIC controller 2 base address

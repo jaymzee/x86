@@ -37,7 +37,6 @@ int main(int argc, char *argv[], char *envp[])
     for (int i = 0; i < 256; i++) {
         DrawLine(i, 0, i, 199, i);
     }
-    SetPixel(100,100,5);
     while (1) {
         print("\npress a key ");
         int c = getchar();

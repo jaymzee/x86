@@ -1,5 +1,5 @@
-#ifndef IDT_H_INCLUDED
-#define IDT_H_INCLUDED
+#ifndef SYS_IDT_H_INCLUDED
+#define SYS_IDT_H_INCLUDED
 
 #include <stdint.h>
 
@@ -49,5 +49,8 @@ static inline void LoadIDT(struct IDTR *idtr)
 
 void IDT_IntGate(struct IDT_entry *d, void (*hndlr)(void), int sel, int dpl);
 void IDT_TrapGate(struct IDT_entry *d, void (*hndlr)(void), int sel, int dpl);
+
+#define IDT_ADDRESS 0x1000
+#define IDTR_ADDRESS 0x2000
 
 #endif /* IDT_H_INCLUDED */

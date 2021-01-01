@@ -1,3 +1,6 @@
+#ifndef SYS_CPU_EXCHANDLERS_H_INCLUDED
+#define SYS_CPU_EXCHANDLERS_H_INCLUDED
+
 void DivbyzeroHandler(void);
 void DebugHandler(void);
 void NMIHandler(void);
@@ -16,8 +19,4 @@ void AlignCheckHandler(void);
 void MachineCheckHandler(void);
 void SIMDFPExceptHandler(void);
 
-// for testing
-void CauseGPFault(void);
-void CausePageFault(void);
-void CauseDivbyzero(void);
-void CauseInvalidOpcode(void);
+#endif

@@ -19,6 +19,6 @@ memory map
     0x00005000 0x00005fff PDPT
     0x00004000 0x00004fff PML4T
     0x00003000 0x00003fff GDT
-    0x00002000 0x00002fff IDTR
-    0x00001000 0x00001fff IDT (long mode)
-    0x00000000 0x000003ff IVT (real mode)
+    0x00002000 0x00002009 IDTR
+    0x00001000 0x00001fff IDT
+    0x00000000 0x000003ff IVT, not mapped in protected mode

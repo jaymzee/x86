@@ -1,5 +1,5 @@
-#ifndef KEYBOARD_H_INCLUDED
-#define KEYBOARD_H_INCLUDED
+#ifndef SYS_KEYBOARD_H_INCLUDED
+#define SYS_KEYBOARD_H_INCLUDED
 
 // state
 //  0 - wait for byte

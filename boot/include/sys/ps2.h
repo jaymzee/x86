@@ -1,5 +1,5 @@
-#ifndef PS2_H_INCLUDED
-#define PS2_H_INCLUDED
+#ifndef SYS_PS2_H_INCLUDED
+#define SYS_PS2_H_INCLUDED
 
 // 8042 PS/2 Controller
 #define KB_DATA     0x60    // Read/Write

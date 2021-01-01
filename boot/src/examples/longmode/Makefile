@@ -1,6 +1,6 @@
 TARGET = boot.img
-OBJECTS = main.o intsetup.o traps.o isr.o
-OBJECTS += crt0.o stdio.o string.o
+OBJECTS = main.o isr.o
+OBJECTS += crt0.o crt1.o stdio.o string.o
 OBJECTS += conio.o kbd_US.o serial.o timer.o interrupt.o cpu.o
 LIBC = ../../libc
 LIBSYS = ../../libsys
@@ -19,6 +19,7 @@ ifeq ($(shell expr $(GCCVERSION) \>= 8), 1)
 endif
 vpath %.c src
 vpath %.asm src
+vpath %.asm $(LIBC)
 vpath %.c $(LIBC)
 vpath %.c $(LIBSYS)
 

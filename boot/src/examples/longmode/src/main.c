@@ -1,11 +1,28 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/conio.h>
+#include <sys/interrupt.h>
 #include <sys/serial.h>
 #include <sys/timer.h>
-#include "intsetup.h"
 #include "isr.h"
-#include "traps.h"
+
+#define CS 0x08
+#define DPL 0
+
+void InstallISRs(void)
+{
+    struct IDT_entry *idt = (void *)IDT_ADDRESS;
+    struct IDTR *idtr = (void *)(IDTR_ADDRESS);
+
+    IDT_IntGate(idt + 0x21, KeyboardHandler, CS, DPL);
+    IDT_IntGate(idt + 0x20, TimerHandler, CS, DPL);
+    idtr->limit = 0x22 * sizeof(struct IDT_entry) - 1;
+
+    LoadIDT(idtr); // also enables cpu interrupts
+
+    PIC_UnmaskIRQ(1); // enable keyboard IRQ
+    PIC_UnmaskIRQ(0); // enable timer IRQ
+}
 
 void ShowTimer(void)
 {
@@ -26,7 +43,7 @@ void ShowTimer(void)
 
 int main(int argc, char *argv[], char *envp[])
 {
-    EnableInterrupts();
+    InstallISRs();
     SetIntervalTimer(60);
     DisableBlinkingText(); // allows 16 background colors
     TextCursorShape(13, 14); // underline
@@ -38,3 +55,4 @@ int main(int argc, char *argv[], char *envp[])
     ShowTimer();
     return 0;
 }
+

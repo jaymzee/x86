@@ -1,6 +1,7 @@
 TARGET = boot.img
 OBJECTS = main.o
-OBJECTS += crt0.o stdio.o conio.o kbd_US.o serial.o string.o graphics.o cpu.o
+OBJECTS += crt0.o crt1.o stdio.o string.o
+OBJECTS += conio.o kbd_US.o serial.o graphics.o interrupt.o cpu.o
 LIBC = ../../libc
 LIBSYS = ../../libsys
 INCLUDE = ../../../include
@@ -19,6 +20,7 @@ endif
 vpath %.asm src
 vpath %.c src
 vpath %.c $(LIBC)
+vpath %.asm $(LIBC)
 vpath %.c $(LIBSYS)
 
 .PHONY: clean run debug

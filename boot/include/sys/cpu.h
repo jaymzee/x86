@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <sys/idt.h>
 
 enum cpu_exception {
     EXC_DIVBYZERO = 0,      // Divide-by-zero Error
