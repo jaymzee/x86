@@ -4,13 +4,11 @@
 #include <sys/cpu.h>
 #include <sys/interrupt.h>
 #include <sys/serial.h>
+#include <sys/timer.h>
 #include "cpuexchndlrs.h"
 
 #define CS 0x08
 #define DPL 0
-
-#define IDT_ENTRIES 32
-#define IDT_SIZE (IDT_ENTRIES * sizeof(struct IDT_entry))
 
 static char *args[1] = {"program"};
 static char *envp[2] = {NULL, NULL};
@@ -20,6 +18,7 @@ void _init_IDT(void);
 void _start(void)
 {
     COM_Init();
+    SetIntervalTimer(60);
 #ifdef __x86_64__
     _init_IDT(); // install CPU Exception handlers
 #endif
@@ -27,6 +26,8 @@ void _start(void)
 }
 
 #ifdef __x86_64__
+
+void SystemTimerHandler(void);
 
 // this sets up the interrupt descriptor tables then enables interrupts
 void _init_IDT(void)
@@ -59,10 +60,14 @@ void _init_IDT(void)
     IDT_TrapGate(idt + EXC_MACHINE, MachineCheckHandler, CS, DPL);
     IDT_TrapGate(idt + EXC_SIMD_FLOAT, SIMDFPExceptHandler, CS, DPL);
 
+    IDT_IntGate(idt + 0x20, SystemTimerHandler, CS, DPL);
+
     idtr->offset = (uint64_t)idt;
-    idtr->limit = IDT_SIZE - 1;
+    idtr->limit = 0x21 * sizeof(struct IDT_entry) - 1;
 
     LoadIDT(idtr); // enable cpu traps
+
+    PIC_UnmaskIRQ(0);
 }
 
 #endif

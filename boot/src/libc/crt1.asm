@@ -182,3 +182,19 @@ CauseDivbyzero:
 CauseInvalidOpcode:
 	ud2
 	ret
+
+	global SystemTimerHandler
+SystemTimerHandler:
+	push	rax
+	mov	al, 0x20
+	out	0x20, al		; issue EOI
+	add	qword [system_time], 16667
+	pop	rax
+	iretq
+
+	section .data
+
+	global system_time
+system_time:
+	dq 0
+

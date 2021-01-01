@@ -1,6 +1,7 @@
 #include <sys/io.h>
 #include <sys/pit.h>
 #include <sys/ps2.h>
+#include <sys/timer.h>
 
 void SetIntervalTimer(int frequency) {
     int divider;
@@ -29,3 +30,13 @@ void NoSound() {
     outb(KB_PORTB, 0);
 }
 
+
+int usleep(unsigned long usec)
+{
+    unsigned long until = system_time + usec;
+
+    while (system_time < until)
+        ;
+
+    return 0;
+}

@@ -15,13 +15,11 @@ void InstallISRs(void)
     struct IDTR *idtr = (void *)(IDTR_ADDRESS);
 
     IDT_IntGate(idt + 0x21, KeyboardHandler, CS, DPL);
-    IDT_IntGate(idt + 0x20, TimerHandler, CS, DPL);
     idtr->limit = 0x22 * sizeof(struct IDT_entry) - 1;
 
     LoadIDT(idtr); // also enables cpu interrupts
 
     PIC_UnmaskIRQ(1); // enable keyboard IRQ
-    PIC_UnmaskIRQ(0); // enable timer IRQ
 }
 
 void ShowTimer(void)
@@ -33,18 +31,18 @@ void ShowTimer(void)
         int ch = getchar();
         println("");
         print("timer_count: ");
-        println(itoa(timer_count, 10, 0, buf));
-        if (ch == 'b')
+        println(ltoa(system_time, 10, 0, buf));
+        if (ch == 'b') {
             Beep(1000);
-        if (ch == 's')
+            usleep(100*1000);
             NoSound();
+        }
     }
 }
 
 int main(int argc, char *argv[], char *envp[])
 {
     InstallISRs();
-    SetIntervalTimer(60);
     DisableBlinkingText(); // allows 16 background colors
     TextCursorShape(13, 14); // underline
     ClearText(0x07);

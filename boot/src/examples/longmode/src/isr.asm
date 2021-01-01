@@ -31,18 +31,3 @@ KeyboardHandler:
 	pop	rax
 	iretq
 
-	global TimerHandler
-TimerHandler:
-	push	rax
-	mov	al, 0x20
-	out	0x20, al		; issue EOI
-	inc	dword [timer_count]
-	pop	rax
-	iretq
-
-	section .data
-
-	global timer_count
-timer_count:
-	dd 0
-
