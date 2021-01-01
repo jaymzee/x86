@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include <sys/conio.h>
 #include <sys/interrupt.h>
-#include <sys/serial.h>
+#include <sys/test.h>
 #include <sys/timer.h>
 #include "isr.h"
 
@@ -22,35 +21,38 @@ void InstallISRs(void)
     PIC_UnmaskIRQ(1); // enable keyboard IRQ
 }
 
-void ShowTimer(void)
+void Menu(void)
 {
-    char buf[80];
+    char sbuf[32];
 
+    println("long mode demo");
     while (1) {
         print("press a key ");
         int ch = getchar();
         println("");
-        print("timer_count: ");
-        println(ltoa(system_time, 10, 0, buf));
-        if (ch == 'b') {
+        print("system timer: ");
+        println(ltoa(system_time, 10, 0, sbuf));
+        switch (ch) {
+        case 'b':
             Beep(1000);
             usleep(100*1000);
             NoSound();
+            break;
+        case 'd':
+            CauseDivbyzero();
+            break;
+        case 'p':
+            CausePageFault();
+            break;
         }
     }
 }
 
 int main(int argc, char *argv[], char *envp[])
 {
-    InstallISRs();
-    DisableBlinkingText(); // allows 16 background colors
-    TextCursorShape(13, 14); // underline
-    ClearText(0x07);
-    fputs("long mode (x64) entered sucessfully!\n", console);
     fputs("connect to serial 0 (COM1) for the console\n", console);
-    fputs("bang on the keyboard to show scan codes\n", console);
-    println("long mode demo");
-    ShowTimer();
+    InstallISRs(); // install keyboard handler
+    Menu();
     return 0;
 }
 
