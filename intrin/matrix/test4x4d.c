@@ -24,7 +24,7 @@ int main()
     y = m4x4v_rd(a, x);
     print_m256d(y);
 
-    printf("success!");
+    printf("success!\n");
 
     return 0;
 }
