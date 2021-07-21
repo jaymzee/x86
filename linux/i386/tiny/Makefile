@@ -1,5 +1,5 @@
 ASFLAGS = -felf
-LDFLAGS = -s -n -melf_i386
+LDFLAGS = -n -melf_i386 -s
 
 tiny: tiny.o
 	ld $(LDFLAGS) -o $@ $<
